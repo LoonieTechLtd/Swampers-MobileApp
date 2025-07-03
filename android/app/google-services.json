@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "968299498317",
+    "project_id": "swamper-solutions",
+    "storage_bucket": "swamper-solutions.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:968299498317:android:ae34b5e7bf3266f3eb0504",
+        "android_client_info": {
+          "package_name": "com.example.swamper_solution"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANp1EKFvG1_Lh7LKimjS-Rl_-fkLThY7o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
