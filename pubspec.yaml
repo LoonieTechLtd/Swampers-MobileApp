@@ -46,6 +46,7 @@ dependencies:
   google_sign_in: ^6.3.0
   dotted_border: ^3.0.1
   email_otp: ^3.0.2
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:

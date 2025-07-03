@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
+import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/controllers/kyc_controller.dart';
 import 'package:swamper_solution/models/crimers_model.dart';
 import 'package:swamper_solution/models/individual_kyc_model.dart';
@@ -15,6 +17,7 @@ import 'package:swamper_solution/views/custom_widgets/custom_drop_down.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_textfield.dart';
 import 'package:swamper_solution/views/custom_widgets/date_picker_bottom_sheet.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class IndividualKycApplicationScreen extends ConsumerStatefulWidget {
   const IndividualKycApplicationScreen({super.key});
@@ -57,6 +60,8 @@ class _IndividualKycApplicationScreenState
   DateTime? dateOfSentence;
   bool isLoading = false;
   bool haveAgreedCanabasPolicy = false;
+  bool haveAgreedToAntiViolancePolicy = false;
+  bool haveAgreedToPrivacyPolicy = false;
 
   final List<String> genders = ["Male", "Female"];
 
@@ -111,6 +116,14 @@ class _IndividualKycApplicationScreenState
   XFile? permitDoc;
   XFile? govIdDoc;
   XFile? voidChequeDoc;
+
+  // go to URl
+  Future<void> goToUrl(String uri) async {
+    final Uri url = Uri.parse(uri);
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
+    }
+  }
 
   // to pick doc images
   Future<void> pickImage(String docType) async {
@@ -709,13 +722,121 @@ class _IndividualKycApplicationScreenState
 
                       CustomDivider(text: "Cannabas Policy"),
 
-                      Checkbox(
-                        value: haveAgreedCanabasPolicy,
-                        onChanged: (value) {
-                          setState(() {
-                            haveAgreedCanabasPolicy = value!;
-                          });
-                        },
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: haveAgreedCanabasPolicy,
+                            onChanged: (value) {
+                              setState(() {
+                                haveAgreedCanabasPolicy = value!;
+                              });
+                            },
+                          ),
+                          Flexible(
+                            child: RichText(
+                              text: TextSpan(
+                                style: CustomTextStyles.lightText.copyWith(
+                                  color: Colors.black,
+                                ),
+                                children: [
+                                  const TextSpan(text: 'Agree to all the '),
+                                  TextSpan(
+                                    recognizer:
+                                        TapGestureRecognizer()
+                                          ..onTap = () {
+                                            goToUrl(
+                                              "https://swampersolutions.com/Cannabis-Policy",
+                                            );
+                                          },
+                                    text:
+                                        'Recreational Cannabis Policy of Swamper',
+                                    style: CustomTextStyles.lightText.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors().primaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: haveAgreedToAntiViolancePolicy,
+                            onChanged: (value) {
+                              setState(() {
+                                haveAgreedToAntiViolancePolicy = value!;
+                              });
+                            },
+                          ),
+                          Flexible(
+                            child: RichText(
+                              text: TextSpan(
+                                style: CustomTextStyles.lightText.copyWith(
+                                  color: Colors.black,
+                                ),
+                                children: [
+                                  const TextSpan(text: 'Agree to all the '),
+                                  TextSpan(
+                                    recognizer:
+                                        TapGestureRecognizer()
+                                          ..onTap = () {
+                                            goToUrl(
+                                              "https://swampersolutions.com/Anti-violence-Policy",
+                                            );
+                                          },
+                                    text: 'Anti-violance Policy of Swamper',
+                                    style: CustomTextStyles.lightText.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors().primaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: haveAgreedToPrivacyPolicy,
+                            onChanged: (value) {
+                              setState(() {
+                                haveAgreedToPrivacyPolicy = value!;
+                              });
+                            },
+                          ),
+                          Flexible(
+                            child: RichText(
+                              text: TextSpan(
+                                style: CustomTextStyles.lightText.copyWith(
+                                  color: Colors.black,
+                                ),
+                                children: [
+                                  const TextSpan(text: 'Agree to all the '),
+                                  TextSpan(
+                                    recognizer:
+                                        TapGestureRecognizer()
+                                          ..onTap = () {
+                                            goToUrl(
+                                              "https://swampersolutions.com/Privacy-Policy",
+                                            );
+                                          },
+                                    text: 'Privacy Policy of Swamper',
+                                    style: CustomTextStyles.lightText.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors().primaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
 
                       CustomButton(
@@ -746,6 +867,16 @@ class _IndividualKycApplicationScreenState
                               backgroundColor: Colors.red,
                             );
                             return;
+                          }
+                          if (haveAgreedCanabasPolicy == false ||
+                              haveAgreedToAntiViolancePolicy == false ||
+                              haveAgreedToPrivacyPolicy == false) {
+                            showCustomSnackBar(
+                              context: context,
+                              message:
+                                  "Must mark all the agreement to continue",
+                              backgroundColor: AppColors().red,
+                            );
                           }
 
                           setState(() {

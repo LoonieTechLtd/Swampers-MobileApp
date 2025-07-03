@@ -1,5 +1,6 @@
 import 'package:email_otp/email_otp.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,13 +12,23 @@ import 'package:swamper_solution/services/notificiation_services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseMessaging.instance.requestPermission();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await NotificiationServices.initilizeLocalNotifications();
-   EmailOTP.config(
+  EmailOTP.config(
     appName: 'Swamper Solution',
     otpType: OTPType.numeric,
     emailTheme: EmailTheme.v4,
   );
   runApp(ProviderScope(child: MyApp()));
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  NotificiationServices.showNotification(
+    title: message.notification!.title.toString(),
+    body: message.notification!.body.toString(),
+  );
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -37,10 +48,15 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     FirebaseAuth.instance.authStateChanges().listen((user) {
       if (mounted) {
-        setState(() {
-        
-        });
+        setState(() {});
       }
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      NotificiationServices.showNotification(
+        title: message.notification?.title ?? 'Notification',
+        body: message.notification?.body ?? '',
+      );
     });
   }
 
@@ -53,9 +69,9 @@ class _MyAppState extends ConsumerState<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         appBarTheme: AppBarTheme(
-          titleTextStyle: CustomTextStyles.title.copyWith(color: Colors.black)
-        )
-      )
+          titleTextStyle: CustomTextStyles.title.copyWith(color: Colors.black),
+        ),
+      ),
     );
   }
 }
