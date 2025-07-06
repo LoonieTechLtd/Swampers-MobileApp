@@ -88,3 +88,7 @@ final kycStatusProvider = FutureProvider((ref) {
     FirebaseAuth.instance.currentUser!.uid,
   );
 });
+
+final getKycData = FutureProvider((ref) {
+  return KycController().getKycData();
+});

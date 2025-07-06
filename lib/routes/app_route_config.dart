@@ -11,6 +11,8 @@ import 'package:swamper_solution/views/company_views/company_kyc_application_scr
 import 'package:swamper_solution/views/company_views/posted_job_details_screen.dart';
 import 'package:swamper_solution/views/individual_views/individual_kyc_application_screen.dart';
 import 'package:swamper_solution/views/individual_views/job_details_screen.dart';
+import 'package:swamper_solution/views/individual_views/kyc_review_screen.dart';
+import 'package:swamper_solution/views/individual_views/edit_kyc_screen.dart';
 import 'package:swamper_solution/views/individual_views/kyc_status_screen.dart';
 import 'package:swamper_solution/views/individual_views/notification_screen.dart';
 import 'package:swamper_solution/views/common/landing_screen.dart';
@@ -49,7 +51,6 @@ class AppRouteConfig {
         name: 'reset_password',
         builder: (context, state) => const ResetPasswordScreen(),
       ),
-    
 
       // Individual user routes
       GoRoute(
@@ -88,6 +89,16 @@ class AppRouteConfig {
             builder: (context, state) {
               return NotificationScreen();
             },
+          ),
+          GoRoute(
+            path: 'kyc_review',
+            name: 'kyc_review',
+            builder: (context, state) => const KycReviewScreen(),
+          ),
+          GoRoute(
+            path: 'edit_kyc',
+            name: 'edit_kyc',
+            builder: (context, state) => const EditKycScreen(),
           ),
         ],
       ),

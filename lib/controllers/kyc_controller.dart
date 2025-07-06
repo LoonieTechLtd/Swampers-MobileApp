@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
@@ -8,9 +9,13 @@ import 'package:swamper_solution/models/individual_model.dart';
 class KycController {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   FirebaseStorage storage = FirebaseStorage.instance;
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   // to apply kyc
-  Future<bool> applyKyc(IndividualKycModel newKyc, IndividualModel individualData) async {
+  Future<bool> applyKyc(
+    IndividualKycModel newKyc,
+    IndividualModel individualData,
+  ) async {
     try {
       await firestore
           .collection("kycApplications")
@@ -26,11 +31,7 @@ class KycController {
   }
 
   // method to upload KYC doc images
-  Future<String?> uploadDoc(
-    String uid,
-    XFile image,
-    String docType,
-  ) async {
+  Future<String?> uploadDoc(String uid, XFile image, String docType) async {
     try {
       final storageRef = FirebaseStorage.instance
           .ref()
@@ -40,6 +41,25 @@ class KycController {
       return await storageRef.getDownloadURL();
     } catch (e) {
       debugPrint('Failed to upload Image: $e');
+      return null;
+    }
+  }
+
+  // get kyc model
+  Future<IndividualKycModel?> getKycData() async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> doc =
+          await firestore
+              .collection("kycApplications")
+              .doc(auth.currentUser!.uid)
+              .get();
+
+      if (doc.exists) {
+        return IndividualKycModel.fromMap(doc.data()!);
+      }
+      return null;
+    } catch (e) {
+      debugPrint("Unable to load Kyc data: ${e.toString()}");
       return null;
     }
   }
@@ -56,6 +76,22 @@ class KycController {
       return false;
     }
   }
+
+  // update kyc application
+  Future<bool> updateKycApplication(IndividualKycModel updatedKyc) async {
+    try {
+      await firestore
+          .collection("kycApplications")
+          .doc(auth.currentUser!.uid)
+          .update(updatedKyc.toMap());
+      return true;
+    } catch (e) {
+      debugPrint("Failed to update kyc $e");
+      return false;
+    }
+  }
+
+
 
   // to check if the kyc application is there
   Future<bool> haveKycApplication(String uid) async {

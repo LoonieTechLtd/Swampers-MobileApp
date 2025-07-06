@@ -87,7 +87,10 @@ class JobModel {
       ),
       postedDate: map['postedDate'] as String,
       companyId: map['companyId'] as String,
-      hourlyIncome: map['hourlyIncome'] as double,
+      hourlyIncome: 
+          (map['hourlyIncome'] is int)
+              ? (map['hourlyIncome'] as int).toDouble()
+              : (map['hourlyIncome'] as num).toDouble(),
       jobStatus: map['jobStatus'] as String,
     );
   }

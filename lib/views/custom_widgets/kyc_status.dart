@@ -4,11 +4,16 @@ import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/models/individual_model.dart';
+import 'package:swamper_solution/views/individual_views/kyc_review_screen.dart';
 
 class KycStatus extends StatelessWidget {
   final IndividualModel data;
   final VoidCallback onTap;
-  const KycStatus({super.key, required this.data, required this.onTap});
+  const KycStatus({
+    super.key,
+    required this.data,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +32,12 @@ class KycStatus extends StatelessWidget {
         text: "KYC application is Pending",
         icon: FeatherIcons.clock,
         backgroundColor: Colors.green,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => KycReviewScreen()),
+          );
+        },
       );
     }
     if (data.kycVerified == "approved") {

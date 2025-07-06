@@ -340,7 +340,7 @@ class _IndividualKycApplicationScreenState
                           if (value == null || value.isEmpty) {
                             return 'Please enter your SIN no';
                           }
-                          if (value.length > 9 || value.length < 9) {
+                          if (value.length != 9) {
                             return 'Invalid SIN no';
                           }
                           return null;
@@ -858,6 +858,7 @@ class _IndividualKycApplicationScreenState
                               message: "Please Select your Mode of Travel",
                               backgroundColor: AppColors().red,
                             );
+                            return;
                           }
 
                           if (permitDoc == null || govIdDoc == null) {
@@ -877,6 +878,7 @@ class _IndividualKycApplicationScreenState
                                   "Must mark all the agreement to continue",
                               backgroundColor: AppColors().red,
                             );
+                            return;
                           }
 
                           setState(() {
