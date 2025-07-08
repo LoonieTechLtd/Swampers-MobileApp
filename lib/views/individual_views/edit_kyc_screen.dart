@@ -260,6 +260,9 @@ class _IndividualKycApplicationScreenState
                   setState(() {
                     localCrimeList.add(crime);
                   });
+                  offenceController.clear();
+                  dateOfSentence = null;
+                  courtLocationController.clear();
                 }
 
                 void removeCrime(int index) {
@@ -424,7 +427,7 @@ class _IndividualKycApplicationScreenState
                       CustomTextfield(
                         hintText: "SIN Expiry",
                         controller:
-                            sinExpiryController..text = kycData.sinExpery,
+                            sinExpiryController..text = kycData.sinExpiry,
                         obscureText: false,
                         textInputType: TextInputType.text,
                       ),
@@ -488,8 +491,7 @@ class _IndividualKycApplicationScreenState
 
                       CustomTextfield(
                         hintText: "Bank Code",
-                        controller:
-                            backCodeController..text = kycData.banckCode,
+                        controller: backCodeController..text = kycData.bankCode,
                         obscureText: false,
                         textInputType: TextInputType.text,
                         validator: (value) {
@@ -540,7 +542,7 @@ class _IndividualKycApplicationScreenState
                       CustomTextfield(
                         hintText: "Account No",
                         controller:
-                            accountNoController..text = kycData.backAccNumber,
+                            accountNoController..text = kycData.bankAccNumber,
                         obscureText: false,
                         textInputType: TextInputType.number,
                         validator: (value) {
@@ -563,6 +565,26 @@ class _IndividualKycApplicationScreenState
                         ],
                       ),
                       CustomDivider(text: "Criminal Records"),
+
+                      Row(
+                        children: [
+                          Text(
+                            "Do you have a criminal record?",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Switch(
+                            value: localHaveCriminalRecord ?? false,
+                            onChanged: (val) {
+                              setState(() {
+                                localHaveCriminalRecord = val;
+                                if (!val) {
+                                  localCrimeList.clear();
+                                }
+                              });
+                            },
+                          ),
+                        ],
+                      ),
 
                       Card(
                         elevation: 0,
@@ -702,13 +724,13 @@ class _IndividualKycApplicationScreenState
                                 dob: k.dob,
                                 gender: k.gender,
                                 sinNumber: sinController.text,
-                                sinExpery: sinExpiryController.text,
+                                sinExpiry: sinExpiryController.text,
                                 transitNumber: transitController.text,
                                 institutionNumber: institutionController.text,
                                 institutionName: institutionNameController.text,
                                 voidCheque: voidChequeImage ?? k.voidCheque,
-                                banckCode: backCodeController.text,
-                                backAccNumber: accountNoController.text,
+                                bankCode: backCodeController.text,
+                                bankAccNumber: accountNoController.text,
                                 statusInCanada:
                                     selectedStatusInCanada ?? k.statusInCanada,
                                 permitImage: permitImage ?? k.permitImage,

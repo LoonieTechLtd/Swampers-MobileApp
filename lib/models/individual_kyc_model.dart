@@ -1,6 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+
 import 'package:swamper_solution/models/crimers_model.dart';
 import 'package:swamper_solution/models/individual_model.dart';
 
@@ -9,13 +11,13 @@ class IndividualKycModel {
   final String dob;
   final String gender;
   final String sinNumber;
-  final String sinExpery;
+  final String sinExpiry;
   final String transitNumber;
   final String institutionNumber;
   final String institutionName;
   final String voidCheque;
-  final String banckCode;
-  final String backAccNumber;
+  final String bankCode;
+  final String bankAccNumber;
   final String statusInCanada;
   final String permitImage;
   final String govDocImage;
@@ -31,13 +33,13 @@ class IndividualKycModel {
     required this.dob,
     required this.gender,
     required this.sinNumber,
-    required this.sinExpery,
+    required this.sinExpiry,
     required this.transitNumber,
     required this.institutionNumber,
     required this.institutionName,
     required this.voidCheque,
-    required this.banckCode,
-    required this.backAccNumber,
+    required this.bankCode,
+    required this.bankAccNumber,
     required this.statusInCanada,
     required this.permitImage,
     required this.govDocImage,
@@ -55,13 +57,13 @@ class IndividualKycModel {
     String? dob,
     String? gender,
     String? sinNumber,
-    String? sinExpery,
+    String? sinExpiry,
     String? transitNumber,
     String? institutionNumber,
     String? institutionName,
     String? voidCheque,
-    String? banckCode,
-    String? backAccNumber,
+    String? bankCode,
+    String? bankAccNumber,
     String? statusInCanada,
     String? permitImage,
     String? govDocImage,
@@ -78,13 +80,13 @@ class IndividualKycModel {
       dob: dob ?? this.dob,
       gender: gender ?? this.gender,
       sinNumber: sinNumber ?? this.sinNumber,
-      sinExpery: sinExpery ?? this.sinExpery,
+      sinExpiry: sinExpiry ?? this.sinExpiry,
       transitNumber: transitNumber ?? this.transitNumber,
       institutionNumber: institutionNumber ?? this.institutionNumber,
       institutionName: institutionName ?? this.institutionName,
       voidCheque: voidCheque ?? this.voidCheque,
-      banckCode: banckCode ?? this.banckCode,
-      backAccNumber: backAccNumber ?? this.backAccNumber,
+      bankCode: bankCode ?? this.bankCode,
+      bankAccNumber: bankAccNumber ?? this.bankAccNumber,
       statusInCanada: statusInCanada ?? this.statusInCanada,
       permitImage: permitImage ?? this.permitImage,
       govDocImage: govDocImage ?? this.govDocImage,
@@ -104,13 +106,13 @@ class IndividualKycModel {
       'dob': dob,
       'gender': gender,
       'sinNumber': sinNumber,
-      'sinExpery': sinExpery,
+      'sinExpiry': sinExpiry,
       'transitNumber': transitNumber,
       'institutionNumber': institutionNumber,
       'institutionName': institutionName,
       'voidCheque': voidCheque,
-      'banckCode': banckCode,
-      'backAccNumber': backAccNumber,
+      'bankCode': bankCode,
+      'bankAccNumber': bankAccNumber,
       'statusInCanada': statusInCanada,
       'permitImage': permitImage,
       'govDocImage': govDocImage,
@@ -126,19 +128,17 @@ class IndividualKycModel {
 
   factory IndividualKycModel.fromMap(Map<String, dynamic> map) {
     return IndividualKycModel(
-      userInfo: IndividualModel.fromMap(
-        map['userInfo'] as Map<String, dynamic>,
-      ),
+      userInfo: IndividualModel.fromMap(map['userInfo'] as Map<String,dynamic>),
       dob: map['dob'] as String? ?? "",
       gender: map['gender'] as String? ?? "",
       sinNumber: map['sinNumber'] as String? ?? "",
-      sinExpery: map['sinExpery'] as String? ?? "",
+      sinExpiry: map['sinExpiry'] as String? ?? "",
       transitNumber: map['transitNumber'] as String? ?? "",
       institutionNumber: map['institutionNumber'] as String? ?? "",
       institutionName: map['institutionName'] as String? ?? "",
       voidCheque: map['voidCheque'] as String? ?? "",
-      banckCode: map['banckCode'] as String? ?? "",
-      backAccNumber: map['backAccNumber'] as String? ?? "",
+      bankCode: map['bankCode'] as String? ?? "",
+      bankAccNumber: map['bankAccNumber'] as String? ?? "",
       statusInCanada: map['statusInCanada'] as String? ?? "",
       permitImage: map['permitImage'] as String? ?? "",
       govDocImage: map['govDocImage'] as String? ?? "",
@@ -161,63 +161,63 @@ class IndividualKycModel {
 
   String toJson() => json.encode(toMap());
 
-  factory IndividualKycModel.fromJson(String source) =>
-      IndividualKycModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory IndividualKycModel.fromJson(String source) => IndividualKycModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'IndividualKycModel(userInfo: $userInfo, dob: $dob, gender: $gender, sinNumber: $sinNumber, sinExpery: $sinExpery, transitNumber: $transitNumber, institutionNumber: $institutionNumber, institutionName: $institutionName, voidCheque: $voidCheque, banckCode: $banckCode, backAccNumber: $backAccNumber, statusInCanada: $statusInCanada, permitImage: $permitImage, govDocImage: $govDocImage, aptNo: $aptNo, emergencyContactNo: $emergencyContactNo, emergencyContactName: $emergencyContactName, modeOfTravel: $modeOfTravel, postalCode: $postalCode, haveCriminalRecord: $haveCriminalRecord, crimes: $crimes)';
+    return 'IndividualKycModel(userInfo: $userInfo, dob: $dob, gender: $gender, sinNumber: $sinNumber, sinExpiry: $sinExpiry, transitNumber: $transitNumber, institutionNumber: $institutionNumber, institutionName: $institutionName, voidCheque: $voidCheque, bankCode: $bankCode, bankAccNumber: $bankAccNumber, statusInCanada: $statusInCanada, permitImage: $permitImage, govDocImage: $govDocImage, aptNo: $aptNo, emergencyContactNo: $emergencyContactNo, emergencyContactName: $emergencyContactName, modeOfTravel: $modeOfTravel, postalCode: $postalCode, haveCriminalRecord: $haveCriminalRecord, crimes: $crimes)';
   }
 
   @override
   bool operator ==(covariant IndividualKycModel other) {
     if (identical(this, other)) return true;
-
-    return other.userInfo == userInfo &&
-        other.dob == dob &&
-        other.gender == gender &&
-        other.sinNumber == sinNumber &&
-        other.sinExpery == sinExpery &&
-        other.transitNumber == transitNumber &&
-        other.institutionNumber == institutionNumber &&
-        other.institutionName == institutionName &&
-        other.voidCheque == voidCheque &&
-        other.banckCode == banckCode &&
-        other.backAccNumber == backAccNumber &&
-        other.statusInCanada == statusInCanada &&
-        other.permitImage == permitImage &&
-        other.govDocImage == govDocImage &&
-        other.aptNo == aptNo &&
-        other.emergencyContactNo == emergencyContactNo &&
-        other.emergencyContactName == emergencyContactName &&
-        other.modeOfTravel == modeOfTravel &&
-        other.postalCode == postalCode &&
-        other.haveCriminalRecord == haveCriminalRecord &&
-        listEquals(other.crimes, crimes);
+  
+    return 
+      other.userInfo == userInfo &&
+      other.dob == dob &&
+      other.gender == gender &&
+      other.sinNumber == sinNumber &&
+      other.sinExpiry == sinExpiry &&
+      other.transitNumber == transitNumber &&
+      other.institutionNumber == institutionNumber &&
+      other.institutionName == institutionName &&
+      other.voidCheque == voidCheque &&
+      other.bankCode == bankCode &&
+      other.bankAccNumber == bankAccNumber &&
+      other.statusInCanada == statusInCanada &&
+      other.permitImage == permitImage &&
+      other.govDocImage == govDocImage &&
+      other.aptNo == aptNo &&
+      other.emergencyContactNo == emergencyContactNo &&
+      other.emergencyContactName == emergencyContactName &&
+      other.modeOfTravel == modeOfTravel &&
+      other.postalCode == postalCode &&
+      other.haveCriminalRecord == haveCriminalRecord &&
+      listEquals(other.crimes, crimes);
   }
 
   @override
   int get hashCode {
     return userInfo.hashCode ^
-        dob.hashCode ^
-        gender.hashCode ^
-        sinNumber.hashCode ^
-        sinExpery.hashCode ^
-        transitNumber.hashCode ^
-        institutionNumber.hashCode ^
-        institutionName.hashCode ^
-        voidCheque.hashCode ^
-        banckCode.hashCode ^
-        backAccNumber.hashCode ^
-        statusInCanada.hashCode ^
-        permitImage.hashCode ^
-        govDocImage.hashCode ^
-        aptNo.hashCode ^
-        emergencyContactNo.hashCode ^
-        emergencyContactName.hashCode ^
-        modeOfTravel.hashCode ^
-        postalCode.hashCode ^
-        haveCriminalRecord.hashCode ^
-        crimes.hashCode;
+      dob.hashCode ^
+      gender.hashCode ^
+      sinNumber.hashCode ^
+      sinExpiry.hashCode ^
+      transitNumber.hashCode ^
+      institutionNumber.hashCode ^
+      institutionName.hashCode ^
+      voidCheque.hashCode ^
+      bankCode.hashCode ^
+      bankAccNumber.hashCode ^
+      statusInCanada.hashCode ^
+      permitImage.hashCode ^
+      govDocImage.hashCode ^
+      aptNo.hashCode ^
+      emergencyContactNo.hashCode ^
+      emergencyContactName.hashCode ^
+      modeOfTravel.hashCode ^
+      postalCode.hashCode ^
+      haveCriminalRecord.hashCode ^
+      crimes.hashCode;
   }
 }

@@ -91,8 +91,6 @@ class KycController {
     }
   }
 
-
-
   // to check if the kyc application is there
   Future<bool> haveKycApplication(String uid) async {
     try {

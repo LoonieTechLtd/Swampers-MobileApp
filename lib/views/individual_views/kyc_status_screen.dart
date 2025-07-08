@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
@@ -30,14 +31,16 @@ class KycStatusScreen extends StatelessWidget {
               ),
               SizedBox(height: 40),
               Text(
-                "You have submitted the your KYC Application.",
+                "You have submitted your KYC Application.",
                 style: CustomTextStyles.h3,
               ),
               Text("Swamper will review and verify you shortly."),
               SizedBox(height: 80),
               CustomButton(
                 backgroundColor: AppColors().primaryColor,
-                onPressed: () {},
+                onPressed: () {
+                  context.pushNamed("kyc_review");
+                },
                 text: "Review your KYC",
                 textColor: Colors.white,
               ),

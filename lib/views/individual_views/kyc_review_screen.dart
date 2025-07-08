@@ -53,11 +53,11 @@ class KycReviewScreen extends ConsumerWidget {
                   'Bank Details',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                _infoRow('Bank Code', kyc.banckCode),
+                _infoRow('Bank Code', kyc.bankCode),
                 _infoRow('Institution No', kyc.institutionNumber),
                 _infoRow('Institution Name', kyc.institutionName),
                 _infoRow('Transit No', kyc.transitNumber),
-                _infoRow('Account No', kyc.backAccNumber),
+                _infoRow('Account No', kyc.bankAccNumber),
                 const Divider(),
                 Text(
                   'Documents',
@@ -79,7 +79,7 @@ class KycReviewScreen extends ConsumerWidget {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 _infoRow('SIN Number', kyc.sinNumber),
-                _infoRow('SIN Expiry', kyc.sinExpery),
+                _infoRow('SIN Expiry', kyc.sinExpiry),
                 const Divider(),
                 Text(
                   'Criminal Record',

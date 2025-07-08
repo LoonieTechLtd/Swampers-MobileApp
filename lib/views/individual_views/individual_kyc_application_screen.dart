@@ -852,6 +852,15 @@ class _IndividualKycApplicationScreenState
                             );
                             return;
                           }
+
+                          if (selectedGender == null) {
+                            showCustomSnackBar(
+                              context: context,
+                              message: "Please Select your gender",
+                              backgroundColor: AppColors().red,
+                            );
+                            return;
+                          }
                           if (selectedModeOfTravel == null) {
                             showCustomSnackBar(
                               context: context,
@@ -861,10 +870,10 @@ class _IndividualKycApplicationScreenState
                             return;
                           }
 
-                          if (permitDoc == null || govIdDoc == null) {
+                          if (permitDoc == null || govIdDoc == null || voidChequeDoc == null) {
                             showCustomSnackBar(
                               context: context,
-                              message: "Please Upload Both documents",
+                              message: "Please all documents images",
                               backgroundColor: Colors.red,
                             );
                             return;
@@ -885,35 +894,34 @@ class _IndividualKycApplicationScreenState
                             isLoading = true;
                           });
 
-                          final IndividualKycModel kycApplication =
-                              IndividualKycModel(
-                                userInfo: userData,
-                                dob: selectedDate!.toString(),
-                                gender: selectedGender!,
-                                sinNumber: sinController.text.trim(),
-                                sinExpery: sinExpiryController.text.trim(),
-                                transitNumber: transitController.text.trim(),
-                                institutionNumber:
-                                    institutionController.text.trim(),
-                                backAccNumber: accountNoController.text.trim(),
-                                statusInCanada: selectedStatusInCanada!,
-                                permitImage: permitImage!,
-                                govDocImage: govDocImage!,
-                                institutionName:
-                                    institutionNameController.text.trim(),
-                                voidCheque: voidChequeImage!,
-                                banckCode: backCodeController.text.trim(),
-                                aptNo: aptNoController.text.trim(),
-                                emergencyContactNo:
-                                    emergencyContactNumberController.text
-                                        .trim(),
-                                emergencyContactName:
-                                    emergencyContactNameController.text.trim(),
-                                modeOfTravel: selectedModeOfTravel!,
-                                postalCode: postalCodeController.text.trim(),
-                                haveCriminalRecord: ref.read(criminalProvider),
-                                crimes: ref.read(crimeListProvider),
-                              );
+                          final IndividualKycModel
+                          kycApplication = IndividualKycModel(
+                            userInfo: userData.copyWith(kycVerified: "pending"),
+                            dob: selectedDate!.toString(),
+                            gender: selectedGender!,
+                            sinNumber: sinController.text.trim(),
+                            sinExpiry: sinExpiryController.text.trim(),
+                            transitNumber: transitController.text.trim(),
+                            institutionNumber:
+                                institutionController.text.trim(),
+                            bankAccNumber: accountNoController.text.trim(),
+                            statusInCanada: selectedStatusInCanada!,
+                            permitImage: permitImage!,
+                            govDocImage: govDocImage!,
+                            institutionName:
+                                institutionNameController.text.trim(),
+                            voidCheque: voidChequeImage!,
+                            bankCode: backCodeController.text.trim(),
+                            aptNo: aptNoController.text.trim(),
+                            emergencyContactNo:
+                                emergencyContactNumberController.text.trim(),
+                            emergencyContactName:
+                                emergencyContactNameController.text.trim(),
+                            modeOfTravel: selectedModeOfTravel!,
+                            postalCode: postalCodeController.text.trim(),
+                            haveCriminalRecord: ref.read(criminalProvider),
+                            crimes: ref.read(crimeListProvider),
+                          );
 
                           final status = await KycController().applyKyc(
                             kycApplication,
