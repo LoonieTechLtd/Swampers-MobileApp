@@ -749,6 +749,7 @@ class _IndividualKycApplicationScreenState
                                     (localHaveCriminalRecord ?? false)
                                         ? localCrimeList
                                         : [],
+                                appliedDate: kycData.appliedDate,
                               );
 
                           final msg = await KycController()

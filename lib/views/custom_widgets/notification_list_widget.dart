@@ -4,7 +4,13 @@ import 'package:swamper_solution/models/notification_model.dart';
 
 class NotificationListWidget extends StatelessWidget {
   final NotificationModel notification;
-  const NotificationListWidget({super.key, required this.notification});
+
+  final VoidCallback notificationToggle;
+  const NotificationListWidget({
+    super.key,
+    required this.notification,
+    required this.notificationToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +40,7 @@ class NotificationListWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      notification.timeStamp.toString(),
+                      notification.body.toString(),
                       style: CustomTextStyles.description.copyWith(
                         color: Colors.black54,
                       ),
@@ -48,7 +54,13 @@ class NotificationListWidget extends StatelessWidget {
           Positioned(
             bottom: -10,
             right: 0,
-            child: TextButton(onPressed: () {}, child: Text("Mark as Read")),
+            child: TextButton(
+              onPressed: notificationToggle,
+              child:
+                  notification.read
+                      ? Text("Mark as Unread")
+                      : Text("Mark as Read"),
+            ),
           ),
         ],
       ),

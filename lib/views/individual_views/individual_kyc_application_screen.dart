@@ -921,6 +921,7 @@ class _IndividualKycApplicationScreenState
                             postalCode: postalCodeController.text.trim(),
                             haveCriminalRecord: ref.read(criminalProvider),
                             crimes: ref.read(crimeListProvider),
+                            appliedDate: DateTime.now().toString()
                           );
 
                           final status = await KycController().applyKyc(

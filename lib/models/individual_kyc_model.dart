@@ -28,6 +28,7 @@ class IndividualKycModel {
   final String postalCode;
   final bool haveCriminalRecord;
   final List<CrimersModel>? crimes;
+  final String appliedDate;
   IndividualKycModel({
     required this.userInfo,
     required this.dob,
@@ -50,6 +51,7 @@ class IndividualKycModel {
     required this.postalCode,
     required this.haveCriminalRecord,
     this.crimes,
+    required this.appliedDate,
   });
 
   IndividualKycModel copyWith({
@@ -74,6 +76,7 @@ class IndividualKycModel {
     String? postalCode,
     bool? haveCriminalRecord,
     List<CrimersModel>? crimes,
+    String? appliedDate,
   }) {
     return IndividualKycModel(
       userInfo: userInfo ?? this.userInfo,
@@ -97,6 +100,7 @@ class IndividualKycModel {
       postalCode: postalCode ?? this.postalCode,
       haveCriminalRecord: haveCriminalRecord ?? this.haveCriminalRecord,
       crimes: crimes ?? this.crimes,
+      appliedDate: appliedDate ?? this.appliedDate,
     );
   }
 
@@ -123,12 +127,15 @@ class IndividualKycModel {
       'postalCode': postalCode,
       'haveCriminalRecord': haveCriminalRecord,
       'crimes': crimes?.map((x) => x.toMap()).toList(),
+      'appliedDate': appliedDate,
     };
   }
 
   factory IndividualKycModel.fromMap(Map<String, dynamic> map) {
     return IndividualKycModel(
-      userInfo: IndividualModel.fromMap(map['userInfo'] as Map<String,dynamic>),
+      userInfo: IndividualModel.fromMap(
+        map['userInfo'] as Map<String, dynamic>,
+      ),
       dob: map['dob'] as String? ?? "",
       gender: map['gender'] as String? ?? "",
       sinNumber: map['sinNumber'] as String? ?? "",
@@ -156,68 +163,71 @@ class IndividualKycModel {
                 ),
               )
               : null,
+      appliedDate: map['appliedDate'] as String? ?? "",
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory IndividualKycModel.fromJson(String source) => IndividualKycModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory IndividualKycModel.fromJson(String source) =>
+      IndividualKycModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'IndividualKycModel(userInfo: $userInfo, dob: $dob, gender: $gender, sinNumber: $sinNumber, sinExpiry: $sinExpiry, transitNumber: $transitNumber, institutionNumber: $institutionNumber, institutionName: $institutionName, voidCheque: $voidCheque, bankCode: $bankCode, bankAccNumber: $bankAccNumber, statusInCanada: $statusInCanada, permitImage: $permitImage, govDocImage: $govDocImage, aptNo: $aptNo, emergencyContactNo: $emergencyContactNo, emergencyContactName: $emergencyContactName, modeOfTravel: $modeOfTravel, postalCode: $postalCode, haveCriminalRecord: $haveCriminalRecord, crimes: $crimes)';
+    return 'IndividualKycModel(userInfo: $userInfo, dob: $dob, gender: $gender, sinNumber: $sinNumber, sinExpiry: $sinExpiry, transitNumber: $transitNumber, institutionNumber: $institutionNumber, institutionName: $institutionName, voidCheque: $voidCheque, bankCode: $bankCode, bankAccNumber: $bankAccNumber, statusInCanada: $statusInCanada, permitImage: $permitImage, govDocImage: $govDocImage, aptNo: $aptNo, emergencyContactNo: $emergencyContactNo, emergencyContactName: $emergencyContactName, modeOfTravel: $modeOfTravel, postalCode: $postalCode, haveCriminalRecord: $haveCriminalRecord, crimes: $crimes, appliedDate: $appliedDate)';
   }
 
   @override
   bool operator ==(covariant IndividualKycModel other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.userInfo == userInfo &&
-      other.dob == dob &&
-      other.gender == gender &&
-      other.sinNumber == sinNumber &&
-      other.sinExpiry == sinExpiry &&
-      other.transitNumber == transitNumber &&
-      other.institutionNumber == institutionNumber &&
-      other.institutionName == institutionName &&
-      other.voidCheque == voidCheque &&
-      other.bankCode == bankCode &&
-      other.bankAccNumber == bankAccNumber &&
-      other.statusInCanada == statusInCanada &&
-      other.permitImage == permitImage &&
-      other.govDocImage == govDocImage &&
-      other.aptNo == aptNo &&
-      other.emergencyContactNo == emergencyContactNo &&
-      other.emergencyContactName == emergencyContactName &&
-      other.modeOfTravel == modeOfTravel &&
-      other.postalCode == postalCode &&
-      other.haveCriminalRecord == haveCriminalRecord &&
-      listEquals(other.crimes, crimes);
+
+    return other.userInfo == userInfo &&
+        other.dob == dob &&
+        other.gender == gender &&
+        other.sinNumber == sinNumber &&
+        other.sinExpiry == sinExpiry &&
+        other.transitNumber == transitNumber &&
+        other.institutionNumber == institutionNumber &&
+        other.institutionName == institutionName &&
+        other.voidCheque == voidCheque &&
+        other.bankCode == bankCode &&
+        other.bankAccNumber == bankAccNumber &&
+        other.statusInCanada == statusInCanada &&
+        other.permitImage == permitImage &&
+        other.govDocImage == govDocImage &&
+        other.aptNo == aptNo &&
+        other.emergencyContactNo == emergencyContactNo &&
+        other.emergencyContactName == emergencyContactName &&
+        other.modeOfTravel == modeOfTravel &&
+        other.postalCode == postalCode &&
+        other.haveCriminalRecord == haveCriminalRecord &&
+        listEquals(other.crimes, crimes) &&
+        other.appliedDate == appliedDate;
   }
 
   @override
   int get hashCode {
     return userInfo.hashCode ^
-      dob.hashCode ^
-      gender.hashCode ^
-      sinNumber.hashCode ^
-      sinExpiry.hashCode ^
-      transitNumber.hashCode ^
-      institutionNumber.hashCode ^
-      institutionName.hashCode ^
-      voidCheque.hashCode ^
-      bankCode.hashCode ^
-      bankAccNumber.hashCode ^
-      statusInCanada.hashCode ^
-      permitImage.hashCode ^
-      govDocImage.hashCode ^
-      aptNo.hashCode ^
-      emergencyContactNo.hashCode ^
-      emergencyContactName.hashCode ^
-      modeOfTravel.hashCode ^
-      postalCode.hashCode ^
-      haveCriminalRecord.hashCode ^
-      crimes.hashCode;
+        dob.hashCode ^
+        gender.hashCode ^
+        sinNumber.hashCode ^
+        sinExpiry.hashCode ^
+        transitNumber.hashCode ^
+        institutionNumber.hashCode ^
+        institutionName.hashCode ^
+        voidCheque.hashCode ^
+        bankCode.hashCode ^
+        bankAccNumber.hashCode ^
+        statusInCanada.hashCode ^
+        permitImage.hashCode ^
+        govDocImage.hashCode ^
+        aptNo.hashCode ^
+        emergencyContactNo.hashCode ^
+        emergencyContactName.hashCode ^
+        modeOfTravel.hashCode ^
+        postalCode.hashCode ^
+        haveCriminalRecord.hashCode ^
+        crimes.hashCode ^
+        appliedDate.hashCode;
   }
 }

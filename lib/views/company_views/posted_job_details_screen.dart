@@ -2,11 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:swamper_solution/consts/app_colors.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/controllers/job_controller.dart';
 import 'package:swamper_solution/models/job_model.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
 import 'package:swamper_solution/views/common/signup_screen/company_form.dart';
+import 'package:swamper_solution/views/custom_widgets/day_range_selector.dart';
+import 'package:swamper_solution/views/custom_widgets/time_range_selector.dart';
 
 class PostedJobDetailsScreen extends ConsumerStatefulWidget {
   final JobModel jobDetails;
@@ -19,11 +22,34 @@ class PostedJobDetailsScreen extends ConsumerStatefulWidget {
 
 class _PostedJobDetailsScreenState
     extends ConsumerState<PostedJobDetailsScreen> {
+  DateTimeRange? selectedDayRange;
+  List<String> _timeRanges = [];
+  List<String> shifts = [];
+  String? dayRangeStr;
+
   @override
   Widget build(BuildContext context) {
     final PageController pageController = PageController();
     final ValueNotifier<int> currentPage = ValueNotifier<int>(0);
+    Future<void> selectDayRange(BuildContext context) async {
+      final DateTimeRange? picked = await showDateRangePicker(
+        context: context,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(2100),
+        initialDateRange: selectedDayRange,
+      );
+
+      if (picked != null) {
+        setState(() {
+          selectedDayRange = picked;
+          dayRangeStr =
+              "${picked.start.day}/${picked.start.month}/${picked.start.year} to ${picked.end.day}/${picked.end.month}/${picked.end.year}";
+        });
+      }
+    }
+
     Widget spacedDivider() => const Divider(thickness: 1.0, height: 24);
+
     Widget sectionTitle(String title) {
       return Padding(
         padding: const EdgeInsets.only(top: 12.0, bottom: 4),
@@ -142,7 +168,108 @@ class _PostedJobDetailsScreenState
                     Expanded(
                       child: CustomButton(
                         backgroundColor: Colors.blue,
-                        onPressed: () {},
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return StatefulBuilder(
+                                builder: (context, setDialogState) {
+                                  return AlertDialog(
+                                    title: Text("Job Repost"),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        DayRangeSelector(
+                                          selectedDayRange: selectedDayRange,
+                                          dayRangeStr: dayRangeStr,
+                                          onTap: () {
+                                            selectDayRange(context).then((_) {
+                                              setDialogState(() {});
+                                            });
+                                          },
+                                          onClear: () {
+                                            setState(() {
+                                              selectedDayRange = null;
+                                              dayRangeStr = null;
+                                            });
+                                            setDialogState(() {});
+                                          },
+                                        ),
+                                        TimeRangeSelector(
+                                          timeRanges: _timeRanges,
+                                          onRangesUpdated: (updatedRanges) {
+                                            setState(() {
+                                              _timeRanges = updatedRanges;
+                                            });
+                                            setDialogState(() {});
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    actionsAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          context.pop();
+                                        },
+                                        child: Text(
+                                          "Cancel",
+                                          style: TextStyle(
+                                            color: AppColors().red,
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          if (selectedDayRange == null ||
+                                              _timeRanges.isEmpty) {
+                                            showCustomSnackBar(
+                                              context: context,
+                                              message: "Select Days and Shifts",
+                                              backgroundColor: AppColors().red,
+                                            );
+                                            return;
+                                          }
+                                          final msg = await JobController()
+                                              .repostJob(
+                                                widget.jobDetails.copyWith(
+                                                  days: dayRangeStr,
+                                                  shifts: _timeRanges,
+                                                ),
+                                              );
+                                          if (msg == true) {
+                                            context.pop();
+                                            showCustomSnackBar(
+                                              context: context,
+                                              message:
+                                                  "Job reposted Successfully",
+                                              backgroundColor:
+                                                  AppColors().primaryColor,
+                                            );
+                                          } else {
+                                            showCustomSnackBar(
+                                              context: context,
+                                              message:
+                                                  "Failed to repost the Job",
+                                              backgroundColor: AppColors().red,
+                                            );
+                                          }
+                                        },
+                                        child: Text(
+                                          "Repost",
+                                          style: TextStyle(
+                                            color: AppColors().primaryColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        },
                         text: "Repost this Job",
                         textColor: Colors.white,
                       ),
@@ -202,7 +329,7 @@ class _PostedJobDetailsScreenState
       widget.jobDetails.jobId,
       context,
     );
-    if (!mounted) return; // Prevents using context if widget is gone
+    if (!mounted) return;
     if (message == true) {
       showCustomSnackBar(
         context: context,

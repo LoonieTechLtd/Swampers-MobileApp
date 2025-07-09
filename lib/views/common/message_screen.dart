@@ -86,14 +86,15 @@ class MessageScreen extends ConsumerWidget {
                   primaryColor: AppColors().primaryColor,
                   onSendPressed: () async {
                     final messageId = randomAlphaNumeric(10);
-                    final swamperUid = "UID123";
+                    final swamperUid = "Admin123";
                     MessageModel message = MessageModel(
                       messageId: messageId,
                       message: messageController.text,
                       senderId: FirebaseAuth.instance.currentUser!.uid,
                       receiverId: swamperUid,
                       isImage: false,
-                      sendAt: DateTime.now(),
+                      sendAt: DateTime.now(), 
+                      senderName: FirebaseAuth.instance.currentUser!.displayName.toString(),
                     );
                     await MessageController().sendMessagetoSwamper(
                       message,

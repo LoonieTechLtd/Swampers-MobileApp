@@ -11,10 +11,11 @@ import 'package:swamper_solution/controllers/job_controller.dart';
 import 'package:swamper_solution/models/company_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
+import 'package:swamper_solution/views/custom_widgets/day_range_selector.dart';
 import 'package:swamper_solution/views/custom_widgets/job_description_field.dart';
 import 'package:swamper_solution/views/custom_widgets/job_details_field.dart';
-import 'package:swamper_solution/views/custom_widgets/time_range_dialog.dart';
 import 'package:swamper_solution/views/common/signup_screen/company_form.dart';
+import 'package:swamper_solution/views/custom_widgets/time_range_selector.dart';
 
 class JobPostingScreen extends StatefulWidget {
   final String jobRole;
@@ -40,6 +41,8 @@ class JobPostingScreenState extends State<JobPostingScreen> {
   List<String> _timeRanges = [];
   List<XFile> _selectedImages = [];
   List<String> shifts = [];
+  DateTimeRange? selectedDayRange;
+  String? dayRangeStr;
 
   void clearForm() {
     _roleTypeController.clear();
@@ -60,23 +63,26 @@ class JobPostingScreenState extends State<JobPostingScreen> {
     super.dispose();
   }
 
-  // Function to show the time range picker dialog with text fields
-  Future<void> _selectTimeRanges(BuildContext context) async {
-    List<String> tempTimeRanges = [..._timeRanges];
+  String formatDate(DateTime date) {
+    return "${date.day}/${date.month}/${date.year}";
+  }
 
-    await showDialog(
+  // pick a number of days
+  Future<void> selectDayRange(BuildContext context) async {
+    final DateTimeRange? picked = await showDateRangePicker(
       context: context,
-      builder:
-          (context) => TimeRangeDialog(
-            initialTimeRanges: tempTimeRanges,
-            onTimeRangesSelected: (List<String> selectedRanges) {
-              setState(() {
-                _timeRanges = selectedRanges;
-                shifts.add(selectedRanges.toString());
-              });
-            },
-          ),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+      initialDateRange: selectedDayRange,
     );
+    if (picked != null) {
+      setState(() {
+        selectedDayRange = picked;
+
+        dayRangeStr =
+            "${formatDate(picked.start)} to ${formatDate(picked.end)}";
+      });
+    }
   }
 
   @override
@@ -151,18 +157,16 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                             GestureDetector(
                               onTap: () async {
                                 final ImagePicker picker = ImagePicker();
-                                final List<XFile>? pickedFiles =
+                                final List<XFile> pickedFiles =
                                     await picker.pickMultiImage();
-                                if (pickedFiles != null) {
-                                  setState(() {
-                                    // Limit to 4 images
-                                    _selectedImages =
-                                        [
-                                          ..._selectedImages,
-                                          ...pickedFiles,
-                                        ].take(4).toList();
-                                  });
-                                }
+                                setState(() {
+                                  // Limit to 4 images
+                                  _selectedImages =
+                                      [
+                                        ..._selectedImages,
+                                        ...pickedFiles,
+                                      ].take(4).toList();
+                                });
                               },
                               child: Container(
                                 width: 70,
@@ -217,78 +221,29 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                     },
                   ),
 
-                  InkWell(
-                    onTap: () => _selectTimeRanges(context),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Shifts", style: CustomTextStyles.h5),
-                        Container(
-                          padding: EdgeInsets.only(left: 12),
-                          height: 60,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.black12,
-                          ),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child:
-                                _timeRanges.isEmpty
-                                    ? Text(
-                                      "01:30 To 05:30",
-                                      style: CustomTextStyles.description
-                                          .copyWith(color: Colors.black38),
-                                    )
-                                    : SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: List.generate(
-                                          _timeRanges.length,
-                                          (index) {
-                                            return Container(
-                                              margin: EdgeInsets.only(right: 8),
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 4,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                border: Border.all(
-                                                  color: Colors.blueGrey,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  Text(_timeRanges[index]),
-                                                  SizedBox(width: 4),
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        _timeRanges.removeAt(
-                                                          index,
-                                                        );
-                                                      });
-                                                    },
-                                                    child: Icon(
-                                                      Icons.cancel_outlined,
-                                                      size: 18,
-                                                      color: Colors.red,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  // Date range selector
+                  DayRangeSelector(
+                    selectedDayRange: selectedDayRange,
+                    dayRangeStr: dayRangeStr,
+                    onTap: () {
+                      selectDayRange(context);
+                    },
+                    onClear: () {
+                      setState(() {
+                        selectedDayRange = null;
+                        dayRangeStr = null;
+                      });
+                    },
+                  ),
+
+                  // Shifts selector
+                  TimeRangeSelector(
+                    timeRanges: _timeRanges,
+                    onRangesUpdated: (updatedRanges) {
+                      setState(() {
+                        _timeRanges = updatedRanges;
+                      });
+                    },
                   ),
                   JobDetailsField(
                     controller: _locationController,
@@ -365,6 +320,7 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                         companyId: companyId,
                         jobId: jobId,
                         jobStatus: "Pending",
+                        days: dayRangeStr ?? '',
                       );
 
                       final message = await JobController().postJob(

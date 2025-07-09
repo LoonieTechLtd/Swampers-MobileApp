@@ -92,3 +92,7 @@ final kycStatusProvider = FutureProvider((ref) {
 final getKycData = FutureProvider((ref) {
   return KycController().getKycData();
 });
+
+final notificationControllerProvider = Provider(
+  (ref) => NotificationController(),
+);

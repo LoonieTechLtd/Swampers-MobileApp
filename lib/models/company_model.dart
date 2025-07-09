@@ -8,6 +8,7 @@ class CompanyModel {
   final String profilePic;
   final String role;
   final String address;
+  final String createdAt;
   CompanyModel({
     required this.uid,
     required this.companyName,
@@ -16,6 +17,7 @@ class CompanyModel {
     required this.profilePic,
     required this.role,
     required this.address,
+    required this.createdAt,
   });
 
   CompanyModel copyWith({
@@ -26,6 +28,7 @@ class CompanyModel {
     String? profilePic,
     String? role,
     String? address,
+    String? createdAt,
   }) {
     return CompanyModel(
       uid: uid ?? this.uid,
@@ -35,6 +38,7 @@ class CompanyModel {
       profilePic: profilePic ?? this.profilePic,
       role: role ?? this.role,
       address: address ?? this.address,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -47,6 +51,7 @@ class CompanyModel {
       'profilePic': profilePic,
       'role': role,
       'address': address,
+      'createdAt': createdAt,
     };
   }
 
@@ -59,40 +64,43 @@ class CompanyModel {
       profilePic: map['profilePic'] as String,
       role: map['role'] as String,
       address: map['address'] as String,
+      createdAt: map['createdAt'] as String,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory CompanyModel.fromJson(String source) => CompanyModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CompanyModel.fromJson(String source) =>
+      CompanyModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'CompanyModel(uid: $uid, companyName: $companyName, email: $email, contactNo: $contactNo, profilePic: $profilePic, role: $role, address: $address)';
+    return 'CompanyModel(uid: $uid, companyName: $companyName, email: $email, contactNo: $contactNo, profilePic: $profilePic, role: $role, address: $address, createdAt: $createdAt)';
   }
 
   @override
   bool operator ==(covariant CompanyModel other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.uid == uid &&
-      other.companyName == companyName &&
-      other.email == email &&
-      other.contactNo == contactNo &&
-      other.profilePic == profilePic &&
-      other.role == role &&
-      other.address == address;
+
+    return other.uid == uid &&
+        other.companyName == companyName &&
+        other.email == email &&
+        other.contactNo == contactNo &&
+        other.profilePic == profilePic &&
+        other.role == role &&
+        other.address == address &&
+        other.createdAt == createdAt;
   }
 
   @override
   int get hashCode {
     return uid.hashCode ^
-      companyName.hashCode ^
-      email.hashCode ^
-      contactNo.hashCode ^
-      profilePic.hashCode ^
-      role.hashCode ^
-      address.hashCode;
+        companyName.hashCode ^
+        email.hashCode ^
+        contactNo.hashCode ^
+        profilePic.hashCode ^
+        role.hashCode ^
+        address.hashCode ^
+        createdAt.hashCode;
   }
 }

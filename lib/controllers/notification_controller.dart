@@ -7,20 +7,6 @@ class NotificationController {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
 
-
-// method to save user's notification
-  Future<void> saveNotificationToDb(NotificationModel notification) async {
-    try {
-      await firestore
-          .collection("notifications")
-          .doc(auth.currentUser!.uid)
-          .collection("userNotifications")
-          .add(notification.toMap());
-    } catch (e) {
-      debugPrint("Failed to save Notification: ${e.toString()}");
-    }
-  }
-
   //method to fetch user's notifications
   Stream<List<NotificationModel>> getUserNotification() {
     try {
@@ -28,7 +14,7 @@ class NotificationController {
           .collection("notifications")
           .doc(auth.currentUser!.uid)
           .collection("userNotifications")
-          .orderBy("timeStamp", descending: true)
+          .orderBy("createdAt", descending: true)
           .snapshots()
           .map((snapshot) {
             return snapshot.docs.map((doc) {
@@ -37,10 +23,33 @@ class NotificationController {
             }).toList();
           });
     } catch (e) {
-      debugPrint("Error fetching notifications: ${e.toString()}");
+      debugPrint("Error fetching notifications: \\${e.toString()}");
       return Stream.value([]);
     }
   }
 
-  
+  //mark notification as read
+  Future<void> toggleNotificationReadStatus(String notificationId ) async {
+    try {
+      final docRef = firestore
+          .collection("notifications")
+          .doc(auth.currentUser!.uid)
+          .collection("userNotifications")
+          .doc(notificationId);
+
+      final docSnapshot = await docRef.get();
+
+      if (docSnapshot.exists) {
+        final currentReadStatus = docSnapshot.data()?['read'] ?? false;
+
+        await docRef.update({
+          "read": !currentReadStatus,
+        });
+      } else {
+        debugPrint("Notification document does not exist.");
+      }
+    } catch (e) {
+      debugPrint("Failed to toggle notification read status: ${e.toString()}");
+    }
+  }
 }

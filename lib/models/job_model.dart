@@ -14,6 +14,7 @@ class JobModel {
   final String companyId;
   final double hourlyIncome;
   final String jobStatus;
+  final String days;
   JobModel({
     required this.jobId,
     required this.role,
@@ -26,6 +27,7 @@ class JobModel {
     required this.companyId,
     required this.hourlyIncome,
     required this.jobStatus,
+    required this.days,
   });
 
   JobModel copyWith({
@@ -40,6 +42,7 @@ class JobModel {
     String? companyId,
     double? hourlyIncome,
     String? jobStatus,
+    String? days,
   }) {
     return JobModel(
       jobId: jobId ?? this.jobId,
@@ -53,6 +56,7 @@ class JobModel {
       companyId: companyId ?? this.companyId,
       hourlyIncome: hourlyIncome ?? this.hourlyIncome,
       jobStatus: jobStatus ?? this.jobStatus,
+      days: days ?? this.days,
     );
   }
 
@@ -69,6 +73,7 @@ class JobModel {
       'companyId': companyId,
       'hourlyIncome': hourlyIncome,
       'jobStatus': jobStatus,
+      'days': days,
     };
   }
 
@@ -87,11 +92,12 @@ class JobModel {
       ),
       postedDate: map['postedDate'] as String,
       companyId: map['companyId'] as String,
-      hourlyIncome: 
+      hourlyIncome:
           (map['hourlyIncome'] is int)
               ? (map['hourlyIncome'] as int).toDouble()
               : (map['hourlyIncome'] as num).toDouble(),
       jobStatus: map['jobStatus'] as String,
+      days: map['days'] as String
     );
   }
 
@@ -102,7 +108,7 @@ class JobModel {
 
   @override
   String toString() {
-    return 'JobModel(jobId: $jobId, role: $role, noOfWorkers: $noOfWorkers, shifts: $shifts, location: $location, description: $description, images: $images, postedDate: $postedDate, companyId: $companyId, hourlyIncome: $hourlyIncome, jobStatus: $jobStatus)';
+    return 'JobModel(jobId: $jobId, role: $role, noOfWorkers: $noOfWorkers, shifts: $shifts, location: $location, description: $description, images: $images, postedDate: $postedDate, companyId: $companyId, hourlyIncome: $hourlyIncome, jobStatus: $jobStatus, days: $days)';
   }
 
   @override
@@ -119,7 +125,8 @@ class JobModel {
         other.postedDate == postedDate &&
         other.companyId == companyId &&
         other.hourlyIncome == hourlyIncome &&
-        other.jobStatus == jobStatus;
+        other.jobStatus == jobStatus &&
+        other.days == days;
   }
 
   @override
@@ -134,6 +141,7 @@ class JobModel {
         postedDate.hashCode ^
         companyId.hashCode ^
         hourlyIncome.hashCode ^
-        jobStatus.hashCode;
+        jobStatus.hashCode ^
+        days.hashCode;
   }
 }

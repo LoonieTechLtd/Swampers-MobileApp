@@ -11,6 +11,7 @@ class IndividualModel {
   final String address;
   final String kycVerified;
   final String interestedWork;
+  final String createdAt;
   IndividualModel({
     required this.uid,
     required this.firstName,
@@ -22,6 +23,7 @@ class IndividualModel {
     required this.address,
     required this.kycVerified,
     required this.interestedWork,
+    required this.createdAt,
   });
 
   IndividualModel copyWith({
@@ -35,6 +37,7 @@ class IndividualModel {
     String? address,
     String? kycVerified,
     String? interestedWork,
+    String? createdAt,
   }) {
     return IndividualModel(
       uid: uid ?? this.uid,
@@ -47,6 +50,7 @@ class IndividualModel {
       address: address ?? this.address,
       kycVerified: kycVerified ?? this.kycVerified,
       interestedWork: interestedWork ?? this.interestedWork,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
@@ -62,6 +66,7 @@ class IndividualModel {
       'address': address,
       'kycVerified': kycVerified,
       'interestedWork': interestedWork,
+      'createdAt': createdAt,
     };
   }
 
@@ -77,6 +82,7 @@ class IndividualModel {
       address: map['address'] as String,
       kycVerified: map['kycVerified'] as String,
       interestedWork: map['interestedWork'] as String,
+      createdAt: map['createdAt'] as String,
     );
   }
 
@@ -87,7 +93,7 @@ class IndividualModel {
 
   @override
   String toString() {
-    return 'IndividualModel(uid: $uid, firstName: $firstName, lastName: $lastName, email: $email, contactNo: $contactNo, profilePic: $profilePic, role: $role, address: $address, kycVerified: $kycVerified, interestedWork: $interestedWork)';
+    return 'IndividualModel(uid: $uid, firstName: $firstName, lastName: $lastName, email: $email, contactNo: $contactNo, profilePic: $profilePic, role: $role, address: $address, kycVerified: $kycVerified, interestedWork: $interestedWork, createdAt: $createdAt)';
   }
 
   @override
@@ -103,7 +109,8 @@ class IndividualModel {
         other.role == role &&
         other.address == address &&
         other.kycVerified == kycVerified &&
-        other.interestedWork == interestedWork;
+        other.interestedWork == interestedWork &&
+        other.createdAt == createdAt;
   }
 
   @override
@@ -117,6 +124,7 @@ class IndividualModel {
         role.hashCode ^
         address.hashCode ^
         kycVerified.hashCode ^
-        interestedWork.hashCode;
+        interestedWork.hashCode ^
+        createdAt.hashCode;
   }
 }

@@ -60,7 +60,7 @@ class AuthServices {
           profilePic:
               "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
           kycVerified: "notSubmitted",
-          interestedWork: interestedWork!,
+          interestedWork: interestedWork!, createdAt: DateTime.now().toString(),
         );
 
         final IndividualStatsModel stats = IndividualStatsModel(
@@ -87,6 +87,7 @@ class AuthServices {
           profilePic:
               "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
           address: address,
+          createdAt: DateTime.now().toString()
         );
 
         final CompanyStatsModel companyStats = CompanyStatsModel(
@@ -202,6 +203,8 @@ class AuthServices {
         profilePic: profilePic,
         kycVerified: "notSubmitted",
         interestedWork: interestedWork,
+        createdAt: DateTime.now().toString()
+
       );
 
       final IndividualStatsModel stats = IndividualStatsModel(
@@ -262,6 +265,7 @@ class AuthServices {
         contactNo: contactNo,
         profilePic: profilePic,
         address: address,
+        createdAt: DateTime.now().toString()
       );
 
       final CompanyStatsModel companyStats = CompanyStatsModel(

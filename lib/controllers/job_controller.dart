@@ -21,7 +21,6 @@ class JobController {
         title: "Job Posted",
         body:
             "Please wait until your job is approved.\n this will take some time.",
-    
       );
       return null;
     } catch (e) {
@@ -199,6 +198,16 @@ class JobController {
     } catch (e) {
       debugPrint('Error uploading images: \\${e.toString()}');
       return [];
+    }
+  }
+
+  Future<bool> repostJob(JobModel job) async {
+    try {
+      await firestore.collection("jobs").doc().set(job.toMap());
+      return true;
+    } catch (e) {
+      debugPrint("Failed to repost the job: $e");
+      return false;
     }
   }
 
