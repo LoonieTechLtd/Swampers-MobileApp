@@ -6,6 +6,7 @@ import 'package:swamper_solution/models/job_model.dart';
 import 'package:swamper_solution/views/common/signup_screen/company_form.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_textfield.dart';
+import 'package:swamper_solution/views/custom_widgets/job_description_field.dart';
 import 'package:swamper_solution/views/custom_widgets/time_range_dialog.dart';
 
 class EditJobScreen extends StatefulWidget {
@@ -25,6 +26,7 @@ class EditJobScreenState extends State<EditJobScreen> {
   final _shiftController = TextEditingController();
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _messageToAdminController = TextEditingController();
 
   final String companyId = FirebaseAuth.instance.currentUser!.uid;
 
@@ -48,6 +50,7 @@ class EditJobScreenState extends State<EditJobScreen> {
     _descriptionController.text = job.description;
     _timeRanges = job.shifts;
     dayRangeStr = job.days;
+    _messageToAdminController.text = job.messageToAdmin ?? "";
   }
 
   Future<void> _selectTimeRanges(BuildContext context) async {
@@ -117,6 +120,8 @@ class EditJobScreenState extends State<EditJobScreen> {
       hourlyIncome: double.parse(_incomeController.text),
       jobStatus: widget.jobDetails.jobStatus,
       days: dayRangeStr ?? widget.jobDetails.days,
+      messageToAdmin:  _messageToAdminController.text,
+      assignedStaffs: []
     );
 
     final isSuccess = await JobController().updateJob(
@@ -144,7 +149,7 @@ class EditJobScreenState extends State<EditJobScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(centerTitle: true, title: const Text("Post a Job")),
+      appBar: AppBar(centerTitle: true, title: const Text("Edit Job")),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
@@ -152,6 +157,7 @@ class EditJobScreenState extends State<EditJobScreen> {
             key: _formKey,
             child: SingleChildScrollView(
               child: Column(
+                spacing: 6,
                 children: [
                   _buildJobField(
                     _roleTypeController,
@@ -179,7 +185,13 @@ class EditJobScreenState extends State<EditJobScreen> {
                     "Melborn",
                   ),
                   JobDescriptionField(
-                    descriptionController: _descriptionController,
+                    textEditingController: _descriptionController,
+                    title: 'Job Description',
+                  ),
+                  JobDescriptionField(
+                    textEditingController: _messageToAdminController,
+                    title: 'Message to Admin',
+                    hintText: "Reassign jobs to: Joe Doe, Figo Carlos",
                   ),
                   CustomButton(
                     backgroundColor: Colors.blue,
@@ -351,50 +363,6 @@ class EditJobScreenState extends State<EditJobScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class JobDescriptionField extends StatelessWidget {
-  final TextEditingController descriptionController;
-  const JobDescriptionField({super.key, required this.descriptionController});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Description, Notes", style: CustomTextStyles.h5),
-        SizedBox(
-          height: 100,
-          child: TextFormField(
-            controller: descriptionController,
-            expands: true,
-            textAlignVertical: TextAlignVertical.top,
-            maxLines: null,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.black12,
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(width: 1, color: Colors.black38),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Colors.red, width: 1),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

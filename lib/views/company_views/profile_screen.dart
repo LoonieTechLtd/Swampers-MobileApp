@@ -45,7 +45,6 @@ class ProfileScreen extends ConsumerWidget {
       appBar: AppBar(
         centerTitle: true,
         title: Text("Company  Profile"),
-        actions: [IconButton(onPressed: () {}, icon: Icon(FeatherIcons.menu))],
       ),
       body: SafeArea(
         child: userAsync.when(

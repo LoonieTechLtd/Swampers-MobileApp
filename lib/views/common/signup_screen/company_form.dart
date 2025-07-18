@@ -55,10 +55,10 @@ class _CompanyFormState extends State<CompanyForm> {
               hintText: "Contact no",
               controller: phoneController,
               obscureText: false,
-              textInputType: TextInputType.text,
+              textInputType: TextInputType.number,
               validator: (value) {
                 if (value!.trim().length < 10) {
-                  return "Phone cannot be empty";
+                  return "Invalid Phone no";
                 }
                 return null;
               },

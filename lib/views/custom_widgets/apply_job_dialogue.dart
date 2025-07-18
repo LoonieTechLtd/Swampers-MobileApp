@@ -78,6 +78,7 @@ class ApplyJobDiaogue {
                       }
                     },
                   ),
+                  Text("* The Resume Size must be less than 5MB."),
                   if (userData.kycVerified != "approved")
                     Padding(
                       padding: const EdgeInsets.only(top: 12.0),

@@ -4,13 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:swamper_solution/models/company_model.dart';
 import 'package:swamper_solution/models/individual_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
+import 'package:swamper_solution/views/company_views/admin_contact_screen.dart';
 import 'package:swamper_solution/views/company_views/edit_job_screen.dart';
 import 'package:swamper_solution/views/company_views/job_posting_screen.dart';
 import 'package:swamper_solution/views/company_views/jobs_screen.dart';
-import 'package:swamper_solution/views/company_views/company_kyc_application_screen.dart';
 import 'package:swamper_solution/views/company_views/posted_job_details_screen.dart';
 import 'package:swamper_solution/views/individual_views/individual_kyc_application_screen.dart';
 import 'package:swamper_solution/views/individual_views/job_details_screen.dart';
+import 'package:swamper_solution/views/individual_views/job_offer_screen.dart';
 import 'package:swamper_solution/views/individual_views/kyc_review_screen.dart';
 import 'package:swamper_solution/views/individual_views/edit_kyc_screen.dart';
 import 'package:swamper_solution/views/individual_views/kyc_status_screen.dart';
@@ -29,6 +30,14 @@ class AppRouteConfig {
     initialLocation: '/',
     redirect: _handleRedirect,
     routes: [
+
+      GoRoute(
+            path: "kyc_status_screen",
+            name: "kyc_status_screen",
+            builder: (context, state) {
+              return KycStatusScreen();
+            },
+          ),
       // Auth routes
       GoRoute(
         path: '/',
@@ -69,17 +78,28 @@ class AppRouteConfig {
             },
           ),
           GoRoute(
+            path: 'job_offer_screen',
+            name: 'job_offer_screen',
+            builder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              final job = data['job'] as JobModel;
+              final user = data['user'] as IndividualModel;
+              return JobOfferScreen(jobDetails: job, userData: user);
+            },
+          ),
+          GoRoute(
             path: "individual_kyc_application_screen",
             name: "individual_kyc_application_screen",
             builder: (context, state) {
               return IndividualKycApplicationScreen();
             },
           ),
+          
           GoRoute(
-            path: "kyc_status_screen",
-            name: "kyc_status_screen",
+            path: "contact_admin_screen",
+            name: "contact_admin_screen",
             builder: (context, state) {
-              return KycStatusScreen();
+              return AdminContactScreen();
             },
           ),
           GoRoute(
@@ -121,14 +141,7 @@ class AppRouteConfig {
             },
           ),
 
-          // Kyc Application Screen
-          GoRoute(
-            path: "company_kyc_application_screen",
-            name: "company_kyc_application_screen",
-            builder: (context, state) {
-              return CompanyKycApplicationScreen();
-            },
-          ),
+      
           GoRoute(
             path: 'posted_jobs_screen',
             name: 'posted_jobs_screen',

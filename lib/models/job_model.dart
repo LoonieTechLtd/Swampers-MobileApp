@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:swamper_solution/models/assigned_staff.dart';
 
 class JobModel {
   final String jobId;
@@ -15,6 +16,9 @@ class JobModel {
   final double hourlyIncome;
   final String jobStatus;
   final String days;
+  final String? messageToAdmin;
+  final List<AssignedStaff> assignedStaffs;
+  final List<String>? appliedUsers;
   JobModel({
     required this.jobId,
     required this.role,
@@ -28,6 +32,9 @@ class JobModel {
     required this.hourlyIncome,
     required this.jobStatus,
     required this.days,
+    this.messageToAdmin,
+    required this.assignedStaffs,
+    this.appliedUsers,
   });
 
   JobModel copyWith({
@@ -43,6 +50,9 @@ class JobModel {
     double? hourlyIncome,
     String? jobStatus,
     String? days,
+    String? messageToAdmin,
+    List<AssignedStaff>? assignedStaffs,
+    List<String>? appliedUsers,
   }) {
     return JobModel(
       jobId: jobId ?? this.jobId,
@@ -57,6 +67,9 @@ class JobModel {
       hourlyIncome: hourlyIncome ?? this.hourlyIncome,
       jobStatus: jobStatus ?? this.jobStatus,
       days: days ?? this.days,
+      messageToAdmin: messageToAdmin ?? this.messageToAdmin,
+      assignedStaffs: assignedStaffs ?? this.assignedStaffs,
+      appliedUsers: appliedUsers ?? this.appliedUsers,
     );
   }
 
@@ -74,6 +87,9 @@ class JobModel {
       'hourlyIncome': hourlyIncome,
       'jobStatus': jobStatus,
       'days': days,
+      'messageToAdmin': messageToAdmin ?? "",
+      'assignedStaffs': assignedStaffs.map((s) => s.toMap()).toList(),
+      'appliedUsers': appliedUsers ?? [],
     };
   }
 
@@ -97,7 +113,17 @@ class JobModel {
               ? (map['hourlyIncome'] as int).toDouble()
               : (map['hourlyIncome'] as num).toDouble(),
       jobStatus: map['jobStatus'] as String,
-      days: map['days'] as String
+      days: map['days'] as String,
+      messageToAdmin: map['messageToAdmin'] as String? ?? "",
+      assignedStaffs:
+          (map['assignedStaffs'] as List<dynamic>? ?? [])
+              .map((e) => AssignedStaff.fromMap(e as Map<String, dynamic>))
+              .toList(),
+      appliedUsers: List<String>.from(
+        (map['appliedUsers'] as List<dynamic>)
+            .map((e) => e.toString())
+            .toList(),
+      ),
     );
   }
 
@@ -108,7 +134,7 @@ class JobModel {
 
   @override
   String toString() {
-    return 'JobModel(jobId: $jobId, role: $role, noOfWorkers: $noOfWorkers, shifts: $shifts, location: $location, description: $description, images: $images, postedDate: $postedDate, companyId: $companyId, hourlyIncome: $hourlyIncome, jobStatus: $jobStatus, days: $days)';
+    return 'JobModel(jobId: $jobId, role: $role, noOfWorkers: $noOfWorkers, shifts: $shifts, location: $location, description: $description, images: $images, postedDate: $postedDate, companyId: $companyId, hourlyIncome: $hourlyIncome, jobStatus: $jobStatus, days: $days, messageToAdmin: $messageToAdmin, assignedStaffs: $assignedStaffs, appliedUsers: $appliedUsers)';
   }
 
   @override
@@ -126,7 +152,10 @@ class JobModel {
         other.companyId == companyId &&
         other.hourlyIncome == hourlyIncome &&
         other.jobStatus == jobStatus &&
-        other.days == days;
+        other.days == days &&
+        other.messageToAdmin == messageToAdmin &&
+        listEquals(other.assignedStaffs, assignedStaffs) &&
+        listEquals(other.appliedUsers, appliedUsers);
   }
 
   @override
@@ -142,6 +171,9 @@ class JobModel {
         companyId.hashCode ^
         hourlyIncome.hashCode ^
         jobStatus.hashCode ^
-        days.hashCode;
+        days.hashCode ^
+        messageToAdmin.hashCode ^
+        assignedStaffs.hashCode ^
+        appliedUsers.hashCode;
   }
 }

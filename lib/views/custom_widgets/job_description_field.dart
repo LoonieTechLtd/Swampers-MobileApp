@@ -2,24 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
 
 class JobDescriptionField extends StatelessWidget {
-  final TextEditingController descriptionController;
+  final TextEditingController textEditingController;
+  final String? hintText;
+  final String title;
 
-  const JobDescriptionField({super.key, required this.descriptionController});
+  const JobDescriptionField({
+    super.key,
+    required this.textEditingController,
+    this.hintText,
+    required this.title,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Description, Notes", style: CustomTextStyles.h5),
+        Text(title, style: CustomTextStyles.h5),
         SizedBox(
           height: 100,
           child: TextFormField(
-            controller: descriptionController,
+            controller: textEditingController,
             expands: true,
             textAlignVertical: TextAlignVertical.top,
             maxLines: null,
             decoration: InputDecoration(
+              hintText: hintText,
               filled: true,
               fillColor: Colors.black12,
               focusedBorder: OutlineInputBorder(

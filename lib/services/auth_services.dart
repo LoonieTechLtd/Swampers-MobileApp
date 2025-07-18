@@ -1,14 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_otp/email_otp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
 import 'package:swamper_solution/controllers/stats_controller.dart';
-
 import 'package:swamper_solution/models/company_model.dart';
 import 'package:swamper_solution/models/company_stats_model.dart';
 import 'package:swamper_solution/models/individual_model.dart';
@@ -87,7 +85,8 @@ class AuthServices {
           profilePic:
               "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
           address: address,
-          createdAt: DateTime.now().toString()
+          createdAt: DateTime.now().toString(),
+          isSuspended: false
         );
 
         final CompanyStatsModel companyStats = CompanyStatsModel(
@@ -111,6 +110,7 @@ class AuthServices {
   // google login method
   Future<dynamic> loginWithGoogle([WidgetRef? ref]) async {
     try {
+
       final googleSignIn = GoogleSignIn();
 
       // Force google sign Out
@@ -265,7 +265,8 @@ class AuthServices {
         contactNo: contactNo,
         profilePic: profilePic,
         address: address,
-        createdAt: DateTime.now().toString()
+        createdAt: DateTime.now().toString(),
+        isSuspended: false
       );
 
       final CompanyStatsModel companyStats = CompanyStatsModel(

@@ -1,68 +1,38 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
+import 'package:swamper_solution/controllers/job_template_controller.dart';
 import 'package:swamper_solution/models/jobs_template_model.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_search_bar.dart';
 import 'package:swamper_solution/views/custom_widgets/stat_widget.dart';
 
+// Job Template Provider
+final jobTemplateProvider = FutureProvider<List<JobsTemplateModel>>((ref) {
+  return JobTemplateController().fetchJobTemplates();
+});
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  // Helper method to validate URL
+  bool _isValidUrl(String? url) {
+    if (url == null || url.isEmpty) return false;
+    try {
+      final uri = Uri.parse(url);
+      return uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https');
+    } catch (e) {
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController searchController = TextEditingController();
-    final List<JobsTemplateModel> jobTemplates = [
-      JobsTemplateModel(
-        jobId: "JOB1",
-        roleName: "Warehouse Associates",
-        prefixImage: "https://i.imgur.com/qlueg7Q.png",
-      ),
-       JobsTemplateModel(
-        jobId: "JOB2",
-        roleName: "Lumping & Destuffing",
-        prefixImage: "https://i.imgur.com/LYiQxJI.png",
-      ),
-      JobsTemplateModel(
-        jobId: "JOB3",
-        roleName: "Construction Labours",
-        prefixImage: "https://i.imgur.com/jg1eToy.png",
-      ),
-      JobsTemplateModel(
-        jobId: "JOB4",
-        roleName: "Factory Workers",
-        prefixImage: "https://i.imgur.com/O49gppV.png",
-      ),
-      JobsTemplateModel(
-        jobId: "JOB5",
-        roleName: "Handy Man",
-        prefixImage: "https://i.imgur.com/xDGeNur.png",
-      ),
-      JobsTemplateModel(
-        jobId: "JOB6",
-        roleName: "Cleaners",
-        prefixImage: "https://i.imgur.com/WjAWFr7.png",
-      ),
-      JobsTemplateModel(
-        jobId: "JOB7",
-        roleName: "Mover",
-        prefixImage: "https://i.imgur.com/cN5TZ3M.png",
-      ),
-      JobsTemplateModel(
-        jobId: "JOB8",
-        roleName: "General Workers",
-        prefixImage: "https://i.imgur.com/h1CcThv.png",
-      ),
-      JobsTemplateModel(
-        jobId: "JOB9",
-        roleName: "Restaurent Services",
-        prefixImage: "https://i.imgur.com/VGvA0Pe.png",
-      ),
-    ];
+
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -96,12 +66,21 @@ class HomeScreen extends StatelessWidget {
                             children: [
                               SizedBox(width: 12),
                               CircleAvatar(
-                                backgroundImage: NetworkImage(user.profilePic),
+                                backgroundImage:
+                                    _isValidUrl(user.profilePic)
+                                        ? NetworkImage(user.profilePic)
+                                        : null,
+                                child:
+                                    _isValidUrl(user.profilePic)
+                                        ? null
+                                        : Icon(
+                                          FeatherIcons.user,
+                                          color: AppColors().white,
+                                        ),
                               ),
                               const SizedBox(width: 12),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-
                                 children: [
                                   Text(
                                     user.companyName,
@@ -119,7 +98,7 @@ class HomeScreen extends StatelessWidget {
                               Spacer(),
                               IconButton(
                                 onPressed: () {
-                                   context.go('/company/company_notifications');
+                                  context.go('/company/company_notifications');
                                 },
                                 icon: Icon(
                                   FeatherIcons.bell,
@@ -130,7 +109,7 @@ class HomeScreen extends StatelessWidget {
                           );
                         },
                         error: (error, stack) {
-                          return Text("Error lodaing user data");
+                          return Text("Error loading user data");
                         },
                         loading: () {
                           return Center(child: SizedBox());
@@ -188,72 +167,182 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Consumer(
               builder: (context, ref, child) {
-                final user = ref.watch(companyProvider);
-                return user.when(
+                final userAsync = ref.watch(companyProvider);
+                final jobTemplatesAsync = ref.watch(jobTemplateProvider);
+
+                return userAsync.when(
                   data: (user) {
                     if (user == null) {
-                      return Center(child: Text("No user Data"));
+                      return Center(child: Text("No user data"));
                     }
-                    return Column(
-                      children: [
-                        ...List.generate(
-                          jobTemplates.length,
-                          (index) => InkWell(
-                            onTap: () {
-                              context.goNamed(
-                                "job_posting_screen",
-                                pathParameters: {
-                                  'job_role': jobTemplates[index].roleName,
-                                },
-                                extra: user,
-                              );
-                            },
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 2,
+
+                    return jobTemplatesAsync.when(
+                      data: (jobs) {
+                        if (jobs.isEmpty) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20.0),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    FeatherIcons.briefcase,
+                                    size: 64,
+                                    color: Colors.grey,
                                   ),
-                                  height: 80,
-                                  child: Row(
-                                    spacing: 8,
-                                    children: [
-                                      SizedBox(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                            0.09,
-                                        width:
-                                            MediaQuery.of(context).size.height *
-                                            0.09,
-                                        child: Image(
-                                          image: CachedNetworkImageProvider(
-                                            jobTemplates[index].prefixImage,
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        jobTemplates[index].roleName,
-                                        style: CustomTextStyles.h4,
-                                      ),
-                                      Spacer(),
-                                      CircleAvatar(
-                                        backgroundColor:
-                                            AppColors().primaryColor,
-                                        child: Icon(
-                                          FeatherIcons.chevronRight,
-                                          color: AppColors().white,
-                                        ),
-                                      ),
-                                    ],
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'No job templates yet',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: jobs.length,
+                          itemBuilder: (context, index) {
+                            final job = jobs[index];
+                            return Container(
+                              padding: EdgeInsets.only(bottom: 8),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    width: 0.6,
+                                    color: Colors.black54,
                                   ),
                                 ),
-                                Divider(),
+                              ),
+                              child: InkWell(
+                                onTap: () {
+                                  context.goNamed(
+                                    "job_posting_screen",
+                                    pathParameters: {'job_role': job.roleName},
+                                    extra: user,
+                                  );
+                                },
+                                child: ListTile(
+                                  leading:
+                                      _isValidUrl(job.prefixImage)
+                                          ? Image.network(
+                                            job.prefixImage,
+                                            width: 50,
+                                            height: 50,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (
+                                              context,
+                                              error,
+                                              stackTrace,
+                                            ) {
+                                              return Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey[300],
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: Icon(
+                                                  FeatherIcons.briefcase,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              );
+                                            },
+                                          )
+                                          : Container(
+                                            width: 40,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[300],
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Icon(
+                                              FeatherIcons.briefcase,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                  title: Text(
+                                    job.roleName,
+                                    style: CustomTextStyles.h4,
+                                  ),
+                                  trailing: Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color.fromARGB(
+                                        255,
+                                        21,
+                                        0,
+                                        255,
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      FeatherIcons.chevronRight,
+                                      color: AppColors().white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      error: (error, stack) {
+                        return Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  FeatherIcons.alertCircle,
+                                  size: 64,
+                                  color: Colors.red,
+                                ),
+                                SizedBox(height: 16),
+                                Text(
+                                  'Error loading job templates',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  '$error',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    ref.invalidate(jobTemplateProvider);
+                                  },
+                                  child: Text('Retry'),
+                                ),
                               ],
                             ),
                           ),
-                        ),
-                      ],
+                        );
+                      },
+                      loading: () {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      },
                     );
                   },
                   error: (error, stack) {

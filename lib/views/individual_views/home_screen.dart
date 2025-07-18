@@ -76,6 +76,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors().primaryColor,
+        elevation: 0,
+        child: Icon(Icons.headset_mic, color: AppColors().white),
+        onPressed: () {
+          context.goNamed("contact_admin_screen");
+        },
+      ),
       drawer: Consumer(
         builder: (context, ref, child) {
           final userAsync = ref.watch(individualProvider);

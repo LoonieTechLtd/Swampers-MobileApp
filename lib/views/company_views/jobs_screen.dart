@@ -14,17 +14,14 @@ class JobsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Posted Jobs"),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text("Posted Jobs"), centerTitle: true),
       body: SafeArea(
         child: ListView(
           children: [
             CustomSearchBar(
               searchController: searchController,
               color: Colors.black12,
-              hintText:"Search Your Jobs"
+              hintText: "Search Your Jobs",
             ),
             Consumer(
               builder: (context, ref, child) {
@@ -34,6 +31,10 @@ class JobsScreen extends StatelessWidget {
                     if (jobs.isEmpty) {
                       return Center(child: Text("You haven't posted any Jobs"));
                     }
+                    for (final job in jobs) {
+                      debugPrint(job.toString());
+                    }
+                    
                     return Column(
                       children:
                           jobs

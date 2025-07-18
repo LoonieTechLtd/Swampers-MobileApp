@@ -48,7 +48,7 @@ class JobController {
     }
   }
 
-  // get those job opsted by respected company
+  // get those job posted by respected company
   Stream<List<JobModel>> getCompanyJobs(String companyId) {
     try {
       return firestore
@@ -201,9 +201,9 @@ class JobController {
     }
   }
 
-  Future<bool> repostJob(JobModel job) async {
+  Future<bool> repostJob(JobModel job, String jobId) async {
     try {
-      await firestore.collection("jobs").doc().set(job.toMap());
+      await firestore.collection("jobs").doc(jobId).set(job.toMap());
       return true;
     } catch (e) {
       debugPrint("Failed to repost the job: $e");

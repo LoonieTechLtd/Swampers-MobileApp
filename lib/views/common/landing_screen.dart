@@ -40,7 +40,7 @@ class LandingScreen extends StatelessWidget {
                   CustomButton(
                     backgroundColor: AppColors().primaryColor,
                     onPressed: () {
-                      print('Log In button tapped');
+                      debugPrint('Log In button tapped');
                       context.go('/login');
                     },
                     text: "Log In",
@@ -49,7 +49,7 @@ class LandingScreen extends StatelessWidget {
                   CustomButton(
                     backgroundColor: AppColors().white,
                     onPressed: () {
-                      print('Sign Up button tapped');
+                      debugPrint('Sign Up button tapped');
                       context.go('/signup');
                     },
                     text: "Sign Up",

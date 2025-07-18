@@ -852,6 +852,14 @@ class _IndividualKycApplicationScreenState
                             );
                             return;
                           }
+                          if(selectedStatusInCanada == null){
+                            showCustomSnackBar(
+                              context: context,
+                              message: "Please Select your Status in Canada",
+                              backgroundColor: AppColors().red,
+                            );
+                            return;
+                          }
 
                           if (selectedGender == null) {
                             showCustomSnackBar(

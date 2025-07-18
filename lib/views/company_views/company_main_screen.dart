@@ -1,6 +1,6 @@
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:swamper_solution/views/common/message_screen.dart';
+import 'package:swamper_solution/views/company_views/admin_contact_screen.dart';
 import 'package:swamper_solution/views/company_views/jobs_screen.dart';
 import 'package:swamper_solution/views/company_views/home_screen.dart';
 import 'package:swamper_solution/views/company_views/profile_screen.dart';
@@ -18,26 +18,12 @@ class _CompanyMainScreenState extends State<CompanyMainScreen> {
   List<Widget> screens = [
     HomeScreen(),
     JobsScreen(),
-    MessageScreen(),
+    AdminContactScreen(),
     ProfileScreen(),
   ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-
-      
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: Color.fromARGB(255, 0, 4, 217),
-      //   shape: CircleBorder(),
-      //   elevation: 0,
-      //   tooltip: "Post a Job",
-      //   onPressed: () {
-      //     context.go("/company/job_posting_screen");
-      //   },
-      //   child: Icon(Icons.add, color: Colors.white),
-      // ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: currentIndex,
         items: const [
@@ -47,8 +33,8 @@ class _CompanyMainScreenState extends State<CompanyMainScreen> {
             label: 'Posted Jobs',
           ),
           BottomNavigationBarItem(
-            icon: Icon(FeatherIcons.messageCircle),
-            label: 'Messages',
+            icon: Icon(FeatherIcons.headphones),
+            label: 'Admin Contact',
           ),
           BottomNavigationBarItem(
             icon: Icon(FeatherIcons.user),

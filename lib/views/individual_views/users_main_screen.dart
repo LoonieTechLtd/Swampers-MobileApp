@@ -2,8 +2,8 @@ import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button_nav_bar.dart';
 import 'package:swamper_solution/views/individual_views/application_screen.dart';
+import 'package:swamper_solution/views/individual_views/employment_screen.dart';
 import 'package:swamper_solution/views/individual_views/home_screen.dart';
-import 'package:swamper_solution/views/common/message_screen.dart';
 import 'package:swamper_solution/views/individual_views/profile_screen.dart';
 
 class UsersMainScreen extends StatefulWidget {
@@ -17,7 +17,7 @@ class _UsersMainScreenState extends State<UsersMainScreen> {
   final List<Widget> screens = [
     HomeScreen(),
     ApplicationScreen(),
-    MessageScreen(),
+    EmploymentScreen(),
     ProfileScreen(),
   ];
   int currentIndex = 0;
@@ -33,8 +33,8 @@ class _UsersMainScreenState extends State<UsersMainScreen> {
             label: 'Applications',
           ),
           BottomNavigationBarItem(
-            icon: Icon(FeatherIcons.messageCircle),
-            label: 'Messages',
+            icon: Icon(FeatherIcons.briefcase),
+            label: 'Employment',
           ),
           BottomNavigationBarItem(
             icon: Icon(FeatherIcons.user),

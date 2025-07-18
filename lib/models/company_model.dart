@@ -9,6 +9,7 @@ class CompanyModel {
   final String role;
   final String address;
   final String createdAt;
+  final bool isSuspended;
   CompanyModel({
     required this.uid,
     required this.companyName,
@@ -18,6 +19,7 @@ class CompanyModel {
     required this.role,
     required this.address,
     required this.createdAt,
+    required this.isSuspended,
   });
 
   CompanyModel copyWith({
@@ -29,6 +31,7 @@ class CompanyModel {
     String? role,
     String? address,
     String? createdAt,
+    bool? isSuspended,
   }) {
     return CompanyModel(
       uid: uid ?? this.uid,
@@ -39,6 +42,7 @@ class CompanyModel {
       role: role ?? this.role,
       address: address ?? this.address,
       createdAt: createdAt ?? this.createdAt,
+      isSuspended: isSuspended ?? this.isSuspended,
     );
   }
 
@@ -52,6 +56,7 @@ class CompanyModel {
       'role': role,
       'address': address,
       'createdAt': createdAt,
+      'isSuspended': isSuspended,
     };
   }
 
@@ -65,6 +70,7 @@ class CompanyModel {
       role: map['role'] as String,
       address: map['address'] as String,
       createdAt: map['createdAt'] as String,
+      isSuspended: map['isSuspended'] as bool,
     );
   }
 
@@ -75,7 +81,7 @@ class CompanyModel {
 
   @override
   String toString() {
-    return 'CompanyModel(uid: $uid, companyName: $companyName, email: $email, contactNo: $contactNo, profilePic: $profilePic, role: $role, address: $address, createdAt: $createdAt)';
+    return 'CompanyModel(uid: $uid, companyName: $companyName, email: $email, contactNo: $contactNo, profilePic: $profilePic, role: $role, address: $address, createdAt: $createdAt, isSuspended: $isSuspended)';
   }
 
   @override
@@ -89,7 +95,8 @@ class CompanyModel {
         other.profilePic == profilePic &&
         other.role == role &&
         other.address == address &&
-        other.createdAt == createdAt;
+        other.createdAt == createdAt &&
+        other.isSuspended == isSuspended;
   }
 
   @override
@@ -101,6 +108,7 @@ class CompanyModel {
         profilePic.hashCode ^
         role.hashCode ^
         address.hashCode ^
-        createdAt.hashCode;
+        createdAt.hashCode ^
+        isSuspended.hashCode;
   }
 }

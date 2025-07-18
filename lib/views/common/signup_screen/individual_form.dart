@@ -90,7 +90,7 @@ class _IndividualFormState extends State<IndividualForm> {
               textInputType: TextInputType.number,
               validator: (value) {
                 if (value!.length < 10) {
-                  return "Phone must be atleast 10 digits";
+                  return "Invalid phone no";
                 }
                 return null;
               },

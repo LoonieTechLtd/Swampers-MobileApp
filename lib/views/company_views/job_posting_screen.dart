@@ -35,6 +35,8 @@ class JobPostingScreenState extends State<JobPostingScreen> {
   final TextEditingController _incomeController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _messageToAdminController =
+      TextEditingController();
   final String companyId = FirebaseAuth.instance.currentUser!.uid.toString();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -51,6 +53,7 @@ class JobPostingScreenState extends State<JobPostingScreen> {
     _locationController.clear();
     _descriptionController.clear();
     _timeRanges.clear();
+    _messageToAdminController.clear();
   }
 
   @override
@@ -60,6 +63,7 @@ class JobPostingScreenState extends State<JobPostingScreen> {
     _incomeController.dispose();
     _locationController.dispose();
     _descriptionController.dispose();
+    _messageToAdminController.dispose();
     super.dispose();
   }
 
@@ -251,7 +255,13 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                     hintText: "Melborn",
                   ),
                   JobDescriptionField(
-                    descriptionController: _descriptionController,
+                    title: "Job Description",
+                    textEditingController: _descriptionController,
+                  ),
+                  JobDescriptionField(
+                    hintText: "Reassign jobs to: Joe Doe, Figo Carlos",
+                    title: "Message to admin",
+                    textEditingController: _messageToAdminController,
                   ),
                   CustomButton(
                     backgroundColor: Colors.blue,
@@ -321,6 +331,8 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                         jobId: jobId,
                         jobStatus: "Pending",
                         days: dayRangeStr ?? '',
+                        messageToAdmin: _messageToAdminController.text,
+                        assignedStaffs: []
                       );
 
                       final message = await JobController().postJob(

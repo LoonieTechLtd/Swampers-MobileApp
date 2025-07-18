@@ -22,6 +22,7 @@ class ApplicationScreen extends StatelessWidget {
               child: Consumer(
                 builder: (context, ref, child) {
                   final isSelected = ref.watch(applicationProvider);
+
                   return Container(
                     margin: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -38,37 +39,36 @@ class ApplicationScreen extends StatelessWidget {
                       selectedBorderColor: Colors.transparent,
                       constraints: BoxConstraints(
                         minHeight: 50.0,
-                        minWidth: MediaQuery.of(context).size.width * 0.3,
+                        minWidth: MediaQuery.of(context).size.width * 0.26,
                       ),
                       onPressed: (int index) {
-                        List<bool> newSelection = List.generate(
-                          2,
-                          (i) => i == index,
-                        );
-                        ref.read(applicationProvider.notifier).state =
-                            newSelection;
+          
+                        ref
+                            .read(applicationProvider.notifier)
+                            .state = List.generate(2, (i) => i == index);
                       },
                       children: const [
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24),
+                          padding: EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
                             "Applied Jobs",
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24),
+                          padding: EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
                             "Saved Jobs",
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
+                        
                       ],
                     ),
                   );
@@ -78,57 +78,64 @@ class ApplicationScreen extends StatelessWidget {
             Consumer(
               builder: (context, ref, child) {
                 final isSelected = ref.watch(applicationProvider);
-                return isSelected[0]
-                    ? Expanded(
-                      child: ref
-                          .watch(getUserApplicationsProvider)
-                          .when(
-                            data: (applications) {
-                              if (applications.isEmpty) {
-                                return Center(child: Text("No Job Applied"));
-                              }
-                              return ListView.builder(
-                                itemCount: applications.length,
-                                itemBuilder: (context, index) {
-                                  return AppliedJobsCard(
-                                    jobApplicationDetails: applications[index],
-                                  );
-                                },
-                              );
-                            },
-                            error: (error, stack) {
-                              return Center(
-                                child: Text("Error Loading your applications"),
-                              );
-                            },
-                            loading: () {
-                              return Center(child: CircularProgressIndicator());
-                            },
-                          ),
-                    )
-                    : Expanded(
-                      child: ref
-                          .watch(getAllSavedJobsProvider)
-                          .when(
-                            data: (jobs) {
-                              if (jobs.isEmpty) {
-                                return Center(child: Text(" No Saved Jobs"));
-                              }
-                              return ListView.builder(
-                                itemCount: jobs.length,
-                                itemBuilder: (context, index) {
-                                  return SavedJobsListWidget(job: jobs[index]);
-                                },
-                              );
-                            },
-                            error: (error, stack) {
-                              return Center(child: Text('Error: $error'));
-                            },
-                            loading: () {
-                              return Center(child: CircularProgressIndicator());
-                            },
-                          ),
-                    );
+
+                // 🧠 decide which list to show
+                if (isSelected[0]) {
+                  // ---- Applied Jobs ----
+                  return Expanded(
+                    child: ref
+                        .watch(getUserApplicationsProvider)
+                        .when(
+                          data:
+                              (apps) =>
+                                  apps.isEmpty
+                                      ? const Center(
+                                        child: Text("No Job Applied"),
+                                      )
+                                      : ListView.builder(
+                                        itemCount: apps.length,
+                                        itemBuilder:
+                                            (_, i) => AppliedJobsCard(
+                                              jobApplicationDetails: apps[i],
+                                            ),
+                                      ),
+                          error:
+                              (_, __) => const Center(
+                                child: Text("Error loading your applications"),
+                              ),
+                          loading:
+                              () => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                        ),
+                  );
+                } else{
+                  // ---- Saved Jobs ----
+                  return Expanded(
+                    child: ref
+                        .watch(getAllSavedJobsProvider)
+                        .when(
+                          data:
+                              (jobs) =>
+                                  jobs.isEmpty
+                                      ? const Center(
+                                        child: Text("No Saved Jobs"),
+                                      )
+                                      : ListView.builder(
+                                        itemCount: jobs.length,
+                                        itemBuilder:
+                                            (_, i) => SavedJobsListWidget(
+                                              job: jobs[i],
+                                            ),
+                                      ),
+                          error: (e, __) => Center(child: Text('Error: $e')),
+                          loading:
+                              () => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                        ),
+                  );
+                } 
               },
             ),
           ],
