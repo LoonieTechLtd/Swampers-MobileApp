@@ -113,7 +113,6 @@ class JobOffersController {
         "jobId": FieldValue.arrayUnion([jobData.jobId]),
       }, SetOptions(merge: true));
 
-      // Update job applications status to "Rejected"
       final querySnap =
           await firestore
               .collection("jobApplications")

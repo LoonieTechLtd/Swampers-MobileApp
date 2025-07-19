@@ -149,9 +149,7 @@ class JobApplicationController {
 
       final QuerySnapshot<Map<String, dynamic>> snapshot =
           await firestore
-              .collection(
-                "profiles",
-              )
+              .collection("profiles")
               .where(FieldPath.documentId, whereIn: job.appliedUsers)
               .get();
 
@@ -172,8 +170,6 @@ class JobApplicationController {
     return appliedUsers;
   }
 
-
-
   // Method to get User's application
   Stream<List<JobApplicationModel>> getUserApplications(String uid) {
     try {
@@ -190,6 +186,72 @@ class JobApplicationController {
     } catch (e) {
       debugPrint("Error getting user jobs: $e");
       return Stream.value([]);
+    }
+  }
+
+  Stream<List<JobApplicationModel>> getCurrentJobs(DateTime selectedDate) {
+    try {
+      final String userId = auth.currentUser!.uid;
+      final String formattedDate =
+          "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}";
+
+      return firestore
+          .collection("jobApplication")
+          .where("applicantId", isEqualTo: userId)
+          .where("applicationStatus", isEqualTo: "Approved")
+          .snapshots()
+          .map((snapshot) {
+            return snapshot.docs
+                .map((doc) => JobApplicationModel.fromMap(doc.data()))
+                .where((application) {
+                  // Check if the selected date falls within the job's date range
+                  final jobDays = application.jobDetails.days;
+                  return _isDateInJobRange(formattedDate, jobDays);
+                })
+                .toList();
+          });
+    } catch (e) {
+      debugPrint("Error getting current jobs: $e");
+      return Stream.value([]);
+    }
+  }
+
+  // Helper method to check if a date falls within the job's date range
+  bool _isDateInJobRange(String selectedDate, String jobDaysRange) {
+    try {
+      final parts = jobDaysRange.split(" to ");
+      if (parts.length != 2) return false;
+
+      final startDateParts = parts[0].split("/");
+      final endDateParts = parts[1].split("/");
+
+      if (startDateParts.length != 3 || endDateParts.length != 3) return false;
+
+      final startDate = DateTime(
+        int.parse(startDateParts[2]), // year
+        int.parse(startDateParts[1]), // month
+        int.parse(startDateParts[0]), // day
+      );
+
+      final endDate = DateTime(
+        int.parse(endDateParts[2]), // year
+        int.parse(endDateParts[1]), // month
+        int.parse(endDateParts[0]), // day
+      );
+
+      final selectedDateParts = selectedDate.split("/");
+      final selected = DateTime(
+        int.parse(selectedDateParts[2]), // year
+        int.parse(selectedDateParts[1]), // month
+        int.parse(selectedDateParts[0]), // day
+      );
+
+      return selected.isAtSameMomentAs(startDate) ||
+          selected.isAtSameMomentAs(endDate) ||
+          (selected.isAfter(startDate) && selected.isBefore(endDate));
+    } catch (e) {
+      debugPrint("Error parsing date range: $e");
+      return false;
     }
   }
 }

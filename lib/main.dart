@@ -113,6 +113,7 @@ class _MyAppState extends ConsumerState<MyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         appBarTheme: AppBarTheme(
+          centerTitle: true,
           titleTextStyle: CustomTextStyles.title.copyWith(color: Colors.black),
         ),
       ),

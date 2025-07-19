@@ -13,6 +13,7 @@ import 'package:swamper_solution/controllers/stats_controller.dart';
 import 'package:swamper_solution/controllers/user_controller.dart';
 import 'package:swamper_solution/models/crimers_model.dart';
 import 'package:swamper_solution/models/individual_model.dart';
+import 'package:swamper_solution/models/job_application_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
 import 'package:swamper_solution/models/jobs_template_model.dart';
 
@@ -119,7 +120,10 @@ final jobTemplateProvider = FutureProvider<List<JobsTemplateModel>>((ref) {
   return JobTemplateController().fetchJobTemplates();
 });
 
-final appliedUsersProvider = FutureProvider.family<List<IndividualModel>, JobModel>((ref, jobModel) async {
+final appliedUsersProvider = FutureProvider.family<
+  List<IndividualModel>,
+  JobModel
+>((ref, jobModel) async {
   try {
     final users = await JobApplicationController().fetchAppliedUsers(jobModel);
     return users;
@@ -129,4 +133,10 @@ final appliedUsersProvider = FutureProvider.family<List<IndividualModel>, JobMod
   }
 });
 
-
+final getCurrentJobsProvider =
+    StreamProvider.family<List<JobApplicationModel>, DateTime>((
+      ref,
+      selectedDate,
+    ) {
+      return JobApplicationController().getCurrentJobs(selectedDate);
+    });
