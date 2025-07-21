@@ -11,7 +11,7 @@ class KycStatusScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("KYC", textAlign: TextAlign.center),
+        title: Text("Due Diligence", textAlign: TextAlign.center),
         centerTitle: true,
       ),
       body: SafeArea(

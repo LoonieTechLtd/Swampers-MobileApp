@@ -9,6 +9,7 @@ import 'package:swamper_solution/controllers/job_template_controller.dart';
 import 'package:swamper_solution/controllers/kyc_controller.dart';
 import 'package:swamper_solution/controllers/message_controller.dart';
 import 'package:swamper_solution/controllers/notification_controller.dart';
+import 'package:swamper_solution/controllers/shift_controller.dart';
 import 'package:swamper_solution/controllers/stats_controller.dart';
 import 'package:swamper_solution/controllers/user_controller.dart';
 import 'package:swamper_solution/models/crimers_model.dart';
@@ -140,3 +141,13 @@ final getCurrentJobsProvider =
     ) {
       return JobApplicationController().getCurrentJobs(selectedDate);
     });
+
+final shiftControllerProvider = Provider((ref) => ShiftController());
+
+final todayShiftStatusProvider = FutureProvider.family<
+  Map<String, dynamic>?,
+  ({String jobId, String uid})
+>((ref, params) async {
+  final shiftController = ref.read(shiftControllerProvider);
+  return await shiftController.getTodayShiftStatus(params.jobId, params.uid);
+});

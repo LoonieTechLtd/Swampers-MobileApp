@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Column(
                         children: [
                           Text(
-                            "App v1.0.0", // Optional footer
+                            "App v1.0.0",
                             style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                           Row(

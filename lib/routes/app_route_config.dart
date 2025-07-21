@@ -1,14 +1,17 @@
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:swamper_solution/models/company_model.dart';
 import 'package:swamper_solution/models/individual_model.dart';
+import 'package:swamper_solution/models/job_application_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
 import 'package:swamper_solution/views/company_views/admin_contact_screen.dart';
 import 'package:swamper_solution/views/company_views/edit_job_screen.dart';
 import 'package:swamper_solution/views/company_views/job_posting_screen.dart';
 import 'package:swamper_solution/views/company_views/jobs_screen.dart';
 import 'package:swamper_solution/views/company_views/posted_job_details_screen.dart';
+import 'package:swamper_solution/views/individual_views/current_job_details_screen.dart';
 import 'package:swamper_solution/views/individual_views/individual_kyc_application_screen.dart';
 import 'package:swamper_solution/views/individual_views/job_details_screen.dart';
 import 'package:swamper_solution/views/individual_views/job_offer_screen.dart';
@@ -20,24 +23,35 @@ import 'package:swamper_solution/views/common/landing_screen.dart';
 import 'package:swamper_solution/views/common/login_screen/login_screen.dart';
 import 'package:swamper_solution/views/common/reset_password_screen.dart';
 import 'package:swamper_solution/views/common/signup_screen/signup_screen.dart';
+import 'package:swamper_solution/views/common/splash_screen.dart';
 import 'package:swamper_solution/views/individual_views/users_main_screen.dart';
 import 'package:swamper_solution/views/company_views/company_main_screen.dart';
 
 class AppRouteConfig {
   AppRouteConfig();
 
+  // Cache user role to avoid repeated Firebase calls
+  static String? _cachedUserRole;
+  static String? _cachedUserId;
+  static DateTime? _lastCacheTime;
+  static const Duration _cacheExpiry = Duration(minutes: 5);
+
   late final GoRouter appRoutes = GoRouter(
-    initialLocation: '/',
+    initialLocation: '/splash',
     redirect: _handleRedirect,
     routes: [
-
       GoRoute(
-            path: "kyc_status_screen",
-            name: "kyc_status_screen",
-            builder: (context, state) {
-              return KycStatusScreen();
-            },
-          ),
+        path: '/splash',
+        name: 'splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: "kyc_status_screen",
+        name: "kyc_status_screen",
+        builder: (context, state) {
+          return KycStatusScreen();
+        },
+      ),
       // Auth routes
       GoRoute(
         path: '/',
@@ -88,13 +102,29 @@ class AppRouteConfig {
             },
           ),
           GoRoute(
+            path: 'current_job_details_screen',
+            name: 'current_job_details_screen',
+            builder: (context, state) {
+              final data = state.extra as Map<String, dynamic>;
+              final jobApplication =
+                  data['jobApplication'] as JobApplicationModel;
+              final user = data['user'] as IndividualModel;
+              final selectedDate = data['selectedDate'] as DateTime?;
+              return CurrentJobDetailsScreen(
+                jobApplicationData: jobApplication,
+                userData: user,
+                selectedDate: selectedDate,
+              );
+            },
+          ),
+          GoRoute(
             path: "individual_kyc_application_screen",
             name: "individual_kyc_application_screen",
             builder: (context, state) {
               return IndividualKycApplicationScreen();
             },
           ),
-          
+
           GoRoute(
             path: "contact_admin_screen",
             name: "contact_admin_screen",
@@ -141,7 +171,6 @@ class AppRouteConfig {
             },
           ),
 
-      
           GoRoute(
             path: 'posted_jobs_screen',
             name: 'posted_jobs_screen',
@@ -190,25 +219,47 @@ class AppRouteConfig {
     final auth = FirebaseAuth.instance;
     final firestore = FirebaseFirestore.instance;
 
+    // Allow splash screen to show
+    if (state.matchedLocation == '/splash') {
+      return null;
+    }
+
     // If user is already logged in
     if (auth.currentUser != null) {
+      final currentUserId = auth.currentUser!.uid;
+
       // Don't redirect if already on correct path
       if (state.matchedLocation.startsWith('/individual') ||
           state.matchedLocation.startsWith('/company')) {
         return null;
       }
+
+      // Check cache first to avoid repeated Firebase calls
+      final now = DateTime.now();
+      if (_cachedUserId == currentUserId &&
+          _lastCacheTime != null &&
+          now.difference(_lastCacheTime!).compareTo(_cacheExpiry) < 0 &&
+          _cachedUserRole != null) {
+        debugPrint('Using cached user role: $_cachedUserRole');
+        return _cachedUserRole == 'Individual' ? '/individual' : '/company';
+      }
+
       try {
         final userDoc =
-            await firestore
-                .collection('profiles')
-                .doc(auth.currentUser!.uid)
-                .get();
+            await firestore.collection('profiles').doc(currentUserId).get();
         if (!userDoc.exists) {
           // Profile deleted or not found, force logout
           await auth.signOut();
+          AppRouteConfig.clearCache();
           return '/';
         }
         final role = userDoc.data()?['role'] as String?;
+
+        // Update cache
+        _cachedUserId = currentUserId;
+        _cachedUserRole = role;
+        _lastCacheTime = now;
+
         if (role == 'Individual') {
           return '/individual';
         } else if (role == 'Company') {
@@ -216,14 +267,21 @@ class AppRouteConfig {
         } else {
           // Invalid role, force logout
           await auth.signOut();
+          AppRouteConfig.clearCache();
           return '/';
         }
       } catch (e) {
         // On error, force logout
+        debugPrint('Error in redirect: $e');
         await auth.signOut();
+        AppRouteConfig.clearCache();
         return '/';
       }
+    } else {
+      // User not logged in, clear cache
+      AppRouteConfig.clearCache();
     }
+
     // If user is not logged in, only allow access to login, signup, and reset_password
     if (!(state.matchedLocation == '/' ||
         state.matchedLocation.startsWith('/login') ||
@@ -233,5 +291,11 @@ class AppRouteConfig {
       return '/';
     }
     return null;
+  }
+
+  static void clearCache() {
+    _cachedUserRole = null;
+    _cachedUserId = null;
+    _lastCacheTime = null;
   }
 }

@@ -19,7 +19,7 @@ class KycStatus extends StatelessWidget {
   Widget build(BuildContext context) {
     if (data.kycVerified == "notSubmitted") {
       return StatusContainer(
-        text: "KYC application not submitted",
+        text: "Due Diligence form not submitted",
         icon: FeatherIcons.userX,
         backgroundColor: Colors.black45,
         onTap: () {
@@ -29,7 +29,7 @@ class KycStatus extends StatelessWidget {
     }
     if (data.kycVerified == "pending") {
       return StatusContainer(
-        text: "KYC application is Pending",
+        text: "Due Diligence application is Pending",
         icon: FeatherIcons.clock,
         backgroundColor: Colors.green,
         onTap: () {
@@ -42,20 +42,20 @@ class KycStatus extends StatelessWidget {
     }
     if (data.kycVerified == "approved") {
       return StatusContainer(
-        text: "KYC Verified",
+        text: "Due Diligence Verified",
         icon: FeatherIcons.userCheck,
         backgroundColor: AppColors().primaryColor,
       );
     }
     if (data.kycVerified == "rejected") {
       return StatusContainer(
-        text: "KYC verification failed",
+        text: "Due Diligence  verification failed",
         icon: FeatherIcons.x,
         backgroundColor: AppColors().red,
       );
     }
     return StatusContainer(
-      text: "Unknown KYC status",
+      text: "Unknown Due Diligence  status",
       icon: FeatherIcons.helpCircle,
       backgroundColor: Colors.grey,
     );

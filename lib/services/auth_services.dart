@@ -12,6 +12,7 @@ import 'package:swamper_solution/models/company_stats_model.dart';
 import 'package:swamper_solution/models/individual_model.dart';
 import 'package:swamper_solution/models/individual_stats_model.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
+import 'package:swamper_solution/routes/app_route_config.dart';
 import 'package:swamper_solution/views/common/signup_screen/individual_form.dart';
 
 class AuthServices {
@@ -58,7 +59,8 @@ class AuthServices {
           profilePic:
               "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
           kycVerified: "notSubmitted",
-          interestedWork: interestedWork!, createdAt: DateTime.now().toString(),
+          interestedWork: interestedWork!,
+          createdAt: DateTime.now().toString(),
         );
 
         final IndividualStatsModel stats = IndividualStatsModel(
@@ -86,7 +88,7 @@ class AuthServices {
               "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
           address: address,
           createdAt: DateTime.now().toString(),
-          isSuspended: false
+          isSuspended: false,
         );
 
         final CompanyStatsModel companyStats = CompanyStatsModel(
@@ -110,7 +112,6 @@ class AuthServices {
   // google login method
   Future<dynamic> loginWithGoogle([WidgetRef? ref]) async {
     try {
-
       final googleSignIn = GoogleSignIn();
 
       // Force google sign Out
@@ -203,8 +204,7 @@ class AuthServices {
         profilePic: profilePic,
         kycVerified: "notSubmitted",
         interestedWork: interestedWork,
-        createdAt: DateTime.now().toString()
-
+        createdAt: DateTime.now().toString(),
       );
 
       final IndividualStatsModel stats = IndividualStatsModel(
@@ -266,7 +266,7 @@ class AuthServices {
         profilePic: profilePic,
         address: address,
         createdAt: DateTime.now().toString(),
-        isSuspended: false
+        isSuspended: false,
       );
 
       final CompanyStatsModel companyStats = CompanyStatsModel(
@@ -378,6 +378,10 @@ class AuthServices {
 
       await auth.signOut();
       await GoogleSignIn().signOut();
+
+      // Clear route cache to prevent stale data
+      AppRouteConfig.clearCache();
+
       // Always redirect to login
       if (context.mounted) {
         context.go("/");

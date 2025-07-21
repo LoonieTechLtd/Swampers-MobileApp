@@ -40,18 +40,22 @@ class MyApp extends ConsumerStatefulWidget {
   ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends ConsumerState<MyApp> {
+class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   late final AppRouteConfig _appRoute;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _appRoute = AppRouteConfig();
     // Set up FCM
     _setupFCM();
 
+    // Only rebuild on significant auth changes, not every state change
+    User? _lastUser;
     FirebaseAuth.instance.authStateChanges().listen((user) {
-      if (mounted) {
+      if (mounted && _lastUser?.uid != user?.uid) {
+        _lastUser = user;
         setState(() {});
       }
     });
@@ -63,6 +67,35 @@ class _MyAppState extends ConsumerState<MyApp> {
         body: message.notification?.body ?? '',
       );
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    debugPrint('App lifecycle state changed to: $state');
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        // App came back to foreground - refresh auth state if needed
+        debugPrint('App resumed from background');
+        break;
+      case AppLifecycleState.paused:
+        // App went to background
+        debugPrint('App paused/went to background');
+        break;
+      case AppLifecycleState.detached:
+        // App is about to be terminated
+        debugPrint('App detached');
+        break;
+      default:
+        break;
+    }
   }
 
   Future<void> _setupFCM() async {
