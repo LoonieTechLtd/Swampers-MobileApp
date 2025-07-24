@@ -50,12 +50,11 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     _appRoute = AppRouteConfig();
     // Set up FCM
     _setupFCM();
-
     // Only rebuild on significant auth changes, not every state change
-    User? _lastUser;
+    User? lastUser;
     FirebaseAuth.instance.authStateChanges().listen((user) {
-      if (mounted && _lastUser?.uid != user?.uid) {
-        _lastUser = user;
+      if (mounted && lastUser?.uid != user?.uid) {
+        lastUser = user;
         setState(() {});
       }
     });

@@ -23,28 +23,21 @@ import 'package:swamper_solution/views/common/landing_screen.dart';
 import 'package:swamper_solution/views/common/login_screen/login_screen.dart';
 import 'package:swamper_solution/views/common/reset_password_screen.dart';
 import 'package:swamper_solution/views/common/signup_screen/signup_screen.dart';
-import 'package:swamper_solution/views/common/splash_screen.dart';
 import 'package:swamper_solution/views/individual_views/users_main_screen.dart';
 import 'package:swamper_solution/views/company_views/company_main_screen.dart';
 
 class AppRouteConfig {
   AppRouteConfig();
 
-  // Cache user role to avoid repeated Firebase calls
   static String? _cachedUserRole;
   static String? _cachedUserId;
   static DateTime? _lastCacheTime;
   static const Duration _cacheExpiry = Duration(minutes: 5);
 
   late final GoRouter appRoutes = GoRouter(
-    initialLocation: '/splash',
+    initialLocation: '/',
     redirect: _handleRedirect,
     routes: [
-      GoRoute(
-        path: '/splash',
-        name: 'splash',
-        builder: (context, state) => const SplashScreen(),
-      ),
       GoRoute(
         path: "kyc_status_screen",
         name: "kyc_status_screen",
@@ -218,11 +211,6 @@ class AppRouteConfig {
   Future<String?> _handleRedirect(context, state) async {
     final auth = FirebaseAuth.instance;
     final firestore = FirebaseFirestore.instance;
-
-    // Allow splash screen to show
-    if (state.matchedLocation == '/splash') {
-      return null;
-    }
 
     // If user is already logged in
     if (auth.currentUser != null) {

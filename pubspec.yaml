@@ -50,6 +50,31 @@ dependencies:
   swipeable_button_view: ^0.0.2
   geolocator: ^12.0.0
   permission_handler: ^11.3.1
+  flutter_native_splash: ^2.4.1
+
+flutter_native_splash:
+  
+  color: "#ffffff"
+  color_dark_android: "#ffffff"
+  color_dark_ios: "#ffffff"
+  image: assets/images/new_logo.png
+  icon_background_color: "#ffffff"
+  # branding: assets/images/icon.png
+  branding: assets/images/branding_white.png
+  branding_mode: bottom
+  branding_dark_android: assets/images/branding_dark.png
+  branding_dark_ios: assets/images/branding_dark.png
+
+  # Following are specific parameters for Android 12+.
+  android_12:
+    image: assets/images/new_logo.png
+    # Splash screen background color.
+    color: "#ffffff"
+    branding: assets/images/branding_white.png
+    # App icon background color.
+    icon_background_color: "#ffffff"
+  
+
 dependency_overrides:
   intl: ^0.20.0
 
@@ -57,17 +82,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^5.0.0
-
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
-
-# The following section is specific to Flutter packages.
 flutter:
 
   # The following line ensures that the Material Icons font is
