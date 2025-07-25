@@ -404,6 +404,46 @@ class AuthServices {
   }
 
   //-------------------------------------------------------------------------------------------------------------
+  // Change Password method
+  Future<String> changePassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
+    try {
+      final user = auth.currentUser;
+      if (user == null) {
+        return "No user signed in";
+      }
+
+      // Re-authenticate the user with current password
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: currentPassword,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+
+      // Update password
+      await user.updatePassword(newPassword);
+
+      return "Success";
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'wrong-password':
+          return 'Current password is incorrect';
+        case 'weak-password':
+          return 'New password should be at least 6 characters';
+        case 'requires-recent-login':
+          return 'Please log out and log in again to change password';
+        default:
+          return 'Failed to change password: ${e.message}';
+      }
+    } catch (e) {
+      return 'Failed to change password. Please try again';
+    }
+  }
+
+  //-------------------------------------------------------------------------------------------------------------
   // Sent a email verification OTP
   Future<bool> sendOtp(String email) async {
     try {

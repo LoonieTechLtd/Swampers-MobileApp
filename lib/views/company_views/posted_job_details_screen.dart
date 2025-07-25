@@ -520,15 +520,15 @@ class _PostedJobDetailsScreenState
             imageUrl: user.profilePic,
             imageBuilder:
                 (context, imageProvider) =>
-                    CircleAvatar(radius: 28, backgroundImage: imageProvider),
+                    CircleAvatar(radius: 20, backgroundImage: imageProvider),
             placeholder:
                 (context, url) => const CircleAvatar(
-                  radius: 28,
+                  radius: 20,
                   child: CircularProgressIndicator(strokeWidth: 2.0),
                 ),
             errorWidget:
                 (context, url, error) => const CircleAvatar(
-                  radius: 28,
+                  radius: 20,
                   child: Icon(Icons.person, size: 30),
                 ),
           ),
@@ -539,35 +539,19 @@ class _PostedJobDetailsScreenState
               children: [
                 Text(
                   '${user.firstName} ${user.lastName}',
-                  style: CustomTextStyles.title.copyWith(
+                  style: CustomTextStyles.h4.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  user.interestedWork,
-                  style: CustomTextStyles.description.copyWith(
-                    color: Colors.grey.shade600,
+                  user.email,
+                  style: CustomTextStyles.caption.copyWith(
+                    color: Colors.black54,
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: Icon(
-              Icons.arrow_forward_ios,
-              size: 18,
-              color: Colors.grey.shade400,
-            ),
-            onPressed: () {
-              // TODO: Navigate to user's profile screen
-              showCustomSnackBar(
-                context: context,
-                message: "Profile view for ${user.firstName} coming soon!",
-                backgroundColor: AppColors().primaryColor,
-              );
-            },
           ),
         ],
       ),
