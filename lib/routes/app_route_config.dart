@@ -18,6 +18,7 @@ import 'package:swamper_solution/views/individual_views/job_offer_screen.dart';
 import 'package:swamper_solution/views/individual_views/kyc_review_screen.dart';
 import 'package:swamper_solution/views/individual_views/edit_kyc_screen.dart';
 import 'package:swamper_solution/views/individual_views/kyc_status_screen.dart';
+import 'package:swamper_solution/views/individual_views/kyc_verified_screen.dart';
 import 'package:swamper_solution/views/individual_views/notification_screen.dart';
 import 'package:swamper_solution/views/common/landing_screen.dart';
 import 'package:swamper_solution/views/common/login_screen/login_screen.dart';
@@ -43,6 +44,13 @@ class AppRouteConfig {
         name: "kyc_status_screen",
         builder: (context, state) {
           return KycStatusScreen();
+        },
+      ),
+      GoRoute(
+        path: "kyc_verified_screen",
+        name: "kyc_verified_screen",
+        builder: (context, state) {
+          return KycVerifiedScreen();
         },
       ),
       // Auth routes
@@ -115,6 +123,13 @@ class AppRouteConfig {
             name: "individual_kyc_application_screen",
             builder: (context, state) {
               return IndividualKycApplicationScreen();
+            },
+          ),
+          GoRoute(
+            path: "verified_kyc_application_screen",
+            name: "verified_kyc_application_screen",
+            builder: (context, state) {
+              return KycVerifiedScreen();
             },
           ),
 

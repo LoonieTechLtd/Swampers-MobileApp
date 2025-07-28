@@ -43,26 +43,26 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
     try {
       // Remove extra spaces and normalize
       timeString = timeString.trim();
-      
+
       // Handle 12-hour format with AM/PM
       bool isPM = timeString.toUpperCase().contains('PM');
       bool isAM = timeString.toUpperCase().contains('AM');
-      
+
       // Extract time part (remove AM/PM)
       String timePart = timeString.replaceAll(RegExp(r'[^\d:]'), '');
       final parts = timePart.split(':');
-      
+
       if (parts.length == 2) {
         int hour = int.parse(parts[0]);
         int minute = int.parse(parts[1]);
-        
+
         // Convert to 24-hour format
         if (isPM && hour != 12) {
           hour += 12;
         } else if (isAM && hour == 12) {
           hour = 0;
         }
-        
+
         return TimeOfDay(hour: hour, minute: minute);
       }
     } catch (e) {
@@ -92,22 +92,23 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
       TimeOfDay startTime = timeRanges[i].startTime;
       TimeOfDay endTime = timeRanges[i].endTime;
 
-      // Validate duration (1-4 hours)
+      // Validate duration (2-6 hours)
       final startMinutes = startTime.hour * 60 + startTime.minute;
       final endMinutes = endTime.hour * 60 + endTime.minute;
       int duration = endMinutes - startMinutes;
 
       if (duration < 0) duration += 24 * 60;
 
-      if (duration > 260 || duration < 60) {
+      if (duration > 360 || duration < 120) {
         _showErrorDialog(
-          "Shift must be less than 4 hours and more than 1 hour.",
+          "Shift must be less than 6 hours and more than 2 hours.",
         );
         return false;
       }
 
       // Format time in 12-hour format for saving
-      String timeRange = '${_formatTime12Hour(startTime)} To ${_formatTime12Hour(endTime)}';
+      String timeRange =
+          '${_formatTime12Hour(startTime)} To ${_formatTime12Hour(endTime)}';
       validRanges.add(timeRange);
     }
 
@@ -120,33 +121,34 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
     int hour = time.hour;
     int minute = time.minute;
     String period = hour >= 12 ? 'PM' : 'AM';
-    
+
     // Convert to 12-hour format
     if (hour == 0) {
       hour = 12; // Midnight
     } else if (hour > 12) {
       hour -= 12; // Afternoon/Evening
     }
-    
+
     String hourStr = hour.toString();
     String minuteStr = minute.toString().padLeft(2, '0');
-    
+
     return '$hourStr:$minuteStr $period';
   }
 
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Invalid Input"),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("OK", style: TextStyle(color: AppColors().red)),
+      builder:
+          (context) => AlertDialog(
+            title: const Text("Invalid Input"),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("OK", style: TextStyle(color: AppColors().red)),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -155,7 +157,7 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
     // Get screen dimensions for responsive sizing
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
+
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Container(
@@ -172,13 +174,10 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
               child: const Text(
                 "Select Time Ranges",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
-            
+
             // Content
             Flexible(
               child: SingleChildScrollView(
@@ -191,7 +190,7 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
                       style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const SizedBox(height: 20),
-                    
+
                     // Time ranges list
                     ...timeRanges.asMap().entries.map((entry) {
                       int index = entry.key;
@@ -234,9 +233,9 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
                                   ),
                               ],
                             ),
-                            
+
                             const SizedBox(height: 16),
-                            
+
                             // Time pickers row - fixed overflow
                             LayoutBuilder(
                               builder: (context, constraints) {
@@ -255,7 +254,7 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
                                         },
                                       ),
                                     ),
-                                    
+
                                     // "TO" indicator
                                     Container(
                                       width: 40,
@@ -270,7 +269,7 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
                                         ),
                                       ),
                                     ),
-                                    
+
                                     // End Time Picker
                                     Expanded(
                                       flex: 5,
@@ -292,7 +291,7 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
                         ),
                       );
                     }).toList(),
-                    
+
                     const SizedBox(height: 16),
 
                     // Add another time range button
@@ -317,7 +316,7 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
                 ),
               ),
             ),
-            
+
             // Action buttons
             Container(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
@@ -352,10 +351,7 @@ class _TimeRangeDialogState extends State<TimeRangeDialog> {
                           borderRadius: BorderRadius.circular(40),
                         ),
                       ),
-                      child: const Text(
-                        "Save",
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      child: const Text("Save", style: TextStyle(fontSize: 16)),
                     ),
                   ),
                 ],
@@ -390,17 +386,17 @@ class TimePickerField extends StatelessWidget {
     int hour = time.hour;
     int minute = time.minute;
     String period = hour >= 12 ? 'PM' : 'AM';
-    
+
     // Convert to 12-hour format
     if (hour == 0) {
       hour = 12; // Midnight
     } else if (hour > 12) {
       hour -= 12; // Afternoon/Evening
     }
-    
+
     String hourStr = hour.toString();
     String minuteStr = minute.toString().padLeft(2, '0');
-    
+
     return '$hourStr:$minuteStr $period';
   }
 
@@ -431,7 +427,6 @@ class TimePickerField extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-               
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -499,7 +494,7 @@ class _IOSStyleTimePickerState extends State<IOSStyleTimePicker> {
   @override
   void initState() {
     super.initState();
-    
+
     // Convert 24-hour format to 12-hour format for display
     int hour24 = widget.initialTime.hour;
     selectedPeriod = hour24 >= 12 ? 1 : 0;
@@ -549,10 +544,7 @@ class _IOSStyleTimePickerState extends State<IOSStyleTimePicker> {
               ),
               const Text(
                 "Select Time",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               TextButton(
                 onPressed: () {
@@ -566,9 +558,9 @@ class _IOSStyleTimePickerState extends State<IOSStyleTimePicker> {
               ),
             ],
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Time Picker Wheels
           Expanded(
             child: Row(
@@ -594,7 +586,7 @@ class _IOSStyleTimePickerState extends State<IOSStyleTimePicker> {
                     }),
                   ),
                 ),
-                
+
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8),
                   child: Text(
@@ -602,7 +594,7 @@ class _IOSStyleTimePickerState extends State<IOSStyleTimePicker> {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                 ),
-                
+
                 // Minute wheel
                 Expanded(
                   flex: 3,
@@ -624,9 +616,9 @@ class _IOSStyleTimePickerState extends State<IOSStyleTimePicker> {
                     }),
                   ),
                 ),
-                
+
                 const SizedBox(width: 16),
-                
+
                 // AM/PM wheel
                 Expanded(
                   flex: 2,
@@ -639,27 +631,17 @@ class _IOSStyleTimePickerState extends State<IOSStyleTimePicker> {
                       });
                     },
                     children: const [
-                      Center(
-                        child: Text(
-                          'AM',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
-                      Center(
-                        child: Text(
-                          'PM',
-                          style: TextStyle(fontSize: 20),
-                        ),
-                      ),
+                      Center(child: Text('AM', style: TextStyle(fontSize: 20))),
+                      Center(child: Text('PM', style: TextStyle(fontSize: 20))),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          
+
           const SizedBox(height: 20),
-          
+
           // Selected time display
           Container(
             width: double.infinity,

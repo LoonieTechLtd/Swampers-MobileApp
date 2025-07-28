@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
-import 'package:swamper_solution/consts/app_colors.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/controllers/job_controller.dart';
 import 'package:swamper_solution/models/company_model.dart';
@@ -266,14 +265,6 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                   CustomButton(
                     backgroundColor: Colors.blue,
                     onPressed: () async {
-                      if (_selectedImages.isEmpty) {
-                        showCustomSnackBar(
-                          context: context,
-                          message: "Please select at least one site image.",
-                          backgroundColor: AppColors().red,
-                        );
-                        return;
-                      }
                       if (!_formKey.currentState!.validate()) return;
                       showDialog(
                         context: context,
@@ -296,7 +287,6 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                       );
                       // Add this line to let the dialog render
                       await Future.delayed(Duration.zero);
-
                       final jobId = randomAlphaNumeric(6);
                       List<String> imageUrls = [];
                       if (_selectedImages.isNotEmpty) {
@@ -332,7 +322,7 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                         jobStatus: "Pending",
                         days: dayRangeStr ?? '',
                         messageToAdmin: _messageToAdminController.text,
-                        assignedStaffs: []
+                        assignedStaffs: [],
                       );
 
                       final message = await JobController().postJob(

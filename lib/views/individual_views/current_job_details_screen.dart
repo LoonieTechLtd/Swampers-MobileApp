@@ -435,44 +435,104 @@ class _CurrentJobDetailsScreenState
   ) {
     return Stack(
       children: [
-        SizedBox(
-          height: 280,
+        Container(
+          height: 300,
           width: double.infinity,
+          margin: const EdgeInsets.only(bottom: 8),
           child: PageView.builder(
             controller: pageController,
             itemCount: widget.jobApplicationData.jobDetails.images.length,
             onPageChanged: (index) => currentPage.value = index,
             itemBuilder: (context, index) {
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                      spreadRadius: 0,
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: CachedNetworkImage(
-                    imageUrl:
-                        widget.jobApplicationData.jobDetails.images[index],
-                    fit: BoxFit.cover,
-                    placeholder:
-                        (context, url) => Container(
-                          color: Colors.grey[200],
-                          child: const Center(
-                            child: CircularProgressIndicator(),
+                  borderRadius: BorderRadius.circular(20),
+                  child: Stack(
+                    children: [
+                      CachedNetworkImage(
+                        imageUrl:
+                            widget.jobApplicationData.jobDetails.images[index],
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                        placeholder:
+                            (context, url) => Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.grey[200]!,
+                                    Colors.grey[300]!,
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        errorWidget:
+                            (context, url, error) => Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.grey[200]!,
+                                    Colors.grey[300]!,
+                                  ],
+                                ),
+                              ),
+                              child: const Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.image_not_supported,
+                                      color: Colors.grey,
+                                      size: 48,
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      'Image not available',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                      ),
+                      // Gradient overlay for better text visibility
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.1),
+                            ],
                           ),
                         ),
-                    errorWidget:
-                        (context, url, error) => Container(
-                          color: Colors.grey[200],
-                          child: const Icon(Icons.error, color: Colors.grey),
-                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -481,26 +541,40 @@ class _CurrentJobDetailsScreenState
         ),
         if (widget.jobApplicationData.jobDetails.images.length > 1)
           Positioned(
-            bottom: 16,
+            bottom: 20,
             left: 0,
             right: 0,
             child: ValueListenableBuilder<int>(
               valueListenable: currentPage,
               builder: (context, page, child) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    widget.jobApplicationData.jobDetails.images.length,
-                    (index) => Container(
-                      width: 8,
-                      height: 8,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color:
-                            page == index
-                                ? Colors.white
-                                : Colors.white.withOpacity(0.5),
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      widget.jobApplicationData.jobDetails.images.length,
+                      (index) => AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        width: page == index ? 24 : 8,
+                        height: 8,
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color:
+                              page == index
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.5),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -545,10 +619,8 @@ class _CurrentJobDetailsScreenState
         hour = 0;
       }
 
-      print("Debug: Final hour: $hour, minute: $minute");
       return TimeOfDay(hour: hour, minute: minute);
     } catch (e) {
-      print("Debug: Exception in _parseTime: $e");
       return null;
     }
   }
@@ -594,15 +666,20 @@ class _CurrentJobDetailsScreenState
 
   Widget _buildJobHeader() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.white, Colors.grey.shade50],
+        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -612,61 +689,108 @@ class _CurrentJobDetailsScreenState
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  widget.jobApplicationData.jobDetails.role,
-                  style: CustomTextStyles.h3.copyWith(
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors().primaryColor,
+                      AppColors().primaryColor.withOpacity(0.8),
+                    ],
                   ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors().primaryColor.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.work_rounded,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.jobApplicationData.jobDetails.role,
+                      style: CustomTextStyles.h3.copyWith(
+                        fontWeight: FontWeight.bold,
+                        height: 1.2,
+                        color: Colors.grey.shade800,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on_rounded,
+                          color: Colors.grey.shade600,
+                          size: 18,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            widget.jobApplicationData.jobDetails.location,
+                            style: CustomTextStyles.bodyText.copyWith(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 12),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+                  horizontal: 16,
+                  vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    colors: [Colors.green.shade400, Colors.green.shade600],
+                  ),
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.green.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    const Icon(
+                      Icons.attach_money_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    ),
                     Text(
-                      "\$${widget.jobApplicationData.jobDetails.hourlyIncome}",
-                      style: CustomTextStyles.h3.copyWith(
-                        color: Colors.green.shade700,
+                      "${widget.jobApplicationData.jobDetails.hourlyIncome}",
+                      style: CustomTextStyles.h4.copyWith(
+                        color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
                       "/hr",
                       style: CustomTextStyles.description.copyWith(
-                        color: Colors.green.shade700,
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 12,
                       ),
                     ),
                   ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Icon(
-                Icons.location_on_rounded,
-                color: Colors.grey.shade600,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  widget.jobApplicationData.jobDetails.location,
-                  style: CustomTextStyles.bodyText.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
                 ),
               ),
             ],
@@ -678,11 +802,22 @@ class _CurrentJobDetailsScreenState
 
   Widget _buildDescriptionCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.white, Colors.purple.shade50.withOpacity(0.3)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.purple.shade100),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purple.withOpacity(0.08),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -690,14 +825,23 @@ class _CurrentJobDetailsScreenState
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.purple.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  gradient: LinearGradient(
+                    colors: [Colors.purple.shade400, Colors.purple.shade600],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.purple.withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: const Icon(
-                  Icons.description,
-                  color: Colors.purple,
+                  Icons.description_rounded,
+                  color: Colors.white,
                   size: 20,
                 ),
               ),
@@ -705,17 +849,27 @@ class _CurrentJobDetailsScreenState
               Text(
                 "Job Description",
                 style: CustomTextStyles.title.copyWith(
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.grey.shade800,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            widget.jobApplicationData.jobDetails.description,
-            style: CustomTextStyles.bodyText.copyWith(
-              height: 1.5,
-              color: Colors.grey.shade700,
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Text(
+              widget.jobApplicationData.jobDetails.description,
+              style: CustomTextStyles.bodyText.copyWith(
+                height: 1.6,
+                color: Colors.grey.shade700,
+                fontSize: 14,
+              ),
             ),
           ),
         ],
@@ -744,164 +898,294 @@ class _CurrentJobDetailsScreenState
           leading: Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withOpacity(0.95),
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              icon: const Icon(
+                Icons.arrow_back_ios_rounded,
+                color: Colors.black87,
+              ),
               onPressed: () => context.pop(),
             ),
           ),
-          actions: [
-            Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ],
+          
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildImageCarousel(pageController, currentPage),
-                    // Date indicator
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getDateIndicatorColor(),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            _getDateIndicatorIcon(),
-                            size: 16,
-                            color: Colors.white,
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.grey.shade50, Colors.white],
+            ),
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      _buildImageCarousel(pageController, currentPage),
+                      // Date indicator
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              _getDateIndicatorColor(),
+                              _getDateIndicatorColor().withOpacity(0.8),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            _getDateIndicatorText(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: _getDateIndicatorColor().withOpacity(0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(
+                                _getDateIndicatorIcon(),
+                                size: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              _getDateIndicatorText(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Column(
-                        children: [
-                          _buildJobHeader(),
-                          const SizedBox(height: 16),
-                          // shift details card
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            height: MediaQuery.of(context).size.height * 0.13,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              color: AppColors().primaryColor,
-                            ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Duration",
-                                      style: CustomTextStyles.h4.copyWith(
-                                        color: AppColors().white,
-                                      ),
-                                    ),
-                                    Text(
-                                      "${_calculateDurationHours(widget.jobApplicationData.selectedShift)}/ Day",
-                                      style: CustomTextStyles.h6.copyWith(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                      ),
-                                    ),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          children: [
+                            _buildJobHeader(),
+                            const SizedBox(height: 20),
+                            // shift details card
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 12),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    AppColors().primaryColor,
+                                    AppColors().primaryColor.withOpacity(0.8),
                                   ],
                                 ),
-                                VerticalDivider(indent: 10, endIndent: 10),
-                                Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Shift",
-                                      style: CustomTextStyles.h4.copyWith(
-                                        color: AppColors().white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors().primaryColor.withOpacity(
+                                      0.3,
+                                    ),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      height: 130,
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: Colors.white.withOpacity(0.3),
+                                        ),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(
+                                                0.2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: const Icon(
+                                              Icons.schedule_rounded,
+                                              color: Colors.white,
+                                              size: 24,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Text(
+                                            "Duration",
+                                            style: CustomTextStyles.h4.copyWith(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            "${_calculateDurationHours(widget.jobApplicationData.selectedShift)}/Day",
+                                            style: CustomTextStyles.h6.copyWith(
+                                              color: Colors.white.withOpacity(
+                                                0.9,
+                                              ),
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    Text(
-                                      widget.jobApplicationData.selectedShift,
-                                      style: CustomTextStyles.h6.copyWith(
-                                        color: Colors.white,
-                                        fontSize: 14,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Container(
+                                      height: 130,
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: Colors.white.withOpacity(0.3),
+                                        ),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(
+                                                0.2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                            child: const Icon(
+                                              Icons.access_time_rounded,
+                                              color: Colors.white,
+                                              size: 24,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Text(
+                                            "Shift",
+                                            style: CustomTextStyles.h4.copyWith(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            widget
+                                                .jobApplicationData
+                                                .selectedShift,
+                                            style: CustomTextStyles.h6.copyWith(
+                                              color: Colors.white.withOpacity(
+                                                0.9,
+                                              ),
+                                              fontSize: 10,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildDescriptionCard(),
-                        ],
+                            const SizedBox(height: 20),
+                            _buildDescriptionCard(),
+                            const SizedBox(
+                              height: 100,
+                            ), // Extra space for floating button
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ), // End of Column
+        ), // End of Container body
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+        floatingActionButton: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.only(bottom: 16),
           child:
               _isShiftCompleted
                   ? Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.green.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.green.shade200),
+                      gradient: LinearGradient(
+                        colors: [Colors.green.shade50, Colors.green.shade100],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.green.shade300),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.green.withOpacity(0.2),
+                          blurRadius: 15,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.check_circle,
-                          color: Colors.green.shade600,
-                          size: 20,
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade500,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.check_circle_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
                         Text(
                           "Shift completed for today",
                           style: CustomTextStyles.h5.copyWith(
                             color: Colors.green.shade700,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],
@@ -909,26 +1193,43 @@ class _CurrentJobDetailsScreenState
                   )
                   : !_isCurrentDateValidForJob()
                   ? Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.orange.shade200),
+                      gradient: LinearGradient(
+                        colors: [Colors.orange.shade50, Colors.orange.shade100],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.orange.shade300),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.orange.withOpacity(0.2),
+                          blurRadius: 15,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.info_outline,
-                          color: Colors.orange.shade600,
-                          size: 20,
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade500,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.info_outline_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
                         Text(
-                          "Cannot start upcomming shift",
+                          "Cannot start upcoming shift",
                           style: CustomTextStyles.bodyText.copyWith(
                             color: Colors.orange.shade700,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
                           ),
                         ),
                       ],
@@ -979,16 +1280,30 @@ class _CurrentJobDetailsScreenState
                         }
                       }
 
-                      return CustomButton(
-                        backgroundColor: buttonColor,
-                        onPressed: () {
-                          if (isEnabled && !_isShiftCompleted && !_isLoading) {
-                            _handleShiftButton(ref);
-                          }
-                        },
-                        text: buttonText,
-                        textColor: AppColors().white,
-                        isLoading: _isLoading,
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: buttonColor.withOpacity(0.3),
+                              blurRadius: 15,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: CustomButton(
+                          backgroundColor: buttonColor,
+                          onPressed: () {
+                            if (isEnabled &&
+                                !_isShiftCompleted &&
+                                !_isLoading) {
+                              _handleShiftButton(ref);
+                            }
+                          },
+                          text: buttonText,
+                          textColor: AppColors().white,
+                          isLoading: _isLoading,
+                        ),
                       );
                     },
                   ),

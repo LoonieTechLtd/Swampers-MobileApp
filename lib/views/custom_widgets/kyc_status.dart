@@ -9,11 +9,7 @@ import 'package:swamper_solution/views/individual_views/kyc_review_screen.dart';
 class KycStatus extends StatelessWidget {
   final IndividualModel data;
   final VoidCallback onTap;
-  const KycStatus({
-    super.key,
-    required this.data,
-    required this.onTap,
-  });
+  const KycStatus({super.key, required this.data, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +38,9 @@ class KycStatus extends StatelessWidget {
     }
     if (data.kycVerified == "approved") {
       return StatusContainer(
+        onTap: () {
+          context.goNamed("verified_kyc_application_screen");
+        },
         text: "Due Diligence Verified",
         icon: FeatherIcons.userCheck,
         backgroundColor: AppColors().primaryColor,
@@ -49,6 +48,9 @@ class KycStatus extends StatelessWidget {
     }
     if (data.kycVerified == "rejected") {
       return StatusContainer(
+        onTap: () {
+          context.goNamed("kyc_review");
+        },
         text: "Due Diligence  verification failed",
         icon: FeatherIcons.x,
         backgroundColor: AppColors().red,
