@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/services/auth_services.dart';
-import 'package:swamper_solution/views/company_views/company_email_verification_screen.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_textfield.dart';
 
@@ -90,64 +90,59 @@ class _CompanyFormState extends State<CompanyForm> {
               },
             ),
             SizedBox(height: 30),
-            Consumer(
-              builder: (context, ref, child) {
-                return CustomButton(
-                  isLoading: isLoading,
-                  backgroundColor: Colors.blue,
-                  onPressed: () async {
-                    if (!formKey.currentState!.validate()) return;
+
+            // Signup button
+            CustomButton(
+              isLoading: isLoading,
+              backgroundColor: Colors.blue,
+              onPressed: () async {
+                if (!formKey.currentState!.validate()) return;
+                setState(() {
+                  isLoading = true;
+                });
+                try {
+                  final result = await AuthServices().registerCompany(
+                    emailController.text.trim(),
+                    passwordController.text,
+                    companyNameController.text.trim(),
+                    phoneController.text.trim(),
+                    addressController.text.trim(),
+                    "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
+                  );
+
+                  if (!mounted) return;
+
+                  if (result == "Success") {
+                    showCustomSnackBar(
+                      context: context,
+                      message:
+                          "Company account created! Please verify your email to continue.",
+                      backgroundColor: Colors.green,
+                    );
+                    context.goNamed('email_varification_screen');
+                  } else {
+                    showCustomSnackBar(
+                      context: context,
+                      message: result ?? "Registration failed",
+                      backgroundColor: Colors.red,
+                    );
+                  }
+                } catch (e) {
+                  showCustomSnackBar(
+                    context: context,
+                    message: e.toString(),
+                    backgroundColor: Colors.red,
+                  );
+                } finally {
+                  if (mounted) {
                     setState(() {
-                      isLoading = true;
+                      isLoading = false;
                     });
-                    try {
-                      // Send OTP first
-                      final otpSent = await AuthServices().sendOtp(
-                        emailController.text.trim(),
-                      );
-                      if (otpSent) {
-                        // Navigate to email verification screen, pass company details
-                        if (!mounted) return;
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder:
-                                (context) => CompanyEmailVerificationScreen(
-                                  companyName:
-                                      companyNameController.text.trim(),
-                                  email: emailController.text.trim(),
-                                  phone: phoneController.text.trim(),
-                                  address: addressController.text.trim(),
-                                  password: passwordController.text,
-                                  profilePic:
-                                      "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
-                                ),
-                          ),
-                        );
-                      } else {
-                        showCustomSnackBar(
-                          context: context,
-                          message: "Failed to send OTP. Please try again.",
-                          backgroundColor: Colors.red,
-                        );
-                      }
-                    } catch (e) {
-                      showCustomSnackBar(
-                        context: context,
-                        message: e.toString(),
-                        backgroundColor: Colors.red,
-                      );
-                    } finally {
-                      if (mounted) {
-                        setState(() {
-                          isLoading = false;
-                        });
-                      }
-                    }
-                  },
-                  text: "Register Your Company",
-                  textColor: Colors.white,
-                );
+                  }
+                }
               },
+              text: "Register Your Company",
+              textColor: Colors.white,
             ),
           ],
         ),

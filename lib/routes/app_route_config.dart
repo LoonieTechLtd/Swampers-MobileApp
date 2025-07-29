@@ -6,6 +6,7 @@ import 'package:swamper_solution/models/company_model.dart';
 import 'package:swamper_solution/models/individual_model.dart';
 import 'package:swamper_solution/models/job_application_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
+import 'package:swamper_solution/views/common/email_verification_screen.dart';
 import 'package:swamper_solution/views/company_views/admin_contact_screen.dart';
 import 'package:swamper_solution/views/company_views/edit_job_screen.dart';
 import 'package:swamper_solution/views/company_views/job_posting_screen.dart';
@@ -39,6 +40,13 @@ class AppRouteConfig {
     initialLocation: '/',
     redirect: _handleRedirect,
     routes: [
+      GoRoute(
+        path: "/email_varification_screen",
+        name: "email_varification_screen",
+        builder: (context, state) {
+          return const EmailVerificationScreen();
+        },
+      ),
       GoRoute(
         path: "kyc_status_screen",
         name: "kyc_status_screen",
@@ -231,6 +239,16 @@ class AppRouteConfig {
     if (auth.currentUser != null) {
       final currentUserId = auth.currentUser!.uid;
 
+      // Check if email is verified
+      if (!auth.currentUser!.emailVerified) {
+        // Allow access to email verification screen
+        if (state.matchedLocation == '/email_varification_screen' ||
+            state.name == 'email_varification_screen') {
+          return null;
+        }
+        return '/email_varification_screen';
+      }
+
       // Don't redirect if already on correct path
       if (state.matchedLocation.startsWith('/individual') ||
           state.matchedLocation.startsWith('/company')) {
@@ -289,7 +307,7 @@ class AppRouteConfig {
     if (!(state.matchedLocation == '/' ||
         state.matchedLocation.startsWith('/login') ||
         state.matchedLocation.startsWith('/signup') ||
-        state.matchedLocation.startsWith('/email_verification') ||
+        state.matchedLocation.startsWith('/email_varification_screen') ||
         state.matchedLocation.startsWith('/reset_password'))) {
       return '/';
     }

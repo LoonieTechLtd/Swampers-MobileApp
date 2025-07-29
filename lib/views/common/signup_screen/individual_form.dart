@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
 import 'package:swamper_solution/services/auth_services.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_drop_down.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_textfield.dart';
-import 'package:swamper_solution/views/individual_views/individual_email_verification_screen.dart';
 
 class IndividualForm extends StatefulWidget {
   final WidgetRef ref;
@@ -139,38 +139,50 @@ class _IndividualFormState extends State<IndividualForm> {
               isLoading: isLoading,
               onPressed: () async {
                 if (!formKey.currentState!.validate()) return;
-                try {
-                  // Send OTP first
-                  final otpSent = await AuthServices().sendOtp(
-                    emailController.text.trim(),
+                if (selectedWork == null) {
+                  showCustomSnackBar(
+                    context: context,
+                    message: "Please select your interested work",
+                    backgroundColor: Colors.red,
                   );
-                  if (otpSent) {
-                    // Navigate to email verification screen, pass company details
-                    if (!mounted) return;
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder:
-                            (context) => IndividualEmailVerificationScreen(
-                              email: emailController.text.trim(),
-                              firstName: firstNameController.text.trim(),
-                              lastName: lastNameController.text.trim(),
-                              phoneNo: phoneController.text.trim(),
-                              password: passwordController.text,
-                              address: addressController.text.trim(),
-                              profilePic:
-                                  "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
-                              interestedWork: selectedWork ?? '',
-                            ),
-                      ),
+                  return;
+                }
+
+                setState(() {
+                  isLoading = true;
+                });
+
+                try {
+                  final result = await AuthServices().registerUser(
+                    emailController.text.trim(),
+                    passwordController.text,
+                    firstNameController.text.trim(),
+                    lastNameController.text.trim(),
+                    phoneController.text.trim(),
+                    addressController.text.trim(),
+                    "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
+                    selectedWork!,
+                  );
+
+                  if (!mounted) return;
+
+                  if (result == "Success") {
+                    showCustomSnackBar(
+                      context: context,
+                      message:
+                          "Account created! Please verify your email to continue.",
+                      backgroundColor: Colors.green,
                     );
+                    context.goNamed("email_varification_screen");
                   } else {
                     showCustomSnackBar(
                       context: context,
-                      message: "Failed to send OTP. Please try again.",
+                      message: result ?? "Registration failed",
                       backgroundColor: Colors.red,
                     );
                   }
                 } catch (e) {
+                  if (!mounted) return;
                   showCustomSnackBar(
                     context: context,
                     message: e.toString(),

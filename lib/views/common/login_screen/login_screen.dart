@@ -126,6 +126,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       if (mounted) context.go('/individual');
                     } else if (message == "Company") {
                       if (mounted) context.go('/company');
+                    } else if (message == "email-not-verified") {
+                      if (mounted) {
+                        context.goNamed('email_varification_screen');
+                        showCustomSnackBar(
+                          context: context,
+                          message:
+                              "Please verify your email address to continue",
+                          backgroundColor: Colors.orange,
+                        );
+                      }
                     } else if (message == "signup") {
                       if (mounted) {
                         context.go('/signup');
@@ -257,7 +267,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         )
                       else ...[
                         Text("Login with Google"),
-                        
                       ],
                     ],
                   ),

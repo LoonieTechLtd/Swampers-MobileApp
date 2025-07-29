@@ -1,11 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:email_otp/email_otp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:swamper_solution/consts/app_colors.dart';
 import 'package:swamper_solution/controllers/stats_controller.dart';
 import 'package:swamper_solution/models/company_model.dart';
 import 'package:swamper_solution/models/company_stats_model.dart';
@@ -13,7 +11,6 @@ import 'package:swamper_solution/models/individual_model.dart';
 import 'package:swamper_solution/models/individual_stats_model.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
 import 'package:swamper_solution/routes/app_route_config.dart';
-import 'package:swamper_solution/views/common/signup_screen/individual_form.dart';
 
 class AuthServices {
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -28,6 +25,20 @@ class AuthServices {
       return true;
     } catch (e) {
       throw Exception("Error checking if user exists");
+    }
+  }
+
+  Future<bool> sendEmailVerificationLink(String email) async {
+    try {
+      final user = auth.currentUser;
+      if (user != null && user.email == email) {
+        await user.sendEmailVerification();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
     }
   }
 
@@ -187,11 +198,13 @@ class AuthServices {
     String interestedWork,
   ) async {
     try {
-      sendOtp(email);
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      // Send email verification link
+      await userCredential.user!.sendEmailVerification();
 
       final IndividualModel newUser = IndividualModel(
         uid: userCredential.user!.uid.toString(),
@@ -250,12 +263,13 @@ class AuthServices {
     String profilePic,
   ) async {
     try {
-      sendOtp(email);
-
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      // Send email verification link
+      await userCredential.user!.sendEmailVerification();
 
       final CompanyModel newCompany = CompanyModel(
         uid: userCredential.user!.uid.toString(),
@@ -284,7 +298,6 @@ class AuthServices {
         companyStats,
         userCredential.user!.uid,
       );
-
       return "Success";
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
@@ -301,7 +314,6 @@ class AuthServices {
   }
 
   //-------------------------------------------------------------------------------------------------------------
-
   // common login method
   Future<String> login(String email, String password, [WidgetRef? ref]) async {
     try {
@@ -309,6 +321,11 @@ class AuthServices {
         email: email,
         password: password,
       );
+
+      // Check if email is verified
+      if (!userCredential.user!.emailVerified) {
+        return 'email-not-verified';
+      }
 
       // Invalidate providers to force reload of user data after login
       if (ref != null) {
@@ -440,33 +457,6 @@ class AuthServices {
       }
     } catch (e) {
       return 'Failed to change password. Please try again';
-    }
-  }
-
-  //-------------------------------------------------------------------------------------------------------------
-  // Sent a email verification OTP
-  Future<bool> sendOtp(String email) async {
-    try {
-      EmailOTP.sendOTP(email: email);
-      return true;
-    } catch (e) {
-      debugPrint("Error while sending OTP: $e");
-      return false;
-    }
-  }
-
-  bool verifyOtp(String otp, BuildContext context) {
-    var res = EmailOTP.verifyOTP(otp: otp);
-    if (res) {
-      showCustomSnackBar(context: context, message: "OTP verified");
-      return true;
-    } else {
-      showCustomSnackBar(
-        context: context,
-        message: "Invalid OTP !",
-        backgroundColor: AppColors().red,
-      );
-      return false;
     }
   }
 }
