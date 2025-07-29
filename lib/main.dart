@@ -17,6 +17,7 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await NotificiationServices.initilizeLocalNotifications();
   EmailOTP.config(
+    appEmail:"noreplay.swampersolution",
     appName: 'Swamper Solution',
     otpType: OTPType.numeric,
     emailTheme: EmailTheme.v4,
