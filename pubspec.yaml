@@ -53,13 +53,11 @@ dependencies:
   flutter_native_splash: ^2.4.1
 
 flutter_native_splash:
-  
   color: "#ffffff"
   color_dark_android: "#ffffff"
   color_dark_ios: "#ffffff"
-  image: assets/images/new_logo.png
+  image: assets/images/splash_logo.png
   icon_background_color: "#ffffff"
-  # branding: assets/images/icon.png
   branding: assets/images/branding_white.png
   branding_mode: bottom
   branding_dark_android: assets/images/branding_dark.png
@@ -67,7 +65,7 @@ flutter_native_splash:
 
   # Following are specific parameters for Android 12+.
   android_12:
-    image: assets/images/new_logo.png
+    image: assets/images/splash_logo.png
     # Splash screen background color.
     color: "#ffffff"
     branding: assets/images/branding_white.png
@@ -81,6 +79,12 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.4
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/company_logo2.png"
+
 
   flutter_lints: ^5.0.0
 flutter:

@@ -44,6 +44,9 @@ class _IndividualEmailVerificationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -117,7 +120,7 @@ class _IndividualEmailVerificationScreenState
                     if (result == "Success") {
                       showCustomSnackBar(
                         context: context,
-                        message: "Company Registered Successfully",
+                        message: "Profile Created Successfully",
                         backgroundColor: Colors.green,
                       );
                       final message = await AuthServices().login(
