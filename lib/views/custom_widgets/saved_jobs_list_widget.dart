@@ -24,12 +24,29 @@ class SavedJobsListWidget extends ConsumerWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: CachedNetworkImage(
-              fit: BoxFit.cover,
-              imageUrl: job.images[0],
-              height: 80,
-              width: 90,
-            ),
+            child:
+                job.images.isNotEmpty
+                    ? CachedNetworkImage(
+                      fit: BoxFit.cover,
+                      errorWidget:
+                          (context, url, error) => const Icon(Icons.image),
+                      imageUrl: job.images[0],
+                      height: 80,
+                      width: 90,
+                    )
+                    : Container(
+                      height: 80,
+                      width: 90,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.image,
+                        color: Colors.grey,
+                        size: 40,
+                      ),
+                    ),
           ),
           const SizedBox(width: 12),
           Expanded(

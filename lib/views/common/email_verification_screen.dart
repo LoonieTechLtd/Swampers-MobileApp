@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:swamper_solution/consts/app_colors.dart';
+import 'package:swamper_solution/views/common/signup_screen/individual_form.dart';
+import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   const EmailVerificationScreen({super.key});
@@ -138,17 +141,18 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
-                  ElevatedButton(
+                  CustomButton(
+                    backgroundColor: AppColors().primaryColor,
                     onPressed: () async {
                       await sendVerificationEmail();
-                      if (!mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Verification email sent!'),
-                        ),
+                      showCustomSnackBar(
+                        context: context,
+                        message: "Verification Email Resent!",
+                        backgroundColor: AppColors().green,
                       );
                     },
-                    child: const Text('Resend Verification Email'),
+                    text: "Resend Verification Email",
+                    textColor: AppColors().white,
                   ),
                   const SizedBox(height: 16),
                   TextButton(
