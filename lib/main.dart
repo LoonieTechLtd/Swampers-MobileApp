@@ -1,4 +1,3 @@
-import 'package:email_otp/email_otp.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -16,12 +15,6 @@ void main() async {
   await FirebaseMessaging.instance.requestPermission();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await NotificiationServices.initilizeLocalNotifications();
-  EmailOTP.config(
-    appEmail:"noreplay.swampersolution",
-    appName: 'Swamper Solution',
-    otpType: OTPType.numeric,
-    emailTheme: EmailTheme.v4,
-  );
   runApp(ProviderScope(child: MyApp()));
 }
 

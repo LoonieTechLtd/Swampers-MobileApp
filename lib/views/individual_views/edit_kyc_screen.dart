@@ -47,6 +47,7 @@ class _IndividualKycApplicationScreenState
   final TextEditingController courtLocationController = TextEditingController();
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> crimeKey = GlobalKey<FormState>();
   String? selectedGender;
   String? selectedModeOfTravel;
   String? selectedStatusInCanada;
@@ -247,7 +248,7 @@ class _IndividualKycApplicationScreenState
     final kycAsnc = ref.watch(getKycData);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Edit your KYC")),
+      appBar: AppBar(title: Text("Edit your Due Diligence")),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -308,7 +309,7 @@ class _IndividualKycApplicationScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     spacing: 10,
                     children: [
-                      Text("Fill your details to verify your KYC."),
+                      Text("Fill your details to verify your Due Diligence."),
                       Row(
                         spacing: 8,
                         children: [
@@ -606,57 +607,81 @@ class _IndividualKycApplicationScreenState
                                 ),
                               ),
                               SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: CrimeTextField(
-                                      controller: offenceController,
-                                      text: "Offence",
+                              Form(
+                                key: crimeKey,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 2,
+                                      child: CrimeTextField(
+                                        controller: offenceController,
+                                        text: "Offence",
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return "Enter Offence";
+                                          }
+                                          return null;
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Expanded(
-                                    flex: 2,
-                                    child: GestureDetector(
-                                      onTap: () async {
-                                        final pickedDate = await showDatePicker(
-                                          context: context,
-                                          initialDate:
-                                              dateOfSentence ?? DateTime.now(),
-                                          firstDate: DateTime(1900),
-                                          lastDate: DateTime.now(),
-                                        );
-                                        if (pickedDate != null) {
-                                          setState(() {
-                                            dateOfSentence = pickedDate;
-                                          });
-                                        }
-                                      },
-                                      child: AbsorbPointer(
-                                        child: CrimeTextField(
-                                          controller: TextEditingController(
-                                            text:
-                                                dateOfSentence != null
-                                                    ? _formatDate(
-                                                      dateOfSentence,
-                                                    )
-                                                    : '',
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      flex: 2,
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          final pickedDate =
+                                              await showDatePicker(
+                                                context: context,
+                                                initialDate:
+                                                    dateOfSentence ??
+                                                    DateTime.now(),
+                                                firstDate: DateTime(1900),
+                                                lastDate: DateTime.now(),
+                                              );
+                                          if (pickedDate != null) {
+                                            setState(() {
+                                              dateOfSentence = pickedDate;
+                                            });
+                                          }
+                                        },
+                                        child: AbsorbPointer(
+                                          child: CrimeTextField(
+                                            controller: TextEditingController(
+                                              text:
+                                                  dateOfSentence != null
+                                                      ? _formatDate(
+                                                        dateOfSentence,
+                                                      )
+                                                      : '',
+                                            ),
+                                            text: "Date Sentenced",
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return "Enter Date";
+                                              }
+                                              return null;
+                                            },
                                           ),
-                                          text: "Date Sentenced",
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Expanded(
-                                    flex: 2,
-                                    child: CrimeTextField(
-                                      controller: courtLocationController,
-                                      text: "Court Location",
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      flex: 2,
+                                      child: CrimeTextField(
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return "Enter Location";
+                                          }
+                                          return null;
+                                        },
+                                        controller: courtLocationController,
+                                        text: "Court Location",
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               SizedBox(height: 10),
                               Align(
@@ -672,6 +697,8 @@ class _IndividualKycApplicationScreenState
                                     ),
                                   ),
                                   onPressed: () {
+                                    if (!crimeKey.currentState!.validate())
+                                      return;
                                     CrimersModel crime = CrimersModel(
                                       offence: offenceController.text,
                                       dateOfSentence: dateOfSentence!,
@@ -760,14 +787,14 @@ class _IndividualKycApplicationScreenState
                           if (msg) {
                             showCustomSnackBar(
                               context: context,
-                              message: "Kyc Updated successfully",
+                              message: "Due Diligence Updated successfully",
                               backgroundColor: AppColors().green,
                             );
                             ref.invalidate(getKycData);
                           } else {
                             showCustomSnackBar(
                               context: context,
-                              message: "Failed to update kyc",
+                              message: "Failed to update Due Diligence",
                               backgroundColor: AppColors().red,
                             );
                           }

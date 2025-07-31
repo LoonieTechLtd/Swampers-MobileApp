@@ -219,7 +219,7 @@ class _IndividualKycApplicationScreenState
     final userAsnc = ref.watch(individualProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text("KYC Application Form")),
+      appBar: AppBar(title: Text("Due Diligence Form")),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -235,7 +235,7 @@ class _IndividualKycApplicationScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     spacing: 10,
                     children: [
-                      Text("Fill your details to verify your KYC."),
+                      Text("Fill your details to verify your Due Diligence."),
                       Row(
                         spacing: 8,
                         children: [
@@ -939,7 +939,7 @@ class _IndividualKycApplicationScreenState
                           if (status) {
                             showCustomSnackBar(
                               context: context,
-                              message: "KYC Application Submitted",
+                              message: "Due Diligence Application Submitted",
                               backgroundColor: AppColors().green,
                             );
                             context.goNamed("kyc_status_screen");
@@ -955,7 +955,7 @@ class _IndividualKycApplicationScreenState
                           });
                         },
                         isLoading: isLoading,
-                        text: "Send KYC Application",
+                        text: "Send Due Diligence Application",
                         textColor: Colors.white,
                       ),
                       SizedBox(height: 6),

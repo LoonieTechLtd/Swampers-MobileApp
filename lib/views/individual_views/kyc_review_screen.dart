@@ -12,13 +12,13 @@ class KycReviewScreen extends ConsumerWidget {
     final kycAsync = ref.watch(getKycData);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('KYC Review'),
+        title: const Text('Due Diligence Review'),
         actions: [
           TextButton(
             onPressed: () {
               context.pushNamed("edit_kyc");
             },
-            child: Text("Edit Your KYC details"),
+            child: Text("Edit Your Due Diligence details"),
           ),
         ],
       ),
@@ -26,7 +26,7 @@ class KycReviewScreen extends ConsumerWidget {
         child: kycAsync.when(
           data: (kyc) {
             if (kyc == null) {
-              return const Center(child: Text('No KYC data found.'));
+              return const Center(child: Text('No Due Diligence data found.'));
             }
             return ListView(
               padding: const EdgeInsets.all(16),
