@@ -4,10 +4,9 @@ import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
 import 'package:swamper_solution/views/custom_widgets/employment_history_card.dart';
 import 'package:swamper_solution/views/custom_widgets/job_offers_card.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
 
-// ❶ import the model if it lives in a separate file
-// import 'package:swamper_solution/models/individual_model.dart';
 
 class EmploymentScreen extends StatelessWidget {
   const EmploymentScreen({super.key});

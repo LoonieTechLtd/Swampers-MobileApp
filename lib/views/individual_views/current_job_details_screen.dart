@@ -213,7 +213,7 @@ class _CurrentJobDetailsScreenState
   }
 
   Future<void> _handleShiftButton(WidgetRef ref) async {
-    if (_isLoading) return; // Prevent multiple simultaneous calls
+    if (_isLoading) return; 
 
     setState(() {
       _isLoading = true;
