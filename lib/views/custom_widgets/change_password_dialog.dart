@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
-import 'package:swamper_solution/services/auth_services.dart';
+import 'package:swamper_solution/core/services/auth_services.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_textfield.dart';
 
 class ChangePasswordDialog {

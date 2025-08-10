@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
-import 'package:swamper_solution/services/auth_services.dart';
+import 'package:swamper_solution/core/services/auth_services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ProfileLogoutDialog {

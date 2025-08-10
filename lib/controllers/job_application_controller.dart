@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:swamper_solution/models/individual_model.dart';
 import 'package:swamper_solution/models/job_application_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
-import 'package:swamper_solution/services/notificiation_services.dart';
+import 'package:swamper_solution/core/services/notificiation_services.dart';
 
 class JobApplicationController {
   FirebaseFirestore firestore = FirebaseFirestore.instance;

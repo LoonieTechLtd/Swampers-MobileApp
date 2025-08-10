@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:swamper_solution/models/job_model.dart';
-import 'package:swamper_solution/services/notificiation_services.dart';
+import 'package:swamper_solution/core/services/notificiation_services.dart';
 
 class JobController {
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -217,5 +217,191 @@ class JobController {
         jobs.location.toLowerCase().contains(lowerKeyword);
   }
 
+  // Utility method to parse time strings (e.g., "9:00 AM" -> TimeOfDay)
+  TimeOfDay? parseTime(String timeStr) {
+    try {
+      String cleanTimeStr = timeStr.trim();
 
+      // Check if it contains AM/PM
+      if (!cleanTimeStr.toUpperCase().contains('AM') &&
+          !cleanTimeStr.toUpperCase().contains('PM')) {
+        return null;
+      }
+
+      final parts = cleanTimeStr.split(" ");
+      if (parts.length < 2) {
+        return null;
+      }
+
+      final timePart = parts[0];
+      final amPm =
+          parts[parts.length - 1].toUpperCase(); // Get last part as AM/PM
+
+      final timeParts = timePart.split(":");
+      if (timeParts.length != 2) {
+        return null;
+      }
+
+      int hour = int.parse(timeParts[0]);
+      final minute = int.parse(timeParts[1]);
+
+      if (amPm == 'PM' && hour != 12) {
+        hour += 12;
+      } else if (amPm == "AM" && hour == 12) {
+        hour = 0;
+      }
+
+      return TimeOfDay(hour: hour, minute: minute);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Calculate duration hours from shift string (e.g., "9:00 AM To 5:00 PM" -> "8h")
+  String calculateDurationHours(String shift) {
+    try {
+      final parts = shift.split(" To ");
+
+      if (parts.length != 2) {
+        return shift;
+      }
+      final startTimeStr = parts[0].trim();
+      final endTimeStr = parts[1].trim();
+
+      final startTime = parseTime(startTimeStr);
+      final endTime = parseTime(endTimeStr);
+
+      if (startTime == null || endTime == null) {
+        return shift;
+      }
+
+      int durationMinutes =
+          endTime.hour * 60 +
+          endTime.minute -
+          (startTime.hour * 60 + startTime.minute);
+
+      if (durationMinutes < 0) {
+        durationMinutes += 24 * 60;
+      }
+
+      final hours = durationMinutes ~/ 60;
+      final minutes = durationMinutes % 60;
+
+      if (minutes == 0) {
+        return "${hours}h";
+      } else {
+        return "${hours}h ${minutes}m";
+      }
+    } catch (e) {
+      return shift;
+    }
+  }
+
+  // Get color indicator based on selected date
+  Color getDateIndicatorColor(DateTime? selectedDate) {
+    final now = DateTime.now();
+    final dateToCheck = selectedDate ?? now;
+    final today = DateTime(now.year, now.month, now.day);
+    final targetDate = DateTime(
+      dateToCheck.year,
+      dateToCheck.month,
+      dateToCheck.day,
+    );
+
+    if (targetDate.isAtSameMomentAs(today)) {
+      return Colors.green; // Today
+    } else if (targetDate.isBefore(today)) {
+      return Colors.grey; // Past
+    } else {
+      return Colors.orange; // Future
+    }
+  }
+
+  // Get icon indicator based on selected date
+  IconData getDateIndicatorIcon(DateTime? selectedDate) {
+    final now = DateTime.now();
+    final dateToCheck = selectedDate ?? now;
+    final today = DateTime(now.year, now.month, now.day);
+    final targetDate = DateTime(
+      dateToCheck.year,
+      dateToCheck.month,
+      dateToCheck.day,
+    );
+
+    if (targetDate.isAtSameMomentAs(today)) {
+      return Icons.today; // Today
+    } else if (targetDate.isBefore(today)) {
+      return Icons.history; // Past
+    } else {
+      return Icons.schedule; // Future
+    }
+  }
+
+  // Get text indicator based on selected date
+  String getDateIndicatorText(DateTime? selectedDate) {
+    final now = DateTime.now();
+    final dateToCheck = selectedDate ?? now;
+    final today = DateTime(now.year, now.month, now.day);
+    final targetDate = DateTime(
+      dateToCheck.year,
+      dateToCheck.month,
+      dateToCheck.day,
+    );
+
+    final dateStr =
+        "${dateToCheck.day}/${dateToCheck.month}/${dateToCheck.year}";
+
+    if (targetDate.isAtSameMomentAs(today)) {
+      return "Today ($dateStr)";
+    } else if (targetDate.isBefore(today)) {
+      return "Past Date ($dateStr)";
+    } else {
+      return "Future Date ($dateStr)";
+    }
+  }
+
+  // Get shift unavailable message based on date and completion status
+  String getShiftUnavailableMessage(
+    DateTime? selectedDate,
+    bool isShiftCompleted,
+  ) {
+    final now = DateTime.now();
+    final dateToCheck = selectedDate ?? now;
+    final today = DateTime(now.year, now.month, now.day);
+    final targetDate = DateTime(
+      dateToCheck.year,
+      dateToCheck.month,
+      dateToCheck.day,
+    );
+
+    if (targetDate.isBefore(today)) {
+      // For past dates, if we reach here, shift was not completed
+      return "Cannot start shift for past dates";
+    } else if (targetDate.isAfter(today)) {
+      return "Cannot start upcoming shift";
+    } else {
+      // This is today but other conditions failed
+      return "Cannot start shift today";
+    }
+  }
+
+  // Get completed message text based on selected date
+  String getCompletedMessageText(DateTime? selectedDate) {
+    final now = DateTime.now();
+    final dateToCheck = selectedDate ?? now;
+    final today = DateTime(now.year, now.month, now.day);
+    final targetDate = DateTime(
+      dateToCheck.year,
+      dateToCheck.month,
+      dateToCheck.day,
+    );
+
+    if (targetDate.isAtSameMomentAs(today)) {
+      return "Shift completed for today";
+    } else if (targetDate.isBefore(today)) {
+      return "Shift completed";
+    } else {
+      return "Shift completed"; // This shouldn't happen for future dates
+    }
+  }
 }

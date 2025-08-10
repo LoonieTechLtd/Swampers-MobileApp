@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/firebase_options.dart';
 import 'package:swamper_solution/routes/app_route_config.dart';
-import 'package:swamper_solution/services/notificiation_services.dart';
+import 'package:swamper_solution/core/services/notificiation_services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

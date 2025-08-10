@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:random_string/random_string.dart';
 import 'package:swamper_solution/models/shift_model.dart';
-import 'package:swamper_solution/services/location_service.dart';
+import 'package:swamper_solution/core/services/location_service.dart';
 import 'package:geolocator/geolocator.dart';
 
 class ShiftController {

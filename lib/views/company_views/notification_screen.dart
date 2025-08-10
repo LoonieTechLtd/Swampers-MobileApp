@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/controllers/notification_controller.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
-import 'package:swamper_solution/services/notificiation_services.dart';
+import 'package:swamper_solution/core/services/notificiation_services.dart';
 import 'package:swamper_solution/views/custom_widgets/notification_list_widget.dart';
 
 class NotificationScreen extends ConsumerWidget {

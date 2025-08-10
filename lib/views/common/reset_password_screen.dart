@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
-import 'package:swamper_solution/services/auth_services.dart';
+import 'package:swamper_solution/core/services/auth_services.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_textfield.dart';
 
