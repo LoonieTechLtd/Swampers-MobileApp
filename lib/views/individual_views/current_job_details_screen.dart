@@ -212,8 +212,28 @@ class _CurrentJobDetailsScreenState
     }
   }
 
+  String _getShiftUnavailableMessage() {
+    final now = DateTime.now();
+    final selectedDate = widget.selectedDate ?? now;
+    final today = DateTime(now.year, now.month, now.day);
+    final targetDate = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
+
+    if (targetDate.isBefore(today)) {
+      return "Cannot start shift for past dates";
+    } else if (targetDate.isAfter(today)) {
+      return "Cannot start upcoming shift";
+    } else {
+      // This is today but other conditions failed
+      return "Cannot start shift today";
+    }
+  }
+
   Future<void> _handleShiftButton(WidgetRef ref) async {
-    if (_isLoading) return; 
+    if (_isLoading) return;
 
     setState(() {
       _isLoading = true;
@@ -916,7 +936,6 @@ class _CurrentJobDetailsScreenState
               onPressed: () => context.pop(),
             ),
           ),
-          
         ),
         body: Container(
           decoration: BoxDecoration(
@@ -998,7 +1017,10 @@ class _CurrentJobDetailsScreenState
                             // shift details card
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   begin: Alignment.topLeft,
@@ -1225,7 +1247,7 @@ class _CurrentJobDetailsScreenState
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          "Cannot start upcoming shift",
+                          _getShiftUnavailableMessage(),
                           style: CustomTextStyles.bodyText.copyWith(
                             color: Colors.orange.shade700,
                             fontWeight: FontWeight.w600,
