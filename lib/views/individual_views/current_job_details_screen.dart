@@ -446,9 +446,7 @@ class _CurrentJobDetailsScreenState
                                       .jobDetails
                                       .description,
                             ),
-                            const SizedBox(
-                              height: 100,
-                            ),
+                            const SizedBox(height: 100),
                           ],
                         ),
                       ),
@@ -457,8 +455,8 @@ class _CurrentJobDetailsScreenState
                 ),
               ),
             ],
-          ), // End of Column
-        ), // End of Container body
+          ),
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),

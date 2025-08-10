@@ -51,32 +51,130 @@ class _CurrentJobsScreenState extends ConsumerState<CurrentJobsScreen> {
     }).toList();
   }
 
+  Widget _buildJobDetailRow(
+    IconData icon,
+    String text,
+    Color iconColor, {
+    bool isHighlighted = false,
+  }) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: iconColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 16, color: iconColor),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          text,
+          style: TextStyle(
+            color: isHighlighted ? iconColor : Colors.grey[700],
+            fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.w500,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentJobsAsync = ref.watch(getCurrentJobsProvider(selectedDate!));
 
     return Scaffold(
-      appBar: AppBar(title: const Text("My Jobs")),
+      backgroundColor: AppColors().backgroundColor,
+      appBar: AppBar(
+        title: const Text(
+          "My Jobs",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        shadowColor: Colors.black26,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CustomSearchBar(
-              searchController: searchController,
-              hintText: "Search Today's Jobs",
+            // Header section with search and date picker
+            Container(
+              color: AppColors().backgroundColor,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: CustomSearchBar(
+                      fillColor: const Color.fromARGB(14, 0, 0, 0),
+                      searchController: searchController,
+                      hintText: "Search jobs by role, location, or description",
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border(top: BorderSide(color: Colors.grey[200]!)),
+                    ),
+                    child: EasyDateTimeLine(
+                      activeColor: AppColors().primaryColor,
+                      initialDate: todayDate,
+                      onDateChange: (date) {
+                        setState(() {
+                          selectedDate = date;
+                        });
+                      },
+                      headerProps: EasyHeaderProps(
+                        monthPickerType: MonthPickerType.switcher,
+                        showHeader: true,
+                        selectedDateStyle: TextStyle(
+                          color: AppColors().primaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      dayProps: EasyDayProps(
+                        dayStructure: DayStructure.dayStrDayNum,
+                        activeDayStyle: DayStyle(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: AppColors().primaryColor,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors().primaryColor.withOpacity(
+                                  0.3,
+                                ),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                        inactiveDayStyle: DayStyle(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.grey[100],
+                          ),
+                        ),
+                        todayStyle: DayStyle(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: AppColors().primaryColor.withOpacity(0.1),
+                            border: Border.all(
+                              color: AppColors().primaryColor,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
-            EasyDateTimeLine(
-              activeColor: AppColors().primaryColor,
-              initialDate: todayDate,
-              onDateChange: (date) {
-                setState(() {
-                  selectedDate = date;
-                });
-              },
-            ),
-
-            const SizedBox(height: 16),
             Expanded(
               child: currentJobsAsync.when(
                 data: (jobs) {
@@ -87,201 +185,322 @@ class _CurrentJobsScreenState extends ConsumerState<CurrentJobsScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.work_off,
-                            size: 64,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "No jobs found for this date",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[600],
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              shape: BoxShape.circle,
                             ),
+                            child: Icon(
+                              Icons.work_off_outlined,
+                              size: 48,
+                              color: Colors.grey[400],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Text(
+                            "No jobs found",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Try selecting a different date or adjusting your search",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),
                     );
                   }
 
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: filteredJobs.length,
-                    itemBuilder: (context, index) {
-                      final jobApplication = filteredJobs[index];
-                      final job = jobApplication.jobDetails;
+                  return Container(
+                    color: Colors.grey[50],
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      itemCount: filteredJobs.length,
+                      itemBuilder: (context, index) {
+                        final jobApplication = filteredJobs[index];
+                        final job = jobApplication.jobDetails;
 
-                      return InkWell(
-                        onTap: () async {
-                          try {
-                            final user = await ref.read(
-                              individualProvider.future,
-                            );
-                            if (user != null) {
-                              context.pushNamed(
-                                "current_job_details_screen",
-                                extra: {
-                                  'jobApplication': jobApplication,
-                                  'user': user,
-                                  'selectedDate':
-                                      selectedDate, // Pass the selected date
-                                },
+                        return InkWell(
+                          onTap: () async {
+                            try {
+                              final user = await ref.read(
+                                individualProvider.future,
                               );
-                            } else {
-                              // Handle the case where user data couldn't be loaded
+                              if (user != null) {
+                                context.pushNamed(
+                                  "current_job_details_screen",
+                                  extra: {
+                                    'jobApplication': jobApplication,
+                                    'user': user,
+                                    'selectedDate': selectedDate,
+                                  },
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                      'Unable to load user data',
+                                    ),
+                                    backgroundColor: Colors.red[400],
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                            } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Unable to load user data'),
+                                SnackBar(
+                                  content: Text('Error loading user data: $e'),
+                                  backgroundColor: Colors.red[400],
+                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                             }
-                          } catch (e) {
-                            // Handle any errors during user data loading
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Error loading user data: $e'),
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                              border: Border.all(
+                                color: Colors.grey[200]!,
+                                width: 1,
                               ),
-                            );
-                          }
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(color: Colors.black12),
-                          ),
-                          margin: const EdgeInsets.only(bottom: 12),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        job.role,
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                            ),
+                            margin: const EdgeInsets.only(bottom: 12),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Header row with title and status
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          job.role,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFF1A1A1A),
+                                          ),
                                         ),
                                       ),
-                                    ),
+                                      const SizedBox(width: 12),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.green[400]!,
+                                              Colors.green[600]!,
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.green.withOpacity(
+                                                0.3,
+                                              ),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Text(
+                                          jobApplication.applicationStatus,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  // Job details with improved icons and spacing
+                                  _buildJobDetailRow(
+                                    Icons.location_on_outlined,
+                                    job.location,
+                                    AppColors().primaryColor,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildJobDetailRow(
+                                    Icons.access_time_outlined,
+                                    jobApplication.selectedShift,
+                                    Colors.orange[600]!,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildJobDetailRow(
+                                    Icons.attach_money_outlined,
+                                    "\$${job.hourlyIncome.toStringAsFixed(0)}/hr",
+                                    Colors.green[600]!,
+                                    isHighlighted: true,
+                                  ),
+
+                                  // Description with improved styling
+                                  if (job.description.isNotEmpty) ...[
+                                    const SizedBox(height: 16),
                                     Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
+                                      padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
-                                        color: Colors.green,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        jobApplication.applicationStatus,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
+                                        color: Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: Colors.grey[200]!,
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.location_on,
-                                      size: 16,
-                                      color: Colors.grey[600],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      job.location,
-                                      style: TextStyle(color: Colors.grey[600]),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.access_time,
-                                      size: 16,
-                                      color: Colors.grey[600],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      jobApplication.selectedShift,
-                                      style: TextStyle(color: Colors.grey[600]),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.attach_money,
-                                      size: 16,
-                                      color: Colors.grey[600],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      "\$${job.hourlyIncome.toStringAsFixed(0)}/hr",
-                                      style: TextStyle(
-                                        color: Colors.green[700],
-                                        fontWeight: FontWeight.w600,
+                                      child: Text(
+                                        job.description,
+                                        style: TextStyle(
+                                          color: Colors.grey[700],
+                                          fontSize: 14,
+                                          height: 1.4,
+                                        ),
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                   ],
-                                ),
-                                if (job.description.isNotEmpty) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    job.description,
-                                    style: TextStyle(color: Colors.grey[700]),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
+
+                                  // Action hint
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        "Tap for details",
+                                        style: TextStyle(
+                                          color: AppColors().primaryColor,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 12,
+                                        color: AppColors().primaryColor,
+                                      ),
+                                    ],
                                   ),
                                 ],
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading:
+                    () => Container(
+                      color: Colors.grey[50],
+                      child: const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 16),
+                            Text(
+                              "Loading your jobs...",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                 error:
-                    (error, stack) => Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            size: 64,
-                            color: Colors.red[400],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            "Error loading jobs",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.red[600],
+                    (error, stack) => Container(
+                      color: Colors.grey[50],
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: Colors.red[50],
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.error_outline,
+                                size: 48,
+                                color: Colors.red[400],
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            error.toString(),
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
+                            const SizedBox(height: 24),
+                            Text(
+                              "Oops! Something went wrong",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.red[600],
+                              ),
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                            const SizedBox(height: 8),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                              ),
+                              child: Text(
+                                "We couldn't load your jobs. Please try again.",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: () => setState(() {}),
+                              icon: const Icon(Icons.refresh),
+                              label: const Text("Try Again"),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors().primaryColor,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
               ),

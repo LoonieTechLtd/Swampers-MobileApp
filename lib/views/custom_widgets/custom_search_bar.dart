@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 class CustomSearchBar extends StatelessWidget {
   final TextEditingController searchController;
   final String hintText;
-
-  final Color? color;
+  final Color? fillColor;
   const CustomSearchBar({
     super.key,
-    this.color,
-    required this.searchController, required this.hintText,
+    this.fillColor,
+    required this.searchController,
+    required this.hintText,
   });
 
   @override
@@ -21,7 +21,7 @@ class CustomSearchBar extends StatelessWidget {
         decoration: InputDecoration(
           hintText: hintText,
           suffixIcon: Icon(FeatherIcons.search),
-          fillColor: color ?? Colors.white,
+          fillColor: fillColor ?? Colors.white,
           filled: true,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),

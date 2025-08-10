@@ -20,7 +20,7 @@ class JobsScreen extends StatelessWidget {
           children: [
             CustomSearchBar(
               searchController: searchController,
-              color: Colors.black12,
+              fillColor: Colors.black12,
               hintText: "Search Your Jobs",
             ),
             Consumer(

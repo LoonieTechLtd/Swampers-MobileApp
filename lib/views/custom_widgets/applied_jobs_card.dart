@@ -13,201 +13,402 @@ class AppliedJobsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-        margin: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          border: Border.all(width: 0.6, color: Colors.black26),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 4,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
+        border: Border.all(color: Colors.grey[100]!, width: 1),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {},
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    jobApplicationDetails.jobDetails.role,
-                    style: CustomTextStyles.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                // Header section with job title and salary
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            jobApplicationDetails.jobDetails.role,
+                            style: CustomTextStyles.title.copyWith(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.grey[900],
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 6),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                FeatherIcons.mapPin,
+                                size: 16,
+                                color: Colors.grey[500],
+                              ),
+                              SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  jobApplicationDetails.jobDetails.location,
+                                  style: CustomTextStyles.description.copyWith(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.green[400]!, Colors.green[600]!],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.green.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "\$${jobApplicationDetails.jobDetails.hourlyIncome}",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            "/hr",
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 16),
+
+                // Shifts section with improved design
+                if (jobApplicationDetails.jobDetails.shifts.isNotEmpty) ...[
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.access_time_rounded,
+                        size: 16,
+                        color: Colors.grey[500],
+                      ),
+                      SizedBox(width: 6),
+                      Text(
+                        "Available Shifts:",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(width: 8),
-                Text(
-                  "${jobApplicationDetails.jobDetails.hourlyIncome.toString()}\$",
-                  style: CustomTextStyles.h4.copyWith(color: Colors.red),
-                ),
-                Text(
-                  "/",
-                  style: CustomTextStyles.h2.copyWith(
-                    fontWeight: FontWeight.w100,
-                  ),
-                ),
-                Text("hr"),
-              ],
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 4,
-              children: [
-                Icon(FeatherIcons.mapPin, size: 14),
-                Text(
-                  jobApplicationDetails.jobDetails.location,
-                  style: CustomTextStyles.description,
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                /// Make this scrollable horizontally
-                Expanded(
-                  child: SingleChildScrollView(
+                  SizedBox(height: 8),
+                  SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children:
                           jobApplicationDetails.jobDetails.shifts.map((shift) {
                             return Container(
                               padding: const EdgeInsets.symmetric(
-                                vertical: 6,
-                                horizontal: 10,
+                                vertical: 8,
+                                horizontal: 12,
                               ),
                               margin: const EdgeInsets.only(right: 8),
                               decoration: BoxDecoration(
-                                color: Colors.black12,
-                                borderRadius: BorderRadius.circular(20),
+                                gradient: LinearGradient(
+                                  colors: [Colors.blue[50]!, Colors.blue[100]!],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.blue[200]!,
+                                  width: 1,
+                                ),
                               ),
                               child: Text(
                                 shift,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
+                                  color: Colors.blue[700],
                                 ),
                               ),
                             );
                           }).toList(),
                     ),
                   ),
-                ),
-
-                const SizedBox(width: 8),
-              ],
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: Text(
-                    jobApplicationDetails.jobDetails.description,
-                    style: CustomTextStyles.bodyText,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                SizedBox(width: 8),
-                if (jobApplicationDetails.applicationStatus == "Approved") ...[
-                  JobStatus(
-                    status: "Approved",
-                    icon: FeatherIcons.check,
-                    backgroundColor: Colors.blue,
-                  ),
-                ] else if (jobApplicationDetails.applicationStatus ==
-                    "Pending") ...[
-                  JobStatus(
-                    status: "Pending",
-                    icon: FeatherIcons.clock,
-                    backgroundColor: Colors.green,
-                  ),
-                ] else ...[
-                  JobStatus(
-                    status: "Rejected",
-                    icon: FeatherIcons.x,
-                    backgroundColor: Colors.red,
-                  ),
+                  SizedBox(height: 16),
                 ],
-              ],
-            ),
 
-            // Delete button in the Job Application Card
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: AppColors().red,
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              ),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text(
-                        "Delete Job Application",
-                        style: TextStyle(color: Colors.red),
-                      ),
-                      content: Text(
-                        "Are you sure you want to delete your job application?",
-                      ),
-                      actionsAlignment: MainAxisAlignment.spaceBetween,
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            context.pop();
-                          },
-                          child: Text("Cancel"),
+                // Description and Status section
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        jobApplicationDetails.jobDetails.description,
+                        style: CustomTextStyles.bodyText.copyWith(
+                          fontSize: 14,
+                          height: 1.4,
+                          color: Colors.grey[700],
                         ),
-                        TextButton(
-                          onPressed: () async {
-                            final message = await JobApplicationController()
-                                .deleteJobApplication(jobApplicationDetails);
-                            if (message) {
-                              context.pop();
-                              showCustomSnackBar(
-                                context: context,
-                                message: "Job Application deleted.",
-                                backgroundColor: AppColors().green,
-                              );
-                            } else {
-                              context.pop();
-                              showCustomSnackBar(
-                                context: context,
-                                message: "Failed to delete Job Application",
-                                backgroundColor: AppColors().red,
-                              );
-                            }
-                          },
-                          child: Text(
-                            "Delete",
-                            style: TextStyle(color: Colors.red),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    _buildStatusBadge(),
+                  ],
+                ),
+
+                SizedBox(height: 20),
+
+                // Enhanced delete button
+                Container(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: Colors.red[50],
+                      foregroundColor: Colors.red[600],
+                      padding: EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: Colors.red[200]!, width: 1),
+                      ),
+                    ),
+                    onPressed: () => _showDeleteDialog(context),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          FeatherIcons.trash2,
+                          size: 18,
+                          color: Colors.red[600],
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          "Delete Application",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.red[600],
                           ),
                         ),
                       ],
-                    );
-                  },
-                );
-              },
-              
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 8,
-                children: [
-                  Icon(FeatherIcons.trash2, color: Colors.white),
-                  Text(
-                    "Delete my Application",
-                    style: CustomTextStyles.caption.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge() {
+    Color backgroundColor;
+    IconData icon;
+    String status = jobApplicationDetails.applicationStatus;
+
+    switch (status.toLowerCase()) {
+      case "approved":
+        backgroundColor = Colors.green;
+        icon = FeatherIcons.checkCircle;
+        break;
+      case "pending":
+        backgroundColor = Colors.orange;
+        icon = FeatherIcons.clock;
+        break;
+      case "rejected":
+        backgroundColor = Colors.red;
+        icon = FeatherIcons.xCircle;
+        break;
+      default:
+        backgroundColor = Colors.grey;
+        icon = FeatherIcons.helpCircle;
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: backgroundColor.withOpacity(0.3),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: Colors.white),
+          SizedBox(width: 6),
+          Text(
+            status,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.red[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  FeatherIcons.trash2,
+                  color: Colors.red[600],
+                  size: 20,
+                ),
+              ),
+              SizedBox(width: 12),
+              Text(
+                "Delete Application",
+                style: TextStyle(
+                  color: Colors.red[700],
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            "Are you sure you want to delete this job application? This action cannot be undone.",
+            style: TextStyle(
+              fontSize: 16,
+              height: 1.4,
+              color: Colors.grey[700],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                context.pop();
+              },
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final message = await JobApplicationController()
+                    .deleteJobApplication(jobApplicationDetails);
+                if (message) {
+                  context.pop();
+                  showCustomSnackBar(
+                    context: context,
+                    message: "Job Application deleted successfully.",
+                    backgroundColor: AppColors().green,
+                  );
+                } else {
+                  context.pop();
+                  showCustomSnackBar(
+                    context: context,
+                    message: "Failed to delete Job Application.",
+                    backgroundColor: AppColors().red,
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[600],
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                "Delete",
+                style: TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
           ],
-        ),
-      ),
+        );
+      },
     );
   }
 }
