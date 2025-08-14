@@ -36,7 +36,6 @@ class _IndividualKycApplicationScreenState
   final TextEditingController institutionController = TextEditingController();
   final TextEditingController accountNoController = TextEditingController();
   final TextEditingController sinController = TextEditingController();
-  final TextEditingController sinExpiryController = TextEditingController();
   final TextEditingController backCodeController = TextEditingController();
   final TextEditingController institutionNameController =
       TextEditingController();
@@ -56,7 +55,8 @@ class _IndividualKycApplicationScreenState
   String? govDocImage;
   String? permitImage;
   String? voidChequeImage;
-  DateTime? selectedDate;
+  DateTime? selectedDobDate;
+  DateTime? selectedSinExpiryDate;
   DateTime? dateOfSentence;
   bool isLoading = false;
   bool haveAgreedCanabasPolicy = false;
@@ -69,7 +69,7 @@ class _IndividualKycApplicationScreenState
     "Study Permit",
     "Work Permit",
     "Permanent Resident",
-    "Canadian citizen",
+    "Canadian Citizen",
   ];
 
   final List<String> _monthNames = [
@@ -94,6 +94,26 @@ class _IndividualKycApplicationScreenState
     return '${date.day.toString().padLeft(2, '0')} ${_monthNames[date.month - 1]} ${date.year}';
   }
 
+  Future<dynamic> showScroolDatePicker({
+    required String title,
+    required DateTime? initialDate,
+    required Function(DateTime) onDateSelected,
+    required bool isSinExpiry,
+  }) {
+    return showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder:
+          (context) => DatePickerBottomSheet(
+            isSinExpiry: isSinExpiry,
+            title: title,
+            initialDate: initialDate ?? DateTime.now(),
+            onDateSelected: onDateSelected,
+          ),
+    );
+  }
+
   @override
   void dispose() {
     firstNameController.dispose();
@@ -103,7 +123,6 @@ class _IndividualKycApplicationScreenState
     transitController.dispose();
     institutionController.dispose();
     accountNoController.dispose();
-    sinExpiryController.dispose();
     backCodeController.dispose();
     institutionNameController.dispose();
     offenceController.dispose();
@@ -128,7 +147,10 @@ class _IndividualKycApplicationScreenState
   // to pick doc images
   Future<void> pickImage(String docType) async {
     try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 60,
+      );
       if (image != null) {
         setState(() {
           if (docType == "workPermit") {
@@ -139,24 +161,6 @@ class _IndividualKycApplicationScreenState
           }
           if (docType == "voidCheque") {
             voidChequeDoc = image;
-          }
-        });
-
-        final url = await KycController().uploadDoc(
-          ref.read(individualProvider).value!.uid,
-          image,
-          docType,
-        );
-
-        setState(() {
-          if (docType == "workPermit") {
-            permitImage = url;
-          }
-          if (docType == "govId") {
-            govDocImage = url;
-          }
-          if (docType == "voidCheque") {
-            voidChequeImage = url;
           }
         });
       }
@@ -297,25 +301,21 @@ class _IndividualKycApplicationScreenState
 
                       CustomButton(
                         backgroundColor: Colors.green,
-                        onPressed: () async {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder:
-                                (context) => DatePickerBottomSheet(
-                                  initialDate: selectedDate,
-                                  onDateSelected: (DateTime date) {
-                                    setState(() {
-                                      selectedDate = date;
-                                    });
-                                  },
-                                ),
+                        onPressed: () {
+                          showScroolDatePicker(
+                            isSinExpiry: false,
+                            title: "Select Date of Birth",
+                            initialDate: selectedDobDate,
+                            onDateSelected: (DateTime date) {
+                              setState(() {
+                                selectedDobDate = date;
+                              });
+                            },
                           );
                         },
                         text:
-                            selectedDate != null
-                                ? _formatDate(selectedDate)
+                            selectedDobDate != null
+                                ? _formatDate(selectedDobDate)
                                 : "Select Your DOB",
                         textColor: Colors.white,
                       ),
@@ -335,7 +335,7 @@ class _IndividualKycApplicationScreenState
                         hintText: "SIN No",
                         controller: sinController,
                         obscureText: false,
-                        textInputType: TextInputType.text,
+                        textInputType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your SIN no';
@@ -346,12 +346,31 @@ class _IndividualKycApplicationScreenState
                           return null;
                         },
                       ),
-                      CustomTextfield(
-                        hintText: "SIN Expiry",
-                        controller: sinExpiryController,
-                        obscureText: false,
-                        textInputType: TextInputType.text,
+
+                      // should be a date picker
+                      CustomButton(
+                        haveBorder: true,
+                        borderColor: Colors.black,
+                        backgroundColor: AppColors().backgroundColor,
+                        onPressed: () {
+                          showScroolDatePicker(
+                            isSinExpiry: true,
+                            title: "Select SIN Expiry Date",
+                            initialDate: selectedSinExpiryDate,
+                            onDateSelected: (DateTime date) {
+                              setState(() {
+                                selectedSinExpiryDate = date;
+                              });
+                            },
+                          );
+                        },
+                        text:
+                            selectedSinExpiryDate != null
+                                ? _formatDate(selectedSinExpiryDate)
+                                : "SIN Expiry Date",
+                        textColor: AppColors().black,
                       ),
+
                       CustomTextfield(
                         hintText: "APT / Suite No",
                         controller: aptNoController,
@@ -830,7 +849,7 @@ class _IndividualKycApplicationScreenState
                         onPressed: () async {
                           if (!formKey.currentState!.validate()) return;
 
-                          if (selectedDate == null) {
+                          if (selectedDobDate == null) {
                             showCustomSnackBar(
                               context: context,
                               message: "Please Select your DOB",
@@ -838,7 +857,15 @@ class _IndividualKycApplicationScreenState
                             );
                             return;
                           }
-                          if(selectedStatusInCanada == null){
+                          if (selectedSinExpiryDate == null) {
+                            showCustomSnackBar(
+                              context: context,
+                              message: "Please Select your SIN Expiry Date",
+                              backgroundColor: AppColors().red,
+                            );
+                            return;
+                          }
+                          if (selectedStatusInCanada == null) {
                             showCustomSnackBar(
                               context: context,
                               message: "Please Select your Status in Canada",
@@ -864,10 +891,12 @@ class _IndividualKycApplicationScreenState
                             return;
                           }
 
-                          if (permitDoc == null || govIdDoc == null || voidChequeDoc == null) {
+                          if (permitDoc == null ||
+                              govIdDoc == null ||
+                              voidChequeDoc == null) {
                             showCustomSnackBar(
                               context: context,
-                              message: "Please all documents images",
+                              message: "Please upload all documents images",
                               backgroundColor: Colors.red,
                             );
                             return;
@@ -888,23 +917,58 @@ class _IndividualKycApplicationScreenState
                             isLoading = true;
                           });
 
+                          // Upload images now
+                          final permitUrl = await KycController().uploadDoc(
+                            userData.uid,
+                            permitDoc!,
+                            "workPermit",
+                          );
+
+                          final govDocUrl = await KycController().uploadDoc(
+                            userData.uid,
+                            govIdDoc!,
+                            "govId",
+                          );
+
+                          final voidChequeUrl = await KycController().uploadDoc(
+                            userData.uid,
+                            voidChequeDoc!,
+                            "voidCheque",
+                          );
+
+                          // Check if all uploads were successful
+                          if (permitUrl == null ||
+                              govDocUrl == null ||
+                              voidChequeUrl == null) {
+                            showCustomSnackBar(
+                              context: context,
+                              message:
+                                  "Failed to upload documents. Please try again.",
+                              backgroundColor: AppColors().red,
+                            );
+                            setState(() {
+                              isLoading = false;
+                            });
+                            return;
+                          }
+
                           final IndividualKycModel
                           kycApplication = IndividualKycModel(
                             userInfo: userData.copyWith(kycVerified: "pending"),
-                            dob: selectedDate!.toString(),
+                            dob: selectedDobDate!.toString(),
                             gender: selectedGender!,
                             sinNumber: sinController.text.trim(),
-                            sinExpiry: sinExpiryController.text.trim(),
+                            sinExpiry: selectedSinExpiryDate!.toString(),
                             transitNumber: transitController.text.trim(),
                             institutionNumber:
                                 institutionController.text.trim(),
                             bankAccNumber: accountNoController.text.trim(),
                             statusInCanada: selectedStatusInCanada!,
-                            permitImage: permitImage!,
-                            govDocImage: govDocImage!,
+                            permitImage: permitUrl,
+                            govDocImage: govDocUrl,
                             institutionName:
                                 institutionNameController.text.trim(),
-                            voidCheque: voidChequeImage!,
+                            voidCheque: voidChequeUrl,
                             aptNo: aptNoController.text.trim(),
                             emergencyContactNo:
                                 emergencyContactNumberController.text.trim(),
@@ -914,7 +978,7 @@ class _IndividualKycApplicationScreenState
                             postalCode: postalCodeController.text.trim(),
                             haveCriminalRecord: ref.read(criminalProvider),
                             crimes: ref.read(crimeListProvider),
-                            appliedDate: DateTime.now().toString()
+                            appliedDate: DateTime.now().toString(),
                           );
 
                           final status = await KycController().applyKyc(
@@ -931,7 +995,8 @@ class _IndividualKycApplicationScreenState
                           } else {
                             showCustomSnackBar(
                               context: context,
-                              message: "Failed to send KYC application !",
+                              message:
+                                  "Failed to send Due Diligence Application !",
                               backgroundColor: AppColors().red,
                             );
                           }

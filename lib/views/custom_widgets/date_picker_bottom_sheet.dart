@@ -6,6 +6,8 @@ class DatePickerBottomSheet extends StatefulWidget {
   final Function(DateTime) onDateSelected;
   final DateTime? minDate;
   final DateTime? maxDate;
+  final String title;
+  final bool isSinExpiry;
 
   const DatePickerBottomSheet({
     super.key,
@@ -13,6 +15,8 @@ class DatePickerBottomSheet extends StatefulWidget {
     required this.onDateSelected,
     this.minDate,
     this.maxDate,
+    required this.title,
+    required this.isSinExpiry
   });
 
   @override
@@ -57,7 +61,7 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
   void _initializeDates() {
     final now = DateTime.now();
     final minYear = widget.minDate?.year ?? 1900;
-    final maxYear = widget.maxDate?.year ?? now.year;
+    final maxYear = widget.isSinExpiry?widget.maxDate?.year ?? 2040:widget.maxDate?.year ?? now.year;
 
     years = List.generate(maxYear - minYear + 1, (index) => minYear + index);
 
@@ -231,7 +235,7 @@ class _DatePickerBottomSheetState extends State<DatePickerBottomSheet> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Select Date of Birth', style: CustomTextStyles.title),
+                  Text(widget.title, style: CustomTextStyles.title),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),

@@ -33,7 +33,6 @@ class _IndividualKycApplicationScreenState
   final TextEditingController institutionController = TextEditingController();
   final TextEditingController accountNoController = TextEditingController();
   final TextEditingController sinController = TextEditingController();
-  final TextEditingController sinExpiryController = TextEditingController();
   final TextEditingController institutionNameController =
       TextEditingController();
   final TextEditingController postalCodeController = TextEditingController();
@@ -54,6 +53,7 @@ class _IndividualKycApplicationScreenState
   String? permitImage;
   String? voidChequeImage;
   DateTime? selectedDate;
+  DateTime? selectedSinExpiryDate;
   DateTime? dateOfSentence;
   bool isLoading = false;
   bool haveAgreedCanabasPolicy = false;
@@ -66,7 +66,7 @@ class _IndividualKycApplicationScreenState
     "Study Permit",
     "Work Permit",
     "Permanent Resident",
-    "Citizenship",
+    "Canadian Citizen",
   ];
 
   final List<String> _monthNames = [
@@ -100,7 +100,6 @@ class _IndividualKycApplicationScreenState
     transitController.dispose();
     institutionController.dispose();
     accountNoController.dispose();
-    sinExpiryController.dispose();
     institutionNameController.dispose();
     offenceController.dispose();
     courtLocationController.dispose();
@@ -289,6 +288,14 @@ class _IndividualKycApplicationScreenState
                   }
                 }
 
+                 if (selectedSinExpiryDate == null && kycData.sinExpiry.isNotEmpty) {
+                  try {
+                    selectedSinExpiryDate = DateTime.tryParse(kycData.sinExpiry);
+                  } catch (_) {
+                    selectedSinExpiryDate = null;
+                  }
+                }
+
                 // --- Crimes: Pre-fill crimeListProvider from kycData.crimes if not already set ---
                 final crimeList = ref.watch(crimeListProvider);
                 if ((crimeList.isEmpty ||
@@ -378,6 +385,8 @@ class _IndividualKycApplicationScreenState
                             backgroundColor: Colors.transparent,
                             builder:
                                 (context) => DatePickerBottomSheet(
+                                  isSinExpiry: false,
+                                  title: "Select Date of Birth",
                                   initialDate: selectedDate,
                                   onDateSelected: (DateTime date) {
                                     setState(() {
@@ -423,13 +432,39 @@ class _IndividualKycApplicationScreenState
                           return null;
                         },
                       ),
-                      CustomTextfield(
-                        hintText: "SIN Expiry",
-                        controller:
-                            sinExpiryController..text = kycData.sinExpiry,
-                        obscureText: false,
-                        textInputType: TextInputType.text,
+
+                      // SIN Expiry Selector
+                      CustomButton(
+                        backgroundColor: AppColors().backgroundColor,
+                        haveBorder: true,
+                        borderColor: AppColors().black,
+                      textColor:AppColors().black,
+                        onPressed: () async {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder:
+                                (context) => DatePickerBottomSheet(
+                                  isSinExpiry: true,
+                                  title: "Select SIN expiry date",
+                                  initialDate: selectedSinExpiryDate,
+                                  onDateSelected: (DateTime date) {
+                                    setState(() {
+                                      selectedSinExpiryDate = date;
+                                    });
+                                  },
+                                ),
+                          );
+                        },
+                        text:
+                            selectedSinExpiryDate != null
+                                ? _formatDate(selectedSinExpiryDate)
+                                : (kycData.sinExpiry.isNotEmpty
+                                    ? _formatDate(selectedSinExpiryDate)
+                                    : "SIN Expiry date"),
                       ),
+
                       CustomTextfield(
                         hintText: "APT / Suite No",
                         controller: aptNoController..text = kycData.aptNo,
@@ -681,8 +716,9 @@ class _IndividualKycApplicationScreenState
                                     ),
                                   ),
                                   onPressed: () {
-                                    if (!crimeKey.currentState!.validate())
+                                    if (!crimeKey.currentState!.validate()) {
                                       return;
+                                    }
                                     CrimersModel crime = CrimersModel(
                                       offence: offenceController.text,
                                       dateOfSentence: dateOfSentence!,
@@ -732,10 +768,10 @@ class _IndividualKycApplicationScreenState
                           final IndividualKycModel updatedKyc =
                               IndividualKycModel(
                                 userInfo: k!.userInfo,
-                                dob: k.dob,
-                                gender: k.gender,
+                                dob: selectedDate.toString(),
+                                gender:selectedGender?? k.gender,
                                 sinNumber: sinController.text,
-                                sinExpiry: sinExpiryController.text,
+                                sinExpiry: selectedSinExpiryDate.toString(),
                                 transitNumber: transitController.text,
                                 institutionNumber: institutionController.text,
                                 institutionName: institutionNameController.text,

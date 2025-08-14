@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -178,12 +179,20 @@ class AuthServices {
         if (role == "Individual" || role == "Company") {
           return role.toString();
         } else {
+          // Delete the account from Firebase Auth and sign out
+          await userCredential.user!.delete();
           await auth.signOut();
-          return "Invalid user role";
+          return "Invalid user role. Account removed.";
         }
       } catch (e) {
+        // Delete the account from Firebase Auth and sign out
+        try {
+          await userCredential.user!.delete();
+        } catch (deleteError) {
+          debugPrint("Error deleting user: $deleteError");
+        }
         await auth.signOut();
-        return "Error checking user profile: $e";
+        return "Error checking user profile. Account removed.";
       }
     } catch (e) {
       return "Failed to sign in with Google: $e";
@@ -334,9 +343,13 @@ class AuthServices {
         email: email,
         password: password,
       );
-      if (await haveEmailInFirestore(email)==false) {
-        auth.currentUser?.delete();
-        return "No user found";
+      if (await haveEmailInFirestore(email) == false) {
+        try {
+          await auth.currentUser?.delete();
+        } catch (deleteError) {
+          debugPrint("Error deleting user: $deleteError");
+        }
+        return "No user found !";
       }
       // Check if email is verified
       if (!userCredential.user!.emailVerified) {
@@ -356,8 +369,13 @@ class AuthServices {
         // Check if user exists in Firestore
         bool exists = await userExists(userCredential.user!.uid);
         if (!exists) {
+          try {
+            await userCredential.user!.delete();
+          } catch (deleteError) {
+            debugPrint("Error deleting user: $deleteError");
+          }
           await auth.signOut();
-          return 'signup'; // Special return value to indicate signup needed
+          return 'User profile not found. Account removed.';
         }
 
         // Get user's role from Firestore
@@ -371,12 +389,22 @@ class AuthServices {
         if (role == "Individual" || role == "Company") {
           return role.toString();
         } else {
+          try {
+            await userCredential.user!.delete();
+          } catch (deleteError) {
+            debugPrint("Error deleting user: $deleteError");
+          }
           await auth.signOut();
-          return 'Invalid user role. Please contact support';
+          return 'Invalid user role. Account removed.';
         }
       } catch (e) {
+        try {
+          await userCredential.user!.delete();
+        } catch (deleteError) {
+          debugPrint("Error deleting user: $deleteError");
+        }
         await auth.signOut();
-        return 'Error accessing user profile. Please try again';
+        return 'Error accessing user profile. Account removed.';
       }
     } on FirebaseAuthException catch (e) {
       switch (e.code) {

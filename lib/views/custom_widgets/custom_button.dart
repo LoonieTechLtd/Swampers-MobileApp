@@ -10,6 +10,7 @@ class CustomButton extends StatelessWidget {
   final Color textColor;
   final bool? haveBorder;
   final Color? borderColor;
+  final double? borderWidth;
   const CustomButton({
     super.key,
     required this.backgroundColor,
@@ -20,6 +21,7 @@ class CustomButton extends StatelessWidget {
     required this.textColor,
     this.haveBorder,
     this.borderColor,
+    this.borderWidth
   });
 
   @override
@@ -36,7 +38,7 @@ class CustomButton extends StatelessWidget {
                 (haveBorder ?? false)
                     ? BorderSide(
                       color: borderColor ?? AppColors().primaryColor,
-                      width: 2,
+                      width: borderWidth??1,
                     )
                     : BorderSide.none,
           ),

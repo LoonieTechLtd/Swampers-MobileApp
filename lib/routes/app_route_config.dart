@@ -269,7 +269,12 @@ class AppRouteConfig {
         final userDoc =
             await firestore.collection('profiles').doc(currentUserId).get();
         if (!userDoc.exists) {
-          // Profile deleted or not found, force logout
+          // Profile deleted or not found, delete auth account and force logout
+          try {
+            await auth.currentUser!.delete();
+          } catch (deleteError) {
+            debugPrint('Error deleting user in redirect: $deleteError');
+          }
           await auth.signOut();
           AppRouteConfig.clearCache();
           return '/';
@@ -286,14 +291,24 @@ class AppRouteConfig {
         } else if (role == 'Company') {
           return '/company';
         } else {
-          // Invalid role, force logout
+          // Invalid role, delete auth account and force logout
+          try {
+            await auth.currentUser!.delete();
+          } catch (deleteError) {
+            debugPrint('Error deleting user with invalid role: $deleteError');
+          }
           await auth.signOut();
           AppRouteConfig.clearCache();
           return '/';
         }
       } catch (e) {
-        // On error, force logout
+        // On error, delete auth account and force logout
         debugPrint('Error in redirect: $e');
+        try {
+          await auth.currentUser!.delete();
+        } catch (deleteError) {
+          debugPrint('Error deleting user in error handler: $deleteError');
+        }
         await auth.signOut();
         AppRouteConfig.clearCache();
         return '/';
