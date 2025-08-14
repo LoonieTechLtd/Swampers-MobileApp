@@ -31,7 +31,6 @@ class JobPostingScreen extends StatefulWidget {
 class JobPostingScreenState extends State<JobPostingScreen> {
   final TextEditingController _roleTypeController = TextEditingController();
   final TextEditingController _workersController = TextEditingController();
-  final TextEditingController _incomeController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _messageToAdminController =
@@ -48,7 +47,6 @@ class JobPostingScreenState extends State<JobPostingScreen> {
   void clearForm() {
     _roleTypeController.clear();
     _workersController.clear();
-    _incomeController.clear();
     _locationController.clear();
     _descriptionController.clear();
     _timeRanges.clear();
@@ -59,7 +57,6 @@ class JobPostingScreenState extends State<JobPostingScreen> {
   void dispose() {
     _roleTypeController.dispose();
     _workersController.dispose();
-    _incomeController.dispose();
     _locationController.dispose();
     _descriptionController.dispose();
     _messageToAdminController.dispose();
@@ -208,22 +205,6 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                     inputType: TextInputType.numberWithOptions(),
                   ),
 
-                  JobDetailsField(
-                    controller: _incomeController,
-                    title: "Hourly income",
-                    hintText: "40\$ / hr",
-                    inputType: TextInputType.number,
-                    validator: (value) {
-                      if (int.parse(value!) < 30) {
-                        return "The amount cannot be less then 30";
-                      }
-                      if (int.parse(value) > 50) {
-                        return "The amount cannot be more then 50";
-                      }
-                      return null;
-                    },
-                  ),
-
                   // Date range selector
                   DayRangeSelector(
                     selectedDayRange: selectedDayRange,
@@ -315,7 +296,6 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                         location: _locationController.text,
                         description: _descriptionController.text,
                         images: imageUrls,
-                        hourlyIncome: double.parse(_incomeController.text),
                         postedDate: DateTime.now().toString(),
                         companyId: companyId,
                         jobId: jobId,

@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyANp1EKFvG1_Lh7LKimjS-Rl_-fkLThY7o',
-    appId: '1:968299498317:android:ae34b5e7bf3266f3eb0504',
+    appId: '1:968299498317:android:18fb272cf1a08db5eb0504',
     messagingSenderId: '968299498317',
     projectId: 'swamper-solutions',
     storageBucket: 'swamper-solutions.firebasestorage.app',

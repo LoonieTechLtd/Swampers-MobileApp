@@ -6,6 +6,8 @@ class AppColors {
   Color backgroundColor = Color.fromARGB(255, 255, 255, 255);
   Color turnaryColor = Color.fromARGB(255, 28, 28, 30);
   Color white = Color.fromARGB(255, 255, 255, 255);
+  Color black = Color.fromARGB(255, 0, 0, 0);
+  Color lightBlack = Color.fromARGB(20, 0, 0, 0);
   Color red = const Color.fromARGB(255, 244, 67, 54);
   Color green = Colors.green;
 }

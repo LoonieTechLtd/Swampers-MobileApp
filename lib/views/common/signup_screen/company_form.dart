@@ -57,7 +57,7 @@ class _CompanyFormState extends State<CompanyForm> {
               obscureText: false,
               textInputType: TextInputType.number,
               validator: (value) {
-                if (value!.trim().length < 10) {
+                if (value!.trim().length != 10) {
                   return "Invalid Phone no";
                 }
                 return null;
@@ -97,6 +97,8 @@ class _CompanyFormState extends State<CompanyForm> {
               backgroundColor: Colors.blue,
               onPressed: () async {
                 if (!formKey.currentState!.validate()) return;
+                if (phoneController.text.length > 10) return;
+
                 setState(() {
                   isLoading = true;
                 });

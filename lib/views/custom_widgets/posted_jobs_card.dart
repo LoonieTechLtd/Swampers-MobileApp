@@ -37,18 +37,6 @@ class PostedJobsCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  "${jobDetails.hourlyIncome}\$",
-                  style: CustomTextStyles.h4.copyWith(color: Colors.red),
-                ),
-                Text(
-                  "/",
-                  style: CustomTextStyles.h2.copyWith(
-                    fontWeight: FontWeight.w100,
-                  ),
-                ),
-                const Text("hr"),
               ],
             ),
 

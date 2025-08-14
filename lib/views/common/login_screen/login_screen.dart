@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/core/services/auth_services.dart';
@@ -266,7 +267,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         )
                       else ...[
-                        Text("Login with Google"),
+                        Row(
+                          children: [
+                            SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CachedNetworkImage(
+                                imageUrl:
+                                    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/1024px-Google_Favicon_2025.svg.png",
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Text("Login with Google"),
+                          ],
+                        ),
                       ],
                     ],
                   ),

@@ -22,7 +22,6 @@ class EditJobScreenState extends State<EditJobScreen> {
 
   final _roleTypeController = TextEditingController();
   final _workersController = TextEditingController();
-  final _incomeController = TextEditingController();
   final _shiftController = TextEditingController();
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -44,7 +43,6 @@ class EditJobScreenState extends State<EditJobScreen> {
     final job = widget.jobDetails;
     _roleTypeController.text = job.role;
     _workersController.text = job.noOfWorkers.toString();
-    _incomeController.text = job.hourlyIncome.toString();
     _shiftController.text = job.shifts.join(', ');
     _locationController.text = job.location;
     _descriptionController.text = job.description;
@@ -117,7 +115,6 @@ class EditJobScreenState extends State<EditJobScreen> {
       images: widget.jobDetails.images,
       postedDate: widget.jobDetails.postedDate,
       companyId: companyId,
-      hourlyIncome: double.parse(_incomeController.text),
       jobStatus: widget.jobDetails.jobStatus,
       days: dayRangeStr ?? widget.jobDetails.days,
       messageToAdmin:  _messageToAdminController.text,
@@ -139,7 +136,6 @@ class EditJobScreenState extends State<EditJobScreen> {
   void dispose() {
     _roleTypeController.dispose();
     _workersController.dispose();
-    _incomeController.dispose();
     _shiftController.dispose();
     _locationController.dispose();
     _descriptionController.dispose();
@@ -169,12 +165,6 @@ class EditJobScreenState extends State<EditJobScreen> {
                     _workersController,
                     "No of Workers",
                     "2, 4, 20",
-                    inputType: TextInputType.number,
-                  ),
-                  _buildJobField(
-                    _incomeController,
-                    "Hourly income",
-                    "40\$ / hr",
                     inputType: TextInputType.number,
                   ),
                   _buildDatePickerField(context),

@@ -173,7 +173,6 @@ class EmploymentScreen extends StatelessWidget {
                                   startedDate: formatPostedDate(
                                     history[i].postedDate,
                                   ),
-                                  hourlyIncome: history[i].hourlyIncome.toString(),
                                   noOfDays: calcNumberOfDays(history[i].days).toString(),
                                 ),
                               );

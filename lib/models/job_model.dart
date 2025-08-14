@@ -13,7 +13,6 @@ class JobModel {
   final List<String> images;
   final String postedDate;
   final String companyId;
-  final double hourlyIncome;
   final String jobStatus;
   final String days;
   final String? messageToAdmin;
@@ -29,7 +28,6 @@ class JobModel {
     required this.images,
     required this.postedDate,
     required this.companyId,
-    required this.hourlyIncome,
     required this.jobStatus,
     required this.days,
     this.messageToAdmin,
@@ -47,7 +45,6 @@ class JobModel {
     List<String>? images,
     String? postedDate,
     String? companyId,
-    double? hourlyIncome,
     String? jobStatus,
     String? days,
     String? messageToAdmin,
@@ -64,7 +61,6 @@ class JobModel {
       images: images ?? this.images,
       postedDate: postedDate ?? this.postedDate,
       companyId: companyId ?? this.companyId,
-      hourlyIncome: hourlyIncome ?? this.hourlyIncome,
       jobStatus: jobStatus ?? this.jobStatus,
       days: days ?? this.days,
       messageToAdmin: messageToAdmin ?? this.messageToAdmin,
@@ -84,7 +80,6 @@ class JobModel {
       'images': images,
       'postedDate': postedDate,
       'companyId': companyId,
-      'hourlyIncome': hourlyIncome,
       'jobStatus': jobStatus,
       'days': days,
       'messageToAdmin': messageToAdmin ?? "",
@@ -108,10 +103,6 @@ class JobModel {
       ),
       postedDate: map['postedDate'] as String,
       companyId: map['companyId'] as String,
-      hourlyIncome:
-          (map['hourlyIncome'] is int)
-              ? (map['hourlyIncome'] as int).toDouble()
-              : (map['hourlyIncome'] as num).toDouble(),
       jobStatus: map['jobStatus'] as String,
       days: map['days'] as String,
       messageToAdmin: map['messageToAdmin'] as String? ?? "",
@@ -134,7 +125,7 @@ class JobModel {
 
   @override
   String toString() {
-    return 'JobModel(jobId: $jobId, role: $role, noOfWorkers: $noOfWorkers, shifts: $shifts, location: $location, description: $description, images: $images, postedDate: $postedDate, companyId: $companyId, hourlyIncome: $hourlyIncome, jobStatus: $jobStatus, days: $days, messageToAdmin: $messageToAdmin, assignedStaffs: $assignedStaffs, appliedUsers: $appliedUsers)';
+    return 'JobModel(jobId: $jobId, role: $role, noOfWorkers: $noOfWorkers, shifts: $shifts, location: $location, description: $description, images: $images, postedDate: $postedDate, companyId: $companyId, jobStatus: $jobStatus, days: $days, messageToAdmin: $messageToAdmin, assignedStaffs: $assignedStaffs, appliedUsers: $appliedUsers)';
   }
 
   @override
@@ -150,7 +141,6 @@ class JobModel {
         listEquals(other.images, images) &&
         other.postedDate == postedDate &&
         other.companyId == companyId &&
-        other.hourlyIncome == hourlyIncome &&
         other.jobStatus == jobStatus &&
         other.days == days &&
         other.messageToAdmin == messageToAdmin &&
@@ -169,7 +159,6 @@ class JobModel {
         images.hashCode ^
         postedDate.hashCode ^
         companyId.hashCode ^
-        hourlyIncome.hashCode ^
         jobStatus.hashCode ^
         days.hashCode ^
         messageToAdmin.hashCode ^

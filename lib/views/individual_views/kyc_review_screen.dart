@@ -53,7 +53,6 @@ class KycReviewScreen extends ConsumerWidget {
                   'Bank Details',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                _infoRow('Bank Code', kyc.bankCode),
                 _infoRow('Institution No', kyc.institutionNumber),
                 _infoRow('Institution Name', kyc.institutionName),
                 _infoRow('Transit No', kyc.transitNumber),

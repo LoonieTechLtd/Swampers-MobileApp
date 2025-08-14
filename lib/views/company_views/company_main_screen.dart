@@ -37,7 +37,6 @@ class _CompanyMainScreenState extends State<CompanyMainScreen> {
       showReleaseNotes: false,
       upgrader: Upgrader(
         messages: UpgraderMessages(code: "Update app now!"),
-        debugDisplayAlways: true,
       ),
       child: Scaffold(
         bottomNavigationBar: CustomBottomNavBar(

@@ -16,7 +16,6 @@ class IndividualKycModel {
   final String institutionNumber;
   final String institutionName;
   final String voidCheque;
-  final String bankCode;
   final String bankAccNumber;
   final String statusInCanada;
   final String permitImage;
@@ -39,7 +38,6 @@ class IndividualKycModel {
     required this.institutionNumber,
     required this.institutionName,
     required this.voidCheque,
-    required this.bankCode,
     required this.bankAccNumber,
     required this.statusInCanada,
     required this.permitImage,
@@ -64,7 +62,6 @@ class IndividualKycModel {
     String? institutionNumber,
     String? institutionName,
     String? voidCheque,
-    String? bankCode,
     String? bankAccNumber,
     String? statusInCanada,
     String? permitImage,
@@ -88,7 +85,6 @@ class IndividualKycModel {
       institutionNumber: institutionNumber ?? this.institutionNumber,
       institutionName: institutionName ?? this.institutionName,
       voidCheque: voidCheque ?? this.voidCheque,
-      bankCode: bankCode ?? this.bankCode,
       bankAccNumber: bankAccNumber ?? this.bankAccNumber,
       statusInCanada: statusInCanada ?? this.statusInCanada,
       permitImage: permitImage ?? this.permitImage,
@@ -115,7 +111,6 @@ class IndividualKycModel {
       'institutionNumber': institutionNumber,
       'institutionName': institutionName,
       'voidCheque': voidCheque,
-      'bankCode': bankCode,
       'bankAccNumber': bankAccNumber,
       'statusInCanada': statusInCanada,
       'permitImage': permitImage,
@@ -144,7 +139,6 @@ class IndividualKycModel {
       institutionNumber: map['institutionNumber'] as String? ?? "",
       institutionName: map['institutionName'] as String? ?? "",
       voidCheque: map['voidCheque'] as String? ?? "",
-      bankCode: map['bankCode'] as String? ?? "",
       bankAccNumber: map['bankAccNumber'] as String? ?? "",
       statusInCanada: map['statusInCanada'] as String? ?? "",
       permitImage: map['permitImage'] as String? ?? "",
@@ -172,10 +166,6 @@ class IndividualKycModel {
   factory IndividualKycModel.fromJson(String source) =>
       IndividualKycModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
-  @override
-  String toString() {
-    return 'IndividualKycModel(userInfo: $userInfo, dob: $dob, gender: $gender, sinNumber: $sinNumber, sinExpiry: $sinExpiry, transitNumber: $transitNumber, institutionNumber: $institutionNumber, institutionName: $institutionName, voidCheque: $voidCheque, bankCode: $bankCode, bankAccNumber: $bankAccNumber, statusInCanada: $statusInCanada, permitImage: $permitImage, govDocImage: $govDocImage, aptNo: $aptNo, emergencyContactNo: $emergencyContactNo, emergencyContactName: $emergencyContactName, modeOfTravel: $modeOfTravel, postalCode: $postalCode, haveCriminalRecord: $haveCriminalRecord, crimes: $crimes, appliedDate: $appliedDate)';
-  }
 
   @override
   bool operator ==(covariant IndividualKycModel other) {
@@ -190,7 +180,6 @@ class IndividualKycModel {
         other.institutionNumber == institutionNumber &&
         other.institutionName == institutionName &&
         other.voidCheque == voidCheque &&
-        other.bankCode == bankCode &&
         other.bankAccNumber == bankAccNumber &&
         other.statusInCanada == statusInCanada &&
         other.permitImage == permitImage &&
@@ -216,7 +205,6 @@ class IndividualKycModel {
         institutionNumber.hashCode ^
         institutionName.hashCode ^
         voidCheque.hashCode ^
-        bankCode.hashCode ^
         bankAccNumber.hashCode ^
         statusInCanada.hashCode ^
         permitImage.hashCode ^

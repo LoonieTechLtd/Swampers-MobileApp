@@ -7,12 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:968299498317:android:ae34b5e7bf3266f3eb0504",
+        "mobilesdk_app_id": "1:968299498317:android:18fb272cf1a08db5eb0504",
         "android_client_info": {
           "package_name": "com.swampersolutions.swamper_solutions"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "968299498317-t21ia5j9lrcqk8u3pcjghsddd8rrp89f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyANp1EKFvG1_Lh7LKimjS-Rl_-fkLThY7o"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "968299498317-t21ia5j9lrcqk8u3pcjghsddd8rrp89f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "968299498317-o4dm8brg2ahheul8ci38s8khimc4bkt2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.swamperSolution"
+              }
+            }
+          ]
         }
       }
     }

@@ -80,6 +80,9 @@ class AuthServices {
           totalJobs: 0,
           totalEarning: 0,
         );
+        if (await haveSameNumber(phone)) {
+          return "Phone no already used by another user";
+        }
 
         await firestore.collection("profiles").doc(uid).set(newUser.toMap());
 
@@ -108,6 +111,9 @@ class AuthServices {
           totalHired: 0,
           totalPay: 0,
         );
+        if (await haveSameNumber(phone)) {
+          return "Phone no already used by another user";
+        }
 
         await firestore.collection("profiles").doc(uid).set(newCompany.toMap());
 
@@ -203,6 +209,10 @@ class AuthServices {
         password: password,
       );
 
+      if (await haveSameNumber(contactNo)) {
+        return "Phone no already used by another user";
+      }
+
       // Send email verification link
       await userCredential.user!.sendEmailVerification();
 
@@ -267,6 +277,9 @@ class AuthServices {
         email: email,
         password: password,
       );
+      if (await haveSameNumber(contactNo)) {
+        return "Phone no already used by another user";
+      }
 
       // Send email verification link
       await userCredential.user!.sendEmailVerification();
@@ -321,7 +334,10 @@ class AuthServices {
         email: email,
         password: password,
       );
-
+      if (await haveEmailInFirestore(email)==false) {
+        auth.currentUser?.delete();
+        return "No user found";
+      }
       // Check if email is verified
       if (!userCredential.user!.emailVerified) {
         return 'email-not-verified';
@@ -457,6 +473,34 @@ class AuthServices {
       }
     } catch (e) {
       return 'Failed to change password. Please try again';
+    }
+  }
+
+  Future<bool> haveSameNumber(String phoneNo) async {
+    try {
+      final res =
+          await firestore
+              .collection("profiles")
+              .where("contactNo", isEqualTo: phoneNo)
+              .get();
+      return res.docs.isNotEmpty;
+    } catch (e) {
+      debugPrint("Error Checking Phone number: $e");
+      return false;
+    }
+  }
+
+  Future<bool> haveEmailInFirestore(String email) async {
+    try {
+      final res =
+          await firestore
+              .collection("profiles")
+              .where("email", isEqualTo: email)
+              .get();
+      return res.docs.isNotEmpty;
+    } catch (e) {
+      debugPrint("Error checking email in firestore: $e");
+      return false;
     }
   }
 }

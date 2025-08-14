@@ -69,7 +69,7 @@ class _IndividualKycApplicationScreenState
     "Study Permit",
     "Work Permit",
     "Permanent Resident",
-    "Citizenship",
+    "Canadian citizen",
   ];
 
   final List<String> _monthNames = [
@@ -402,20 +402,6 @@ class _IndividualKycApplicationScreenState
                         ],
                       ),
                       CustomDivider(text: "Bank Details"),
-
-                      CustomTextfield(
-                        hintText: "Bank Code",
-                        controller: backCodeController,
-                        obscureText: false,
-                        textInputType: TextInputType.text,
-                        validator: (value) {
-                          if (value?.length != 4) {
-                            return 'Invalid Bank Code';
-                          }
-                          return null;
-                        },
-                      ),
-
                       CustomTextfield(
                         hintText: "Institution No",
                         controller: institutionController,
@@ -919,7 +905,6 @@ class _IndividualKycApplicationScreenState
                             institutionName:
                                 institutionNameController.text.trim(),
                             voidCheque: voidChequeImage!,
-                            bankCode: backCodeController.text.trim(),
                             aptNo: aptNoController.text.trim(),
                             emergencyContactNo:
                                 emergencyContactNumberController.text.trim(),

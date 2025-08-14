@@ -5,14 +5,12 @@ import 'package:swamper_solution/consts/custom_text_styles.dart';
 class EmploymentHistoryCard extends StatelessWidget {
   final String title;
   final String location;
-  final String hourlyIncome;
   final String startedDate;
   final String noOfDays;
   const EmploymentHistoryCard({
     super.key,
     required this.title,
     required this.location,
-    required this.hourlyIncome,
     required this.startedDate,
     required this.noOfDays,
   });
@@ -103,11 +101,6 @@ class EmploymentHistoryCard extends StatelessWidget {
                 ),
                 SizedBox(height: 12),
 
-                _buildInfoRow(
-                  FeatherIcons.dollarSign,
-                  "\$$hourlyIncome / hr",
-                  Colors.green[600]!,
-                ),
               ],
             ),
           ),

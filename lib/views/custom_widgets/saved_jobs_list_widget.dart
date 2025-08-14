@@ -163,31 +163,7 @@ class SavedJobsListWidget extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
 
-                      // Salary badge if available
-                      if (job.hourlyIncome > 0) ...[
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Colors.green[400]!, Colors.green[600]!],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            "\$${job.hourlyIncome}/hr",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
+                
                     ],
                   ),
                 ),

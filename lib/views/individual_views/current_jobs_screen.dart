@@ -362,13 +362,7 @@ class _CurrentJobsScreenState extends ConsumerState<CurrentJobsScreen> {
                                     Colors.orange[600]!,
                                   ),
                                   const SizedBox(height: 10),
-                                  _buildJobDetailRow(
-                                    Icons.attach_money_outlined,
-                                    "\$${job.hourlyIncome.toStringAsFixed(0)}/hr",
-                                    Colors.green[600]!,
-                                    isHighlighted: true,
-                                  ),
-
+                                  
                                   // Description with improved styling
                                   if (job.description.isNotEmpty) ...[
                                     const SizedBox(height: 16),

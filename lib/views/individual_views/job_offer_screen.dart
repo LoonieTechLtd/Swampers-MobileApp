@@ -178,20 +178,6 @@ class JobOfferScreen extends ConsumerWidget {
                           style: CustomTextStyles.h3,
                         ),
                       ),
-                      Text(
-                        "\$ ${jobDetails.hourlyIncome}",
-                        style: CustomTextStyles.h3.copyWith(color: Colors.red),
-                      ),
-                      const SizedBox(width: 2),
-                      const Text(
-                        "/",
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w200,
-                        ),
-                      ),
-                      const SizedBox(width: 2),
-                      Text("hr", style: CustomTextStyles.description),
                     ],
                   ),
                   const SizedBox(height: 6),

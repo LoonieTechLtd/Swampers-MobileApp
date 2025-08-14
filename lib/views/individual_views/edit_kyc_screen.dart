@@ -34,7 +34,6 @@ class _IndividualKycApplicationScreenState
   final TextEditingController accountNoController = TextEditingController();
   final TextEditingController sinController = TextEditingController();
   final TextEditingController sinExpiryController = TextEditingController();
-  final TextEditingController backCodeController = TextEditingController();
   final TextEditingController institutionNameController =
       TextEditingController();
   final TextEditingController postalCodeController = TextEditingController();
@@ -102,7 +101,6 @@ class _IndividualKycApplicationScreenState
     institutionController.dispose();
     accountNoController.dispose();
     sinExpiryController.dispose();
-    backCodeController.dispose();
     institutionNameController.dispose();
     offenceController.dispose();
     courtLocationController.dispose();
@@ -489,20 +487,6 @@ class _IndividualKycApplicationScreenState
                         ],
                       ),
                       CustomDivider(text: "Bank Details"),
-
-                      CustomTextfield(
-                        hintText: "Bank Code",
-                        controller: backCodeController..text = kycData.bankCode,
-                        obscureText: false,
-                        textInputType: TextInputType.text,
-                        validator: (value) {
-                          if (value?.length != 4) {
-                            return 'Invalid Bank Code';
-                          }
-                          return null;
-                        },
-                      ),
-
                       CustomTextfield(
                         hintText: "Institution No",
                         controller:
@@ -756,7 +740,6 @@ class _IndividualKycApplicationScreenState
                                 institutionNumber: institutionController.text,
                                 institutionName: institutionNameController.text,
                                 voidCheque: voidChequeImage ?? k.voidCheque,
-                                bankCode: backCodeController.text,
                                 bankAccNumber: accountNoController.text,
                                 statusInCanada:
                                     selectedStatusInCanada ?? k.statusInCanada,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
@@ -22,16 +23,21 @@ class _IndividualFormState extends State<IndividualForm> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+  final TextEditingController otherInterstedJobController =
+      TextEditingController();
+  bool isSelectedOther = false;
   final List<String> workOptions = [
-    "Warehouse Associates",
+    "Forklist Operator",
+    "Warehouse Associate",
     "Lumping & Destuffing",
-    "Constructions",
-    "Factory Works",
+    "Construction",
+    "Factory Work",
     "Handy Man",
-    "Cleaning",
+    "Cleaner",
     "Movers",
-    "General Works",
+    "General Work",
     "Restaurant Service",
+    "Other",
   ];
 
   bool isVisible = true;
@@ -89,7 +95,7 @@ class _IndividualFormState extends State<IndividualForm> {
               obscureText: false,
               textInputType: TextInputType.number,
               validator: (value) {
-                if (value!.length < 10) {
+                if (value!.trim().length != 10) {
                   return "Invalid phone no";
                 }
                 return null;
@@ -115,7 +121,7 @@ class _IndividualFormState extends State<IndividualForm> {
                 isVisible ? Icons.visibility : Icons.visibility_off,
               ),
               validator: (value) {
-                if (value!.length < 6) {
+                if (value!.trim().length < 6) {
                   return "Password must be more than 6 char long";
                 }
                 return null;
@@ -127,11 +133,29 @@ class _IndividualFormState extends State<IndividualForm> {
               options: workOptions,
               onChanged: (value) {
                 setState(() {
+                  if (value == "Other") {
+                    setState(() {
+                      isSelectedOther = true;
+                    });
+                  } else {
+                    setState(() {
+                      isSelectedOther = false;
+                    });
+                  }
                   selectedWork = value;
                 });
               },
             ),
-            SizedBox(height: 40),
+            isSelectedOther
+                ? CustomTextfield(
+                  hintText: "Enter your interested work",
+                  controller: otherInterstedJobController,
+                  obscureText: false,
+                  textInputType: TextInputType.text,
+                )
+                : SizedBox(),
+
+            SizedBox(height: 20),
 
             // Signup button
             CustomButton(
@@ -139,6 +163,7 @@ class _IndividualFormState extends State<IndividualForm> {
               isLoading: isLoading,
               onPressed: () async {
                 if (!formKey.currentState!.validate()) return;
+                if (phoneController.text.length > 10) return;
                 if (selectedWork == null) {
                   showCustomSnackBar(
                     context: context,
@@ -161,7 +186,9 @@ class _IndividualFormState extends State<IndividualForm> {
                     phoneController.text.trim(),
                     addressController.text.trim(),
                     "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
-                    selectedWork!,
+                    isSelectedOther
+                        ? otherInterstedJobController.text.trim()
+                        : selectedWork!,
                   );
 
                   if (!mounted) return;
