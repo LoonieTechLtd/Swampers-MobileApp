@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -41,6 +42,30 @@ class KycController {
       return await storageRef.getDownloadURL();
     } catch (e) {
       debugPrint('Failed to upload Image: $e');
+      return null;
+    }
+  }
+
+  // method to upload KYC documents (PDF, DOC, etc.)
+  Future<String?> uploadDocumentFile(
+    String uid,
+    File file,
+    String docType,
+    String fileName,
+  ) async {
+    try {
+      // Get file extension
+      final extension = fileName.split('.').last.toLowerCase();
+
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('kycDocs')
+          .child('$uid/$docType.$extension');
+
+      await storageRef.putFile(file);
+      return await storageRef.getDownloadURL();
+    } catch (e) {
+      debugPrint('Failed to upload Document: $e');
       return null;
     }
   }

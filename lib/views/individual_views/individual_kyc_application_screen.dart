@@ -17,6 +17,7 @@ import 'package:swamper_solution/views/custom_widgets/custom_drop_down.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_textfield.dart';
 import 'package:swamper_solution/views/custom_widgets/date_picker_bottom_sheet.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class IndividualKycApplicationScreen extends ConsumerStatefulWidget {
@@ -136,6 +137,14 @@ class _IndividualKycApplicationScreenState
   XFile? govIdDoc;
   XFile? voidChequeDoc;
 
+  // Document files for PDF/DOC uploads
+  File? permitDocFile;
+  File? govIdDocFile;
+  File? voidChequeDocFile;
+  String? permitDocFileName;
+  String? govIdDocFileName;
+  String? voidChequeDocFileName;
+
   // go to URl
   Future<void> goToUrl(String uri) async {
     final Uri url = Uri.parse(uri);
@@ -174,10 +183,12 @@ class _IndividualKycApplicationScreenState
     required String title,
     required String docType,
     XFile? selectedImage,
+    File? selectedDocFile,
+    String? selectedDocFileName,
   }) {
     return Expanded(
       child: GestureDetector(
-        onTap: () => pickImage(docType),
+        onTap: () => _showUploadOptions(docType),
         child: DottedBorder(
           options: RoundedRectDottedBorderOptions(
             radius: Radius.circular(8),
@@ -199,6 +210,24 @@ class _IndividualKycApplicationScreenState
                           fit: BoxFit.cover,
                         ),
                       )
+                      : (selectedDocFile != null && selectedDocFileName != null)
+                      ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.description, size: 40, color: Colors.blue),
+                          SizedBox(height: 8),
+                          Text(
+                            selectedDocFileName,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
+                        ],
+                      )
                       : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -216,6 +245,83 @@ class _IndividualKycApplicationScreenState
         ),
       ),
     );
+  }
+
+  // Show upload options dialog
+  void _showUploadOptions(String docType) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Choose Upload Type',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16),
+                ListTile(
+                  leading: Icon(Icons.photo_camera, color: Colors.green),
+                  title: Text('Upload Photo'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    pickImage(docType);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.description, color: Colors.blue),
+                  title: Text('Upload Document (PDF, DOC)'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _pickDocument(docType);
+                  },
+                ),
+                SizedBox(height: 16),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // Pick document method
+  Future<void> _pickDocument(String docType) async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'doc', 'docx'],
+      );
+
+      if (result != null && result.files.single.path != null) {
+        final file = File(result.files.single.path!);
+        final fileName = result.files.single.name;
+
+        setState(() {
+          // Clear image when document is selected
+          if (docType == "workPermit") {
+            permitDoc = null;
+            permitDocFile = file;
+            permitDocFileName = fileName;
+          }
+          if (docType == "govId") {
+            govIdDoc = null;
+            govIdDocFile = file;
+            govIdDocFileName = fileName;
+          }
+          if (docType == "voidCheque") {
+            voidChequeDoc = null;
+            voidChequeDocFile = file;
+            voidChequeDocFileName = fileName;
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking document: $e');
+    }
   }
 
   @override
@@ -412,11 +518,15 @@ class _IndividualKycApplicationScreenState
                             title: 'Upload Study/Work\nPermit',
                             docType: "workPermit",
                             selectedImage: permitDoc,
+                            selectedDocFile: permitDocFile,
+                            selectedDocFileName: permitDocFileName,
                           ),
                           _buildImagePickerBox(
                             title: 'Upload Gov ID/\nPassport',
                             docType: "govId",
                             selectedImage: govIdDoc,
+                            selectedDocFile: govIdDocFile,
+                            selectedDocFileName: govIdDocFileName,
                           ),
                         ],
                       ),
@@ -472,6 +582,8 @@ class _IndividualKycApplicationScreenState
                             title: "Void Cheque",
                             docType: "voidCheque",
                             selectedImage: voidChequeDoc,
+                            selectedDocFile: voidChequeDocFile,
+                            selectedDocFileName: voidChequeDocFileName,
                           ),
                         ],
                       ),
@@ -891,12 +1003,13 @@ class _IndividualKycApplicationScreenState
                             return;
                           }
 
-                          if (permitDoc == null ||
-                              govIdDoc == null ||
-                              voidChequeDoc == null) {
+                          if ((permitDoc == null && permitDocFile == null) ||
+                              (govIdDoc == null && govIdDocFile == null) ||
+                              (voidChequeDoc == null &&
+                                  voidChequeDocFile == null)) {
                             showCustomSnackBar(
                               context: context,
-                              message: "Please upload all documents images",
+                              message: "Please upload all documents",
                               backgroundColor: Colors.red,
                             );
                             return;
@@ -917,24 +1030,61 @@ class _IndividualKycApplicationScreenState
                             isLoading = true;
                           });
 
-                          // Upload images now
-                          final permitUrl = await KycController().uploadDoc(
-                            userData.uid,
-                            permitDoc!,
-                            "workPermit",
-                          );
+                          // Upload images/documents now
+                          String? permitUrl;
+                          String? govDocUrl;
+                          String? voidChequeUrl;
 
-                          final govDocUrl = await KycController().uploadDoc(
-                            userData.uid,
-                            govIdDoc!,
-                            "govId",
-                          );
+                          // Upload permit document
+                          if (permitDoc != null) {
+                            permitUrl = await KycController().uploadDoc(
+                              userData.uid,
+                              permitDoc!,
+                              "workPermit",
+                            );
+                          } else if (permitDocFile != null) {
+                            permitUrl = await KycController()
+                                .uploadDocumentFile(
+                                  userData.uid,
+                                  permitDocFile!,
+                                  "workPermit",
+                                  permitDocFileName!,
+                                );
+                          }
 
-                          final voidChequeUrl = await KycController().uploadDoc(
-                            userData.uid,
-                            voidChequeDoc!,
-                            "voidCheque",
-                          );
+                          // Upload government ID document
+                          if (govIdDoc != null) {
+                            govDocUrl = await KycController().uploadDoc(
+                              userData.uid,
+                              govIdDoc!,
+                              "govId",
+                            );
+                          } else if (govIdDocFile != null) {
+                            govDocUrl = await KycController()
+                                .uploadDocumentFile(
+                                  userData.uid,
+                                  govIdDocFile!,
+                                  "govId",
+                                  govIdDocFileName!,
+                                );
+                          }
+
+                          // Upload void cheque document
+                          if (voidChequeDoc != null) {
+                            voidChequeUrl = await KycController().uploadDoc(
+                              userData.uid,
+                              voidChequeDoc!,
+                              "voidCheque",
+                            );
+                          } else if (voidChequeDocFile != null) {
+                            voidChequeUrl = await KycController()
+                                .uploadDocumentFile(
+                                  userData.uid,
+                                  voidChequeDocFile!,
+                                  "voidCheque",
+                                  voidChequeDocFileName!,
+                                );
+                          }
 
                           // Check if all uploads were successful
                           if (permitUrl == null ||

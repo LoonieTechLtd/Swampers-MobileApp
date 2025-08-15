@@ -143,10 +143,6 @@ class HomeScreen extends StatelessWidget {
                                 data: data.totalJobs.toString(),
                                 label: "Total Jobs",
                               ),
-                              StatWidget(
-                                data: data.totalPay.toString(),
-                                label: "Total Pay",
-                              ),
                             ],
                           );
                         },

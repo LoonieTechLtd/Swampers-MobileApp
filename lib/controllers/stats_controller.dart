@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:swamper_solution/models/company_stats_model.dart';
 import 'package:swamper_solution/models/individual_stats_model.dart';
@@ -19,7 +20,7 @@ class StatsController {
     }
   }
 
-   // creating a seperate collection to store company stats
+  // creating a seperate collection to store company stats
   Future<void> createCompanyStatsCollection(
     CompanyStatsModel comapnyStats,
     String uid,
@@ -30,8 +31,6 @@ class StatsController {
       debugPrint("Error wile creating stats collection: ${e.toString()}");
     }
   }
-
-
 
   Future<IndividualStatsModel?> loadUserStats() async {
     try {
@@ -51,7 +50,6 @@ class StatsController {
     }
   }
 
-
   Future<CompanyStatsModel?> loadCompanyStats() async {
     try {
       DocumentSnapshot<Map<String, dynamic>> doc =
@@ -67,6 +65,63 @@ class StatsController {
     } catch (e) {
       debugPrint("Unable to load company stats data: ${e.toString()}");
       return null;
+    }
+  }
+
+  Future<bool> updateCompanyStats(
+    int additionalHired,
+    int additionalJobs,
+  ) async {
+    try {
+      final docRef = firestore
+          .collection("stats")
+          .doc(FirebaseAuth.instance.currentUser!.uid);
+      final doc = await docRef.get();
+
+      if (doc.exists) {
+        final data = doc.data()!;
+        double currentHired = (data["totalHired"] ?? 0).toInt();
+        int currentJobs = (data["totalJobs"] ?? 0).toInt();
+
+        await docRef.update({
+          "totalHired": currentHired + additionalHired,
+          "totalJobs": currentJobs + additionalJobs,
+        });
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint("Failed to update company stats: $e");
+      return false;
+    }
+  }
+
+  Future<bool> updateIndividualStats(
+    double updatedHours,
+    int updatedTotalJobs,
+  ) async {
+    try {
+      final docRef = firestore
+          .collection("stats")
+          .doc(FirebaseAuth.instance.currentUser!.uid);
+      final doc = await docRef.get();
+
+      if (doc.exists) {
+        final data = doc.data()!;
+        int currentJobs = (data["totalJobs"] ?? 0).toInt();
+        double currentHours = (data['totalHours'] ?? 0.0).toDouble();
+
+        await docRef.update({
+          "totalHours": currentHours + updatedHours,
+          "totalJobs": currentJobs + updatedTotalJobs,
+        });
+        return true;
+      }
+
+      return false;
+    } catch (e) {
+      debugPrint("Failed to update individual stats: $e");
+      return false;
     }
   }
 }

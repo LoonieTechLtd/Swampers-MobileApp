@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class KycReviewScreen extends ConsumerWidget {
   const KycReviewScreen({super.key});
@@ -62,9 +63,9 @@ class KycReviewScreen extends ConsumerWidget {
                   'Documents',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                _infoRow('Gov Doc Image', kyc.govDocImage, isImage: true),
-                _infoRow('Permit Image', kyc.permitImage, isImage: true),
-                _infoRow('Void Cheque', kyc.voidCheque, isImage: true),
+                _infoRow('Gov Doc Image', kyc.govDocImage, isDocument: true),
+                _infoRow('Permit Image', kyc.permitImage, isDocument: true),
+                _infoRow('Void Cheque', kyc.voidCheque, isDocument: true),
                 const Divider(),
                 Text(
                   'Emergency Contact',
@@ -114,7 +115,37 @@ class KycReviewScreen extends ConsumerWidget {
     );
   }
 
-  Widget _infoRow(String label, String value, {bool isImage = false}) {
+  // Helper method to determine if URL is an image
+  bool _isImageFile(String url) {
+    if (url.isEmpty) return false;
+    final lowerUrl = url.toLowerCase();
+    return lowerUrl.contains('.jpg') ||
+        lowerUrl.contains('.jpeg') ||
+        lowerUrl.contains('.png') ||
+        lowerUrl.contains('.gif') ||
+        !lowerUrl.contains('.pdf') && !lowerUrl.contains('.doc');
+  }
+
+  // Helper method to get file name from URL
+  String _getFileName(String url) {
+    if (url.isEmpty) return 'Unknown file';
+    try {
+      final uri = Uri.parse(url);
+      final segments = uri.pathSegments;
+      if (segments.isNotEmpty) {
+        return segments.last;
+      }
+    } catch (e) {
+      // Fallback to basic extraction
+      final parts = url.split('/');
+      if (parts.isNotEmpty) {
+        return parts.last.split('?').first; // Remove query parameters
+      }
+    }
+    return 'Document file';
+  }
+
+  Widget _infoRow(String label, String value, {bool isDocument = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -127,17 +158,82 @@ class KycReviewScreen extends ConsumerWidget {
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
-          isImage
-              ? SizedBox(
-                height: 120,
-                width: 120,
-                child: ClipRRect(
-                  child: CachedNetworkImage(imageUrl: value, fit: BoxFit.cover),
-                ),
-              )
+          isDocument
+              ? _buildDocumentWidget(value)
               : Expanded(child: Text(value)),
         ],
       ),
     );
+  }
+
+  Widget _buildDocumentWidget(String url) {
+    if (url.isEmpty) {
+      return const SizedBox(
+        height: 120,
+        width: 120,
+        child: Center(child: Text('No document uploaded')),
+      );
+    }
+
+    // Check if it's an image file
+    if (_isImageFile(url)) {
+      return SizedBox(
+        height: 120,
+        width: 120,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: CachedNetworkImage(
+            imageUrl: url,
+            fit: BoxFit.cover,
+            placeholder:
+                (context, url) =>
+                    const Center(child: CircularProgressIndicator()),
+            errorWidget:
+                (context, url, error) => const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error, color: Colors.red),
+                    Text('Error loading image'),
+                  ],
+                ),
+          ),
+        ),
+      );
+    } else {
+      // It's a document (PDF/DOC)
+      return SizedBox(
+        height: 120,
+        width: 120,
+        child: Card(
+          child: InkWell(
+            onTap: () async {
+              // Try to open the document URL
+              final uri = Uri.parse(url);
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.description, size: 40, color: Colors.blue[600]),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Text(
+                    _getFileName(url),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 10),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                
+              ],
+            ),
+          ),
+        ),
+      );
+    }
   }
 }

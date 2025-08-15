@@ -298,10 +298,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 data: data.totalJobs.toString(),
                                 label: "Total Jobs",
                               ),
-                              StatWidget(
-                                data: data.totalEarning.toString(),
-                                label: "Total Earning",
-                              ),
                             ],
                           );
                         },

@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:random_string/random_string.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/controllers/job_controller.dart';
+import 'package:swamper_solution/controllers/stats_controller.dart';
 import 'package:swamper_solution/models/company_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
@@ -309,6 +310,10 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                         newJob,
                         jobId,
                       );
+                      StatsController().updateCompanyStats(
+                        newJob.noOfWorkers,
+                        1,
+                      );
 
                       Navigator.of(context, rootNavigator: true).pop();
 
@@ -319,6 +324,7 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                           message: "Job Posted Successfully",
                           backgroundColor: Colors.green,
                         );
+
                         context.pop();
                       } else {
                         showCustomSnackBar(

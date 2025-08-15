@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -79,7 +78,6 @@ class AuthServices {
           uid: uid,
           totalHours: 0,
           totalJobs: 0,
-          totalEarning: 0,
         );
         if (await haveSameNumber(phone)) {
           return "Phone no already used by another user";
@@ -110,7 +108,6 @@ class AuthServices {
           uid: uid,
           totalJobs: 0,
           totalHired: 0,
-          totalPay: 0,
         );
         if (await haveSameNumber(phone)) {
           return "Phone no already used by another user";
@@ -243,7 +240,6 @@ class AuthServices {
         uid: userCredential.user!.uid,
         totalHours: 0,
         totalJobs: 0,
-        totalEarning: 0,
       );
       await firestore
           .collection("profiles")
@@ -309,7 +305,6 @@ class AuthServices {
         uid: userCredential.user!.uid,
         totalJobs: 0,
         totalHired: 0,
-        totalPay: 0,
       );
       await firestore
           .collection("profiles")
