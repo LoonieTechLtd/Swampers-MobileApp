@@ -310,10 +310,16 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                         newJob,
                         jobId,
                       );
-                      StatsController().updateCompanyStats(
-                        newJob.noOfWorkers,
-                        1,
-                      );
+
+                      final statsUpdated = await StatsController()
+                          .updateCompanyStats(
+                            newJob.noOfWorkers,
+                            1,
+                          );
+
+                      if (!statsUpdated) {
+                        debugPrint("Warning: Failed to update company stats");
+                      }
 
                       Navigator.of(context, rootNavigator: true).pop();
 

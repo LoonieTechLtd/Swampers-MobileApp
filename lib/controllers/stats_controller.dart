@@ -80,8 +80,14 @@ class StatsController {
 
       if (doc.exists) {
         final data = doc.data()!;
-        double currentHired = (data["totalHired"] ?? 0).toInt();
-        int currentJobs = (data["totalJobs"] ?? 0).toInt();
+        int currentHired =
+            (data["totalHired"] is double)
+                ? (data["totalHired"] as double).toInt()
+                : (data["totalHired"] ?? 0) as int;
+        int currentJobs =
+            (data["totalJobs"] is double)
+                ? (data["totalJobs"] as double).toInt()
+                : (data["totalJobs"] ?? 0) as int;
 
         await docRef.update({
           "totalHired": currentHired + additionalHired,
