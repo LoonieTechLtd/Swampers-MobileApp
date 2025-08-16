@@ -57,10 +57,9 @@ flutter_native_splash:
   color_dark_ios: "#ffffff"
   image: assets/images/splash_logo.png
   icon_background_color: "#ffffff"
-  branding: assets/images/branding_white.png
+  branding: assets/images/splash_branding.png
   branding_mode: bottom
-  branding_dark_android: assets/images/branding_dark.png
-  branding_dark_ios: assets/images/branding_dark.png
+  branding_dark_android: assets/images/splash_branding.png
   android_gravity: center
   ios_content_mode: scaleAspectFit
   web_image_mode: center
@@ -69,7 +68,7 @@ flutter_native_splash:
   android_12:
     image: assets/images/splash_logo.png
     color: "#ffffff"
-    branding: assets/images/branding_white.png
+    branding: assets/images/splash_branding.png
     icon_background_color: "#ffffff"
   
 
