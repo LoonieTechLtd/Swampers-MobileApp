@@ -10,6 +10,7 @@ import 'package:swamper_solution/views/custom_widgets/custom_choice_chip.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_search_bar.dart';
 import 'package:swamper_solution/views/custom_widgets/job_post_card.dart';
 import 'package:swamper_solution/views/custom_widgets/stat_widget.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -118,7 +119,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       _buildDrawerItem(
                         icon: Icons.info_outline,
                         title: 'About',
-                        onTap: () {},
+                        onTap: () {
+                          launchUrl(Uri.parse("https://swampersolutions.com/about"), mode: LaunchMode.externalApplication);
+                        },
                       ),
                       const Spacer(),
                       Column(
