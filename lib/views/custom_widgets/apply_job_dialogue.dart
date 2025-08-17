@@ -159,7 +159,11 @@ class ApplyJobDiaogue {
                                         .getQuickApplyResume();
                                 if (quickApplicationResumeUrl == null ||
                                     quickApplicationResumeUrl.isEmpty) {
-                                  context.pop;
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                  context.pop();
+
                                   showCustomSnackBar(
                                     context: context,
                                     message:
@@ -171,24 +175,8 @@ class ApplyJobDiaogue {
                                 final String applicationId = randomAlphaNumeric(
                                   10,
                                 );
-                                final String? resumeUrl =
-                                    await JobApplicationController()
-                                        .uploadResumeToFirebase(
-                                          pickedFile!,
-                                          pickedFileName!,
-                                        );
-                                if (resumeUrl == null) {
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                  showCustomSnackBar(
-                                    context: context,
-                                    message:
-                                        "Failed to upload resume. Try again.",
-                                    backgroundColor: Colors.red,
-                                  );
-                                  return;
-                                }
+                              
+                               
                                 final JobApplicationModel applicationDetails =
                                     JobApplicationModel(
                                       applicationId: applicationId,
