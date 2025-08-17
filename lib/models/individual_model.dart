@@ -12,6 +12,7 @@ class IndividualModel {
   final String kycVerified;
   final String interestedWork;
   final String createdAt;
+  final String oneTimeResume;
   IndividualModel({
     required this.uid,
     required this.firstName,
@@ -24,6 +25,7 @@ class IndividualModel {
     required this.kycVerified,
     required this.interestedWork,
     required this.createdAt,
+    required this.oneTimeResume,
   });
 
   IndividualModel copyWith({
@@ -38,6 +40,7 @@ class IndividualModel {
     String? kycVerified,
     String? interestedWork,
     String? createdAt,
+    String? oneTimeResume,
   }) {
     return IndividualModel(
       uid: uid ?? this.uid,
@@ -51,6 +54,7 @@ class IndividualModel {
       kycVerified: kycVerified ?? this.kycVerified,
       interestedWork: interestedWork ?? this.interestedWork,
       createdAt: createdAt ?? this.createdAt,
+      oneTimeResume: oneTimeResume ?? this.oneTimeResume,
     );
   }
 
@@ -67,6 +71,7 @@ class IndividualModel {
       'kycVerified': kycVerified,
       'interestedWork': interestedWork,
       'createdAt': createdAt,
+      'oneTimeResume': oneTimeResume,
     };
   }
 
@@ -83,6 +88,7 @@ class IndividualModel {
       kycVerified: map['kycVerified'] as String,
       interestedWork: map['interestedWork'] as String,
       createdAt: map['createdAt'] as String,
+      oneTimeResume: map['oneTimeResume'] as String,
     );
   }
 
@@ -90,11 +96,6 @@ class IndividualModel {
 
   factory IndividualModel.fromJson(String source) =>
       IndividualModel.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() {
-    return 'IndividualModel(uid: $uid, firstName: $firstName, lastName: $lastName, email: $email, contactNo: $contactNo, profilePic: $profilePic, role: $role, address: $address, kycVerified: $kycVerified, interestedWork: $interestedWork, createdAt: $createdAt)';
-  }
 
   @override
   bool operator ==(covariant IndividualModel other) {
@@ -110,7 +111,8 @@ class IndividualModel {
         other.address == address &&
         other.kycVerified == kycVerified &&
         other.interestedWork == interestedWork &&
-        other.createdAt == createdAt;
+        other.createdAt == createdAt &&
+        other.oneTimeResume == oneTimeResume;
   }
 
   @override
@@ -125,6 +127,7 @@ class IndividualModel {
         address.hashCode ^
         kycVerified.hashCode ^
         interestedWork.hashCode ^
-        createdAt.hashCode;
+        createdAt.hashCode ^
+        oneTimeResume.hashCode;
   }
 }

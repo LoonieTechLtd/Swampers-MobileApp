@@ -254,4 +254,20 @@ class JobApplicationController {
       return false;
     }
   }
+
+  Future<String?> getQuickApplyResume() async {
+    try {
+      final String userId = auth.currentUser!.uid;
+      final docSnapshot = await firestore.collection("profiles").doc(userId).get();
+      if (docSnapshot.exists) {
+        final data = docSnapshot.data();
+        final resumeUrl = data?['oneTimeResume'] as String?;
+        return resumeUrl;
+      }
+      return null;
+    } catch (e) {
+      debugPrint("Unable to quick apply: $e");
+      return null;
+    }
+  }
 }

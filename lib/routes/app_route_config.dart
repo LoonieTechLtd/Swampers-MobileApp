@@ -25,6 +25,8 @@ import 'package:swamper_solution/views/common/landing_screen.dart';
 import 'package:swamper_solution/views/common/login_screen/login_screen.dart';
 import 'package:swamper_solution/views/common/reset_password_screen.dart';
 import 'package:swamper_solution/views/common/signup_screen/signup_screen.dart';
+import 'package:swamper_solution/views/individual_views/one_time_resume_upload_screen.dart';
+import 'package:swamper_solution/views/individual_views/profile_screen.dart';
 import 'package:swamper_solution/views/individual_views/users_main_screen.dart';
 import 'package:swamper_solution/views/company_views/company_main_screen.dart';
 
@@ -54,6 +56,7 @@ class AppRouteConfig {
           return KycStatusScreen();
         },
       ),
+   
       GoRoute(
         path: "kyc_verified_screen",
         name: "kyc_verified_screen",
@@ -89,6 +92,14 @@ class AppRouteConfig {
         path: '/individual',
         builder: (context, state) => const UsersMainScreen(),
         routes: [
+
+             GoRoute(
+        path: "profile_screen",
+        name: "profile_screen",
+        builder: (context, state) {
+          return ProfileScreen();
+        },
+      ),
           GoRoute(
             path: 'job_details',
             name: 'individual_job_details',
@@ -165,6 +176,11 @@ class AppRouteConfig {
             path: 'edit_kyc',
             name: 'edit_kyc',
             builder: (context, state) => const EditKycScreen(),
+          ),
+          GoRoute(
+            path: "one_time_resume_upload_screen",
+            name: "one_time_resume_upload_screen",
+            builder: (context, state) => const OneTimeResumeUploadScreen(),
           ),
         ],
       ),

@@ -106,6 +106,10 @@ class ApplyJobDiaogue {
                 pickedFile != null &&
                 userData.kycVerified == "approved" &&
                 !isLoading;
+            bool canQuickApply =
+                selectedShift != null &&
+                userData.kycVerified == "approved" &&
+                !isLoading;
             return AlertDialog(
               title: Text("Apply for this Job"),
               content: Column(
@@ -131,27 +135,136 @@ class ApplyJobDiaogue {
                   ),
                   const SizedBox(height: 30),
 
-                  // PDF uploading button
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.attach_file),
-                    label: Text(
-                      pickedFileName ?? "Attach Resume (PDF)",
-                      style: CustomTextStyles.bodyText,
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        backgroundColor: AppColors().primaryColor,
+                      ),
+                      label: Text(
+                        "Quick Apply",
+                        style: CustomTextStyles.bodyText.copyWith(
+                          color: AppColors().white,
+                        ),
+                      ),
+                      onPressed:
+                          canQuickApply
+                              ? () async {
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                final quickApplicationResumeUrl =
+                                    await JobApplicationController()
+                                        .getQuickApplyResume();
+                                if (quickApplicationResumeUrl == null ||
+                                    quickApplicationResumeUrl.isEmpty) {
+                                  context.pop;
+                                  showCustomSnackBar(
+                                    context: context,
+                                    message:
+                                        "Upload One-Time resume to Quick Apply",
+                                    backgroundColor: AppColors().red,
+                                  );
+                                  return;
+                                }
+                                final String applicationId = randomAlphaNumeric(
+                                  10,
+                                );
+                                final String? resumeUrl =
+                                    await JobApplicationController()
+                                        .uploadResumeToFirebase(
+                                          pickedFile!,
+                                          pickedFileName!,
+                                        );
+                                if (resumeUrl == null) {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                  showCustomSnackBar(
+                                    context: context,
+                                    message:
+                                        "Failed to upload resume. Try again.",
+                                    backgroundColor: Colors.red,
+                                  );
+                                  return;
+                                }
+                                final JobApplicationModel applicationDetails =
+                                    JobApplicationModel(
+                                      applicationId: applicationId,
+                                      jobDetails: jobDetails,
+                                      applicantId:
+                                          FirebaseAuth
+                                              .instance
+                                              .currentUser!
+                                              .uid,
+                                      appliedDate: DateTime.now().toString(),
+                                      selectedShift: selectedShift!,
+                                      resume: quickApplicationResumeUrl,
+                                      applicationStatus: "Pending",
+                                    );
+                                final message = await JobApplicationController()
+                                    .applyForJob(
+                                      applicationDetails,
+                                      applicationId,
+                                    );
+                                setState(() {
+                                  isLoading = false;
+                                });
+                                if (message) {
+                                  // Calculate total hours from the selected shift
+                                  double shiftHours = calculateShiftHours(
+                                    applicationDetails.selectedShift,
+                                  );
+                                  StatsController().updateIndividualStats(
+                                    shiftHours,
+                                    1,
+                                  );
+                                  showCustomSnackBar(
+                                    context: context,
+                                    message: "Job Applied Successfully",
+                                    backgroundColor: Colors.green,
+                                  );
+                                  context.pop();
+                                } else {
+                                  showCustomSnackBar(
+                                    context: context,
+                                    message: "Failed to apply Job, Try Again",
+                                    backgroundColor: Colors.red,
+                                  );
+                                  context.pop();
+                                }
+                              }
+                              : null,
                     ),
-                    onPressed: () async {
-                      FilePickerResult? result = await FilePicker.platform
-                          .pickFiles(
-                            type: FileType.custom,
-                            allowedExtensions: ['pdf'],
-                          );
-                      if (result != null && result.files.single.path != null) {
-                        setState(() {
-                          pickedFileName = result.files.single.name;
-                          pickedFile = File(result.files.single.path!);
-                        });
-                      }
-                    },
                   ),
+
+                  // PDF uploading button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.attach_file),
+                      label: Text(
+                        pickedFileName ?? "Attach Resume (PDF)",
+                        style: CustomTextStyles.bodyText,
+                      ),
+                      onPressed: () async {
+                        FilePickerResult? result = await FilePicker.platform
+                            .pickFiles(
+                              type: FileType.custom,
+                              allowedExtensions: ['pdf'],
+                            );
+                        if (result != null &&
+                            result.files.single.path != null) {
+                          setState(() {
+                            pickedFileName = result.files.single.name;
+                            pickedFile = File(result.files.single.path!);
+                          });
+                        }
+                      },
+                    ),
+                  ),
+
                   Text("* The Resume Size must be less than 5MB."),
                   if (userData.kycVerified != "approved")
                     Padding(
@@ -222,7 +335,6 @@ class ApplyJobDiaogue {
                               double shiftHours = calculateShiftHours(
                                 applicationDetails.selectedShift,
                               );
-
                               StatsController().updateIndividualStats(
                                 shiftHours,
                                 1,

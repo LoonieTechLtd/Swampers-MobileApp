@@ -52,38 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Notification toggle
-  Widget _buildNotificationToggle() {
-    bool isNotificationEnabled = true;
-
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          title: const Text('Notifications'),
-          value: isNotificationEnabled,
-          onChanged: (val) {
-            setState(() {
-              isNotificationEnabled = val;
-            });
-          },
-          secondary: const Icon(Icons.notifications_active_outlined),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors().primaryColor,
-        elevation: 0,
-        child: Icon(Icons.headset_mic, color: AppColors().white),
-        onPressed: () {
-          context.goNamed("contact_admin_screen");
-        },
-      ),
       drawer: Consumer(
         builder: (context, ref, child) {
           final userAsync = ref.watch(individualProvider);
@@ -123,33 +94,31 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 40),
                       _buildDrawerItem(
-                        icon: Icons.settings_outlined,
-                        title: 'Settings',
+                        icon: Icons.person_outline,
+                        title: 'My Profile',
                         onTap: () {
-                          // Navigate to settings
+                          context.goNamed("profile_screen");
                         },
                       ),
-                      _buildNotificationToggle(),
-                      _buildDrawerItem(
-                        icon: Icons.work_outline,
-                        title: 'My Jobs',
-                        onTap: () {
-                          // Navigate to my jobs
-                        },
-                      ),
+
                       _buildDrawerItem(
                         icon: Icons.description_outlined,
-                        title: 'My Documents',
+                        title: 'My Resume',
                         onTap: () {
-                          // Navigate to documents
+                          context.goNamed("one_time_resume_upload_screen");
+                        },
+                      ),
+                      _buildDrawerItem(
+                        icon: Icons.headset_mic_outlined,
+                        title: 'Help and Support',
+                        onTap: () {
+                          context.goNamed("contact_admin_screen");
                         },
                       ),
                       _buildDrawerItem(
                         icon: Icons.info_outline,
                         title: 'About',
-                        onTap: () {
-                          // Navigate to about
-                        },
+                        onTap: () {},
                       ),
                       const Spacer(),
                       Column(
@@ -219,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               SizedBox(width: 12),
                               InkWell(
                                 onTap: () {
-                                  // Scaffold.of(context).openDrawer();
+                                  Scaffold.of(context).openDrawer();
                                 },
                                 child: CircleAvatar(
                                   backgroundImage: NetworkImage(

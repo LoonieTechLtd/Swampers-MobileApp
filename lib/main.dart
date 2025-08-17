@@ -75,15 +75,12 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
     switch (state) {
       case AppLifecycleState.resumed:
-        // App came back to foreground - refresh auth state if needed
         debugPrint('App resumed from background');
         break;
       case AppLifecycleState.paused:
-        // App went to background
         debugPrint('App paused/went to background');
         break;
       case AppLifecycleState.detached:
-        // App is about to be terminated
         debugPrint('App detached');
         break;
       default:

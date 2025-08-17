@@ -72,6 +72,7 @@ class AuthServices {
           kycVerified: "notSubmitted",
           interestedWork: interestedWork!,
           createdAt: DateTime.now().toString(),
+          oneTimeResume: ""
         );
 
         final IndividualStatsModel stats = IndividualStatsModel(
@@ -234,6 +235,7 @@ class AuthServices {
         kycVerified: "notSubmitted",
         interestedWork: interestedWork,
         createdAt: DateTime.now().toString(),
+        oneTimeResume: ""
       );
 
       final IndividualStatsModel stats = IndividualStatsModel(
