@@ -83,7 +83,7 @@ class AppliedJobsCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    SizedBox(width: 12,)
+                    SizedBox(width: 12),
                   ],
                 ),
 
@@ -172,41 +172,58 @@ class AppliedJobsCard extends StatelessWidget {
                 SizedBox(height: 20),
 
                 // Enhanced delete button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: Colors.red[50],
-                      foregroundColor: Colors.red[600],
-                      padding: EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.red[200]!, width: 1),
-                      ),
-                    ),
-                    onPressed: () => _showDeleteDialog(context),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          FeatherIcons.trash2,
-                          size: 18,
-                          color: Colors.red[600],
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          "Delete Application",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.red[600],
+                jobApplicationDetails.applicationStatus == "Pending"
+                    ? SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: Colors.red[50],
+                          foregroundColor: Colors.red[600],
+                          padding: EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: Colors.red[200]!, width: 1),
                           ),
                         ),
-                      ],
+                        onPressed: () => _showDeleteDialog(context),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              FeatherIcons.trash2,
+                              size: 18,
+                              color: Colors.red[600],
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              "Delete Application",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.red[600],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                    : Container(
+                      width: double.infinity,
+                      height: 35,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors().red, width: 1),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Application Approved! Cannot Delete",
+                          style: CustomTextStyles.description.copyWith(
+                            color: AppColors().red,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
               ],
             ),
           ),

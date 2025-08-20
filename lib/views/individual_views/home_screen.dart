@@ -233,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                         error: (error, stack) {
-                          return Text("Error lodaing user data");
+                          return Text("Error loading user data");
                         },
                         loading: () {
                           return Center(child: SizedBox());

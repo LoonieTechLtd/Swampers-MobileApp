@@ -241,7 +241,7 @@ class JobDetailsScreen extends ConsumerWidget {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () {
-                        ApplyJobDiaogue().showApplyJobDialouge(
+                        ApplyJobDialogue().showApplyJobDialogue(
                           context,
                           jobDetails,
                           userData,

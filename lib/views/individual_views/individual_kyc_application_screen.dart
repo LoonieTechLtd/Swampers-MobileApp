@@ -50,6 +50,24 @@ class _IndividualKycApplicationScreenState
   final TextEditingController courtLocationController = TextEditingController();
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  // Keys for scrolling to specific fields
+  final GlobalKey firstNameKey = GlobalKey();
+  final GlobalKey lastNameKey = GlobalKey();
+  final GlobalKey genderKey = GlobalKey();
+  final GlobalKey statusInCanadaKey = GlobalKey();
+  final GlobalKey dobKey = GlobalKey();
+  final GlobalKey addressKey = GlobalKey();
+  final GlobalKey sinKey = GlobalKey();
+  final GlobalKey sinExpiryKey = GlobalKey();
+  final GlobalKey modeOfTravelKey = GlobalKey();
+  final GlobalKey documentsKey = GlobalKey();
+  final GlobalKey institutionKey = GlobalKey();
+  final GlobalKey transitKey = GlobalKey();
+  final GlobalKey accountKey = GlobalKey();
+  final GlobalKey agreementsKey = GlobalKey();
+
+  final ScrollController _scrollController = ScrollController();
   String? selectedGender;
   String? selectedModeOfTravel;
   String? selectedStatusInCanada;
@@ -63,6 +81,15 @@ class _IndividualKycApplicationScreenState
   bool haveAgreedCanabasPolicy = false;
   bool haveAgreedToAntiViolancePolicy = false;
   bool haveAgreedToPrivacyPolicy = false;
+
+  // Error states for better UI feedback
+  bool genderError = false;
+  bool statusInCanadaError = false;
+  bool dobError = false;
+  bool sinExpiryError = false;
+  bool modeOfTravelError = false;
+  bool documentsError = false;
+  bool agreementsError = false;
 
   final List<String> genders = ["Male", "Female"];
 
@@ -93,6 +120,169 @@ class _IndividualKycApplicationScreenState
   String _formatDate(DateTime? date) {
     if (date == null) return 'Select Your DOB';
     return '${date.day.toString().padLeft(2, '0')} ${_monthNames[date.month - 1]} ${date.year}';
+  }
+
+  // Method to scroll to a specific field with error
+  void _scrollToField(GlobalKey key) {
+    if (key.currentContext != null) {
+      Scrollable.ensureVisible(
+        key.currentContext!,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+        alignment: 0.1, // Position field near top of screen
+      );
+    }
+  }
+
+  // Enhanced validation method that shows specific errors and scrolls to invalid fields
+  bool _validateFormWithScroll() {
+    // Reset all error states
+    setState(() {
+      genderError = false;
+      statusInCanadaError = false;
+      dobError = false;
+      sinExpiryError = false;
+      modeOfTravelError = false;
+      documentsError = false;
+      agreementsError = false;
+    });
+
+    // First validate the form fields
+    if (!formKey.currentState!.validate()) {
+      // Find the first field with an error and scroll to it
+      if (firstNameController.text.trim().isEmpty) {
+        _scrollToField(firstNameKey);
+        return false;
+      }
+      if (lastNameController.text.trim().isEmpty) {
+        _scrollToField(lastNameKey);
+        return false;
+      }
+      if (addressController.text.trim().isEmpty) {
+        _scrollToField(addressKey);
+        return false;
+      }
+      if (sinController.text.trim().isEmpty || sinController.text.length != 9) {
+        _scrollToField(sinKey);
+        return false;
+      }
+      if (institutionController.text.trim().length != 3) {
+        _scrollToField(institutionKey);
+        return false;
+      }
+      if (transitController.text.trim().length != 5) {
+        _scrollToField(transitKey);
+        return false;
+      }
+      if (accountNoController.text.trim().length > 12) {
+        _scrollToField(accountKey);
+        return false;
+      }
+      return false;
+    }
+
+    // Validate dropdown fields with error states
+    if (selectedGender == null) {
+      setState(() {
+        genderError = true;
+      });
+      showCustomSnackBar(
+        context: context,
+        message: "Please select your gender",
+        backgroundColor: AppColors().red,
+      );
+      _scrollToField(genderKey);
+      return false;
+    }
+
+    if (selectedStatusInCanada == null) {
+      setState(() {
+        statusInCanadaError = true;
+      });
+      showCustomSnackBar(
+        context: context,
+        message: "Please select your status in Canada",
+        backgroundColor: AppColors().red,
+      );
+      _scrollToField(statusInCanadaKey);
+      return false;
+    }
+
+    if (selectedDobDate == null) {
+      setState(() {
+        dobError = true;
+      });
+      showCustomSnackBar(
+        context: context,
+        message: "Please select your date of birth",
+        backgroundColor: AppColors().red,
+      );
+      _scrollToField(dobKey);
+      return false;
+    }
+
+    if (selectedSinExpiryDate == null) {
+      setState(() {
+        sinExpiryError = true;
+      });
+      showCustomSnackBar(
+        context: context,
+        message: "Please select your SIN expiry date",
+        backgroundColor: AppColors().red,
+      );
+      _scrollToField(sinExpiryKey);
+      return false;
+    }
+
+    if (selectedModeOfTravel == null) {
+      setState(() {
+        modeOfTravelError = true;
+      });
+      showCustomSnackBar(
+        context: context,
+        message: "Please select your mode of travel",
+        backgroundColor: AppColors().red,
+      );
+      _scrollToField(modeOfTravelKey);
+      return false;
+    }
+
+    // Validate document uploads
+    if ((_filePickerHelper.permitDoc == null &&
+            _filePickerHelper.permitDocFile == null) ||
+        (_filePickerHelper.govIdDoc == null &&
+            _filePickerHelper.govIdDocFile == null) ||
+        (_filePickerHelper.voidChequeDoc == null &&
+            _filePickerHelper.voidChequeDocFile == null)) {
+      setState(() {
+        documentsError = true;
+      });
+      showCustomSnackBar(
+        context: context,
+        message: "Please upload all required documents",
+        backgroundColor: Colors.red,
+      );
+      _scrollToField(documentsKey);
+      return false;
+    }
+
+    // Validate agreements
+    if (haveAgreedCanabasPolicy == false ||
+        haveAgreedToAntiViolancePolicy == false ||
+        haveAgreedToPrivacyPolicy == false) {
+      setState(() {
+        agreementsError = true;
+      });
+      showCustomSnackBar(
+        context: context,
+        message: "Please agree to all policies to continue",
+        backgroundColor: AppColors().red,
+      );
+      _scrollToField(agreementsKey);
+      return false;
+    }
+
+    return true;
   }
 
   Future<dynamic> showScroolDatePicker({
@@ -128,6 +318,7 @@ class _IndividualKycApplicationScreenState
     institutionNameController.dispose();
     offenceController.dispose();
     courtLocationController.dispose();
+    _scrollController.dispose();
 
     super.dispose();
   }
@@ -147,7 +338,17 @@ class _IndividualKycApplicationScreenState
     super.initState();
     _filePickerHelper = FilePickerHelper(
       onStateChanged: () {
-        setState(() {});
+        setState(() {
+          // Clear documents error when any file is selected
+          if ((_filePickerHelper.permitDoc != null ||
+                  _filePickerHelper.permitDocFile != null) &&
+              (_filePickerHelper.govIdDoc != null ||
+                  _filePickerHelper.govIdDocFile != null) &&
+              (_filePickerHelper.voidChequeDoc != null ||
+                  _filePickerHelper.voidChequeDocFile != null)) {
+            documentsError = false;
+          }
+        });
       },
     );
   }
@@ -248,6 +449,7 @@ class _IndividualKycApplicationScreenState
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: SingleChildScrollView(
+            controller: _scrollController,
             child: userAsnc.when(
               data: (userData) {
                 if (userData == null) {
@@ -261,6 +463,7 @@ class _IndividualKycApplicationScreenState
                     children: [
                       Text("Fill your details to verify your Due Diligence."),
                       Row(
+                        key: firstNameKey,
                         spacing: 8,
                         children: [
                           Expanded(
@@ -280,6 +483,7 @@ class _IndividualKycApplicationScreenState
                             ),
                           ),
                           Expanded(
+                            key: lastNameKey,
                             child: CustomTextfield(
                               hintText: "Last name",
                               controller:
@@ -298,97 +502,166 @@ class _IndividualKycApplicationScreenState
                       ),
 
                       // Gender Selection Drop Down
-                      CustomDropDown(
-                        value: selectedGender,
-                        hintText: "Select your Gender",
-                        options: genders,
-                        onChanged: (value) {
-                          setState(() {
-                            selectedGender = value;
-                          });
-                        },
+                      Container(
+                        key: genderKey,
+                        decoration:
+                            genderError
+                                ? BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                )
+                                : null,
+                        child: CustomDropDown(
+                          value: selectedGender,
+                          hintText: "Select your Gender",
+                          options: genders,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedGender = value;
+                              genderError =
+                                  false; // Clear error when selection is made
+                            });
+                          },
+                        ),
                       ),
 
                       // Status in Canada dropdown
-                      CustomDropDown(
-                        value: selectedStatusInCanada,
-                        hintText: "Status in Canada",
-                        options: statusInCanada,
-                        onChanged: (value) {
-                          selectedStatusInCanada = value;
-                        },
+                      Container(
+                        key: statusInCanadaKey,
+                        decoration:
+                            statusInCanadaError
+                                ? BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                )
+                                : null,
+                        child: CustomDropDown(
+                          value: selectedStatusInCanada,
+                          hintText: "Status in Canada",
+                          options: statusInCanada,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedStatusInCanada = value;
+                              statusInCanadaError =
+                                  false; // Clear error when selection is made
+                            });
+                          },
+                        ),
                       ),
 
-                      CustomButton(
-                        backgroundColor: Colors.green,
-                        onPressed: () {
-                          showScroolDatePicker(
-                            isSinExpiry: false,
-                            title: "Select Date of Birth",
-                            initialDate: selectedDobDate,
-                            onDateSelected: (DateTime date) {
-                              setState(() {
-                                selectedDobDate = date;
-                              });
-                            },
-                          );
-                        },
-                        text:
-                            selectedDobDate != null
-                                ? _formatDate(selectedDobDate)
-                                : "Select Your DOB",
-                        textColor: Colors.white,
+                      Container(
+                        key: dobKey,
+                        decoration:
+                            dobError
+                                ? BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                )
+                                : null,
+                        child: CustomButton(
+                          backgroundColor: Colors.green,
+                          onPressed: () {
+                            showScroolDatePicker(
+                              isSinExpiry: false,
+                              title: "Select Date of Birth",
+                              initialDate: selectedDobDate,
+                              onDateSelected: (DateTime date) {
+                                setState(() {
+                                  selectedDobDate = date;
+                                  dobError =
+                                      false; // Clear error when date is selected
+                                });
+                              },
+                            );
+                          },
+                          text:
+                              selectedDobDate != null
+                                  ? _formatDate(selectedDobDate)
+                                  : "Select Your DOB",
+                          textColor: Colors.white,
+                        ),
                       ),
-                      CustomTextfield(
-                        hintText: "Permanent Address",
-                        controller: addressController..text = userData.address,
-                        obscureText: false,
-                        textInputType: TextInputType.text,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your address';
-                          }
-                          return null;
-                        },
+                      Container(
+                        key: addressKey,
+                        child: CustomTextfield(
+                          hintText: "Permanent Address",
+                          controller:
+                              addressController..text = userData.address,
+                          obscureText: false,
+                          textInputType: TextInputType.text,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your address';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
-                      CustomTextfield(
-                        hintText: "SIN No",
-                        controller: sinController,
-                        obscureText: false,
-                        textInputType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your SIN no';
-                          }
-                          if (value.length != 9) {
-                            return 'Invalid SIN no';
-                          }
-                          return null;
-                        },
+                      Container(
+                        key: sinKey,
+                        child: CustomTextfield(
+                          hintText: "SIN No",
+                          controller: sinController,
+                          obscureText: false,
+                          textInputType: TextInputType.number,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your SIN no';
+                            }
+                            if (value.length != 9) {
+                              return 'Invalid SIN no';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
 
                       // should be a date picker
-                      CustomButton(
-                        haveBorder: true,
-                        borderColor: Colors.black,
-                        backgroundColor: AppColors().backgroundColor,
-                        onPressed: () {
-                          showScroolDatePicker(
-                            isSinExpiry: true,
-                            title: "Select SIN Expiry Date",
-                            initialDate: selectedSinExpiryDate,
-                            onDateSelected: (DateTime date) {
-                              setState(() {
-                                selectedSinExpiryDate = date;
-                              });
-                            },
-                          );
-                        },
-                        text:
-                            selectedSinExpiryDate != null
-                                ? _formatDate(selectedSinExpiryDate)
-                                : "SIN Expiry Date",
-                        textColor: AppColors().black,
+                      Container(
+                        key: sinExpiryKey,
+                        decoration:
+                            sinExpiryError
+                                ? BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                )
+                                : null,
+                        child: CustomButton(
+                          haveBorder: true,
+                          borderColor: Colors.black,
+                          backgroundColor: AppColors().backgroundColor,
+                          onPressed: () {
+                            showScroolDatePicker(
+                              isSinExpiry: true,
+                              title: "Select SIN Expiry Date",
+                              initialDate: selectedSinExpiryDate,
+                              onDateSelected: (DateTime date) {
+                                setState(() {
+                                  selectedSinExpiryDate = date;
+                                  sinExpiryError =
+                                      false; // Clear error when date is selected
+                                });
+                              },
+                            );
+                          },
+                          text:
+                              selectedSinExpiryDate != null
+                                  ? _formatDate(selectedSinExpiryDate)
+                                  : "SIN Expiry Date",
+                          textColor: AppColors().black,
+                        ),
                       ),
 
                       CustomTextfield(
@@ -416,40 +689,73 @@ class _IndividualKycApplicationScreenState
                         obscureText: false,
                         textInputType: TextInputType.name,
                       ),
-                      CustomDropDown(
-                        value: selectedModeOfTravel,
-                        hintText: "Mode of travel",
-                        options: modeOfTravels,
-                        onChanged: (value) {
-                          selectedModeOfTravel = value;
-                        },
+                      Container(
+                        key: modeOfTravelKey,
+                        decoration:
+                            modeOfTravelError
+                                ? BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                )
+                                : null,
+                        child: CustomDropDown(
+                          value: selectedModeOfTravel,
+                          hintText: "Mode of travel",
+                          options: modeOfTravels,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedModeOfTravel = value;
+                              modeOfTravelError =
+                                  false; // Clear error when selection is made
+                            });
+                          },
+                        ),
                       ),
 
-                      Row(
-                        spacing: 12,
-                        children: [
-                          _buildImagePickerBox(
-                            title: 'Upload Study/Work\nPermit',
-                            docType: "workPermit",
-                          ),
-                          _buildImagePickerBox(
-                            title: 'Upload Gov ID/\nPassport',
-                            docType: "govId",
-                          ),
-                        ],
+                      Container(
+                        key: documentsKey,
+                        decoration:
+                            documentsError
+                                ? BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                )
+                                : null,
+                        child: Row(
+                          spacing: 12,
+                          children: [
+                            _buildImagePickerBox(
+                              title: 'Upload Study/Work\nPermit',
+                              docType: "workPermit",
+                            ),
+                            _buildImagePickerBox(
+                              title: 'Upload Gov ID/\nPassport',
+                              docType: "govId",
+                            ),
+                          ],
+                        ),
                       ),
                       CustomDivider(text: "Bank Details"),
-                      CustomTextfield(
-                        hintText: "Institution No",
-                        controller: institutionController,
-                        obscureText: false,
-                        textInputType: TextInputType.number,
-                        validator: (value) {
-                          if (value?.length != 3) {
-                            return 'Invalid Institution No';
-                          }
-                          return null;
-                        },
+                      Container(
+                        key: institutionKey,
+                        child: CustomTextfield(
+                          hintText: "Institution No",
+                          controller: institutionController,
+                          obscureText: false,
+                          textInputType: TextInputType.number,
+                          validator: (value) {
+                            if (value?.length != 3) {
+                              return 'Invalid Institution No';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
 
                       CustomTextfield(
@@ -459,29 +765,35 @@ class _IndividualKycApplicationScreenState
                         textInputType: TextInputType.text,
                       ),
 
-                      CustomTextfield(
-                        hintText: "Transit No",
-                        controller: transitController,
-                        obscureText: false,
-                        textInputType: TextInputType.number,
-                        validator: (value) {
-                          if (value?.length != 5) {
-                            return "Invalid Transit no";
-                          }
-                          return null;
-                        },
+                      Container(
+                        key: transitKey,
+                        child: CustomTextfield(
+                          hintText: "Transit No",
+                          controller: transitController,
+                          obscureText: false,
+                          textInputType: TextInputType.number,
+                          validator: (value) {
+                            if (value?.length != 5) {
+                              return "Invalid Transit no";
+                            }
+                            return null;
+                          },
+                        ),
                       ),
-                      CustomTextfield(
-                        hintText: "Account No",
-                        controller: accountNoController,
-                        obscureText: false,
-                        textInputType: TextInputType.number,
-                        validator: (value) {
-                          if (value!.length > 12) {
-                            return 'Invalid Account No';
-                          }
-                          return null;
-                        },
+                      Container(
+                        key: accountKey,
+                        child: CustomTextfield(
+                          hintText: "Account No",
+                          controller: accountNoController,
+                          obscureText: false,
+                          textInputType: TextInputType.number,
+                          validator: (value) {
+                            if (value!.length > 12) {
+                              return 'Invalid Account No';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
 
                       Row(
@@ -744,193 +1056,171 @@ class _IndividualKycApplicationScreenState
 
                       CustomDivider(text: "Cannabas Policy"),
 
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: haveAgreedCanabasPolicy,
-                            onChanged: (value) {
-                              setState(() {
-                                haveAgreedCanabasPolicy = value!;
-                              });
-                            },
-                          ),
-                          Flexible(
-                            child: RichText(
-                              text: TextSpan(
-                                style: CustomTextStyles.lightText.copyWith(
-                                  color: Colors.black,
+                      Container(
+                        key: agreementsKey,
+                        decoration:
+                            agreementsError
+                                ? BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                )
+                                : null,
+                        padding: agreementsError ? EdgeInsets.all(8) : null,
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: haveAgreedCanabasPolicy,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      haveAgreedCanabasPolicy = value!;
+                                      if (haveAgreedCanabasPolicy &&
+                                          haveAgreedToAntiViolancePolicy &&
+                                          haveAgreedToPrivacyPolicy) {
+                                        agreementsError =
+                                            false; // Clear error when all agreements are checked
+                                      }
+                                    });
+                                  },
                                 ),
-                                children: [
-                                  const TextSpan(text: 'Agree to all the '),
-                                  TextSpan(
-                                    recognizer:
-                                        TapGestureRecognizer()
-                                          ..onTap = () {
-                                            goToUrl(
-                                              "https://swampersolutions.com/Cannabis-Policy",
-                                            );
-                                          },
-                                    text:
-                                        'Recreational Cannabis Policy of Swamper',
-                                    style: CustomTextStyles.lightText.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors().primaryColor,
+                                Flexible(
+                                  child: RichText(
+                                    text: TextSpan(
+                                      style: CustomTextStyles.lightText
+                                          .copyWith(color: Colors.black),
+                                      children: [
+                                        const TextSpan(
+                                          text: 'Agree to all the ',
+                                        ),
+                                        TextSpan(
+                                          recognizer:
+                                              TapGestureRecognizer()
+                                                ..onTap = () {
+                                                  goToUrl(
+                                                    "https://swampersolutions.com/Cannabis-Policy",
+                                                  );
+                                                },
+                                          text:
+                                              'Recreational Cannabis Policy of Swamper',
+                                          style: CustomTextStyles.lightText
+                                              .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors().primaryColor,
+                                              ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: haveAgreedToAntiViolancePolicy,
-                            onChanged: (value) {
-                              setState(() {
-                                haveAgreedToAntiViolancePolicy = value!;
-                              });
-                            },
-                          ),
-                          Flexible(
-                            child: RichText(
-                              text: TextSpan(
-                                style: CustomTextStyles.lightText.copyWith(
-                                  color: Colors.black,
                                 ),
-                                children: [
-                                  const TextSpan(text: 'Agree to all the '),
-                                  TextSpan(
-                                    recognizer:
-                                        TapGestureRecognizer()
-                                          ..onTap = () {
-                                            goToUrl(
-                                              "https://swampersolutions.com/Anti-violence-Policy",
-                                            );
-                                          },
-                                    text: 'Anti-violance Policy of Swamper',
-                                    style: CustomTextStyles.lightText.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors().primaryColor,
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: haveAgreedToAntiViolancePolicy,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      haveAgreedToAntiViolancePolicy = value!;
+                                      if (haveAgreedCanabasPolicy &&
+                                          haveAgreedToAntiViolancePolicy &&
+                                          haveAgreedToPrivacyPolicy) {
+                                        agreementsError =
+                                            false; // Clear error when all agreements are checked
+                                      }
+                                    });
+                                  },
+                                ),
+                                Flexible(
+                                  child: RichText(
+                                    text: TextSpan(
+                                      style: CustomTextStyles.lightText
+                                          .copyWith(color: Colors.black),
+                                      children: [
+                                        const TextSpan(
+                                          text: 'Agree to all the ',
+                                        ),
+                                        TextSpan(
+                                          recognizer:
+                                              TapGestureRecognizer()
+                                                ..onTap = () {
+                                                  goToUrl(
+                                                    "https://swampersolutions.com/Anti-violence-Policy",
+                                                  );
+                                                },
+                                          text:
+                                              'Anti-violance Policy of Swamper',
+                                          style: CustomTextStyles.lightText
+                                              .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors().primaryColor,
+                                              ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
 
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: haveAgreedToPrivacyPolicy,
-                            onChanged: (value) {
-                              setState(() {
-                                haveAgreedToPrivacyPolicy = value!;
-                              });
-                            },
-                          ),
-                          Flexible(
-                            child: RichText(
-                              text: TextSpan(
-                                style: CustomTextStyles.lightText.copyWith(
-                                  color: Colors.black,
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: haveAgreedToPrivacyPolicy,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      haveAgreedToPrivacyPolicy = value!;
+                                      if (haveAgreedCanabasPolicy &&
+                                          haveAgreedToAntiViolancePolicy &&
+                                          haveAgreedToPrivacyPolicy) {
+                                        agreementsError =
+                                            false; // Clear error when all agreements are checked
+                                      }
+                                    });
+                                  },
                                 ),
-                                children: [
-                                  const TextSpan(text: 'Agree to all the '),
-                                  TextSpan(
-                                    recognizer:
-                                        TapGestureRecognizer()
-                                          ..onTap = () {
-                                            goToUrl(
-                                              "https://swampersolutions.com/Privacy-Policy",
-                                            );
-                                          },
-                                    text: 'Privacy Policy of Swamper',
-                                    style: CustomTextStyles.lightText.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors().primaryColor,
+                                Flexible(
+                                  child: RichText(
+                                    text: TextSpan(
+                                      style: CustomTextStyles.lightText
+                                          .copyWith(color: Colors.black),
+                                      children: [
+                                        const TextSpan(
+                                          text: 'Agree to all the ',
+                                        ),
+                                        TextSpan(
+                                          recognizer:
+                                              TapGestureRecognizer()
+                                                ..onTap = () {
+                                                  goToUrl(
+                                                    "https://swampersolutions.com/Privacy-Policy",
+                                                  );
+                                                },
+                                          text: 'Privacy Policy of Swamper',
+                                          style: CustomTextStyles.lightText
+                                              .copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors().primaryColor,
+                                              ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
 
                       CustomButton(
                         backgroundColor: AppColors().primaryColor,
                         onPressed: () async {
-                          if (!formKey.currentState!.validate()) return;
-
-                          if (selectedDobDate == null) {
-                            showCustomSnackBar(
-                              context: context,
-                              message: "Please Select your DOB",
-                              backgroundColor: AppColors().red,
-                            );
-                            return;
-                          }
-                          if (selectedSinExpiryDate == null) {
-                            showCustomSnackBar(
-                              context: context,
-                              message: "Please Select your SIN Expiry Date",
-                              backgroundColor: AppColors().red,
-                            );
-                            return;
-                          }
-                          if (selectedStatusInCanada == null) {
-                            showCustomSnackBar(
-                              context: context,
-                              message: "Please Select your Status in Canada",
-                              backgroundColor: AppColors().red,
-                            );
-                            return;
-                          }
-
-                          if (selectedGender == null) {
-                            showCustomSnackBar(
-                              context: context,
-                              message: "Please Select your gender",
-                              backgroundColor: AppColors().red,
-                            );
-                            return;
-                          }
-                          if (selectedModeOfTravel == null) {
-                            showCustomSnackBar(
-                              context: context,
-                              message: "Please Select your Mode of Travel",
-                              backgroundColor: AppColors().red,
-                            );
-                            return;
-                          }
-
-                          if ((_filePickerHelper.permitDoc == null &&
-                                  _filePickerHelper.permitDocFile == null) ||
-                              (_filePickerHelper.govIdDoc == null &&
-                                  _filePickerHelper.govIdDocFile == null) ||
-                              (_filePickerHelper.voidChequeDoc == null &&
-                                  _filePickerHelper.voidChequeDocFile ==
-                                      null)) {
-                            showCustomSnackBar(
-                              context: context,
-                              message: "Please upload all documents",
-                              backgroundColor: Colors.red,
-                            );
-                            return;
-                          }
-                          if (haveAgreedCanabasPolicy == false ||
-                              haveAgreedToAntiViolancePolicy == false ||
-                              haveAgreedToPrivacyPolicy == false) {
-                            showCustomSnackBar(
-                              context: context,
-                              message:
-                                  "Must mark all the agreement to continue",
-                              backgroundColor: AppColors().red,
-                            );
+                          // Use enhanced validation with scrolling
+                          if (!_validateFormWithScroll()) {
                             return;
                           }
 

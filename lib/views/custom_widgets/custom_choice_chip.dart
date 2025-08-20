@@ -20,15 +20,16 @@ class CustomChoiceChip extends StatefulWidget {
 
 class _CustomChoiceChipState extends State<CustomChoiceChip> {
   static const works = [
-    _Sport("All Works", Icons.circle),
-    _Sport("Warehouse Associates", Icons.warehouse),
-    _Sport("Construction Labours", Icons.construction),
-    _Sport("Factory Workers", Icons.factory),
-    _Sport("Handy Man", Icons.handshake),
-    _Sport("Cleaners", Icons.cleaning_services),
-    _Sport("Mover", Icons.move_up),
-    _Sport("General Workers", Icons.home),
-    _Sport("Restaurent Services", Icons.restaurant_menu),
+    Category("All Works", Icons.circle),
+    Category("Forklift Operator", Icons.forklift),
+    Category("Warehouse Associates", Icons.warehouse),
+    Category("Construction Labours", Icons.construction),
+    Category("Factory Workers", Icons.factory),
+    Category("Handy Man", Icons.handshake),
+    Category("Cleaning", Icons.cleaning_services),
+    Category("Mover", Icons.move_up),
+    Category("General Workers", Icons.home),
+    Category("Restaurant Services", Icons.restaurant_menu),
   ];
 
   int _selectedIndex = 0;
@@ -52,6 +53,7 @@ class _CustomChoiceChipState extends State<CustomChoiceChip> {
                 size: widget.iconSize,
                 color: _selectedIndex == index ? Colors.white : Colors.black,
               ),
+              
               showCheckmark: false,
               label: Text(sport.name),
               selected: _selectedIndex == index,
@@ -86,9 +88,9 @@ class _CustomChoiceChipState extends State<CustomChoiceChip> {
   }
 }
 
-class _Sport {
+class Category {
   final String name;
   final IconData icon;
 
-  const _Sport(this.name, this.icon);
+  const Category(this.name, this.icon);
 }

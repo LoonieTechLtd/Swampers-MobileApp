@@ -13,26 +13,63 @@ class NotificationScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationAsnc = ref.watch(getUserNotifications);
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
+      backgroundColor: Colors.grey.shade50,
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           NotificiationServices.showNotification(
-            title: "Test Notificaiton",
-            body: "Body of the test notification and other ",
+            title: "Test Notification",
+            body: "Body of the test notification and other details",
           );
         },
-        child: Icon(Icons.notifications_active_outlined),
+        icon: Icon(Icons.notifications_active_outlined),
+        label: Text("Test"),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
       ),
       appBar: AppBar(
         centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
         title: Text("Notifications", style: CustomTextStyles.title),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(1),
+          child: Container(height: 1, color: Colors.grey.shade200),
+        ),
       ),
       body: SafeArea(
         child: notificationAsnc.when(
           data: (notification) {
             if (notification.isEmpty) {
-              return Center(child: Text("No Notification Available"));
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.notifications_none,
+                      size: 80,
+                      color: Colors.grey.shade400,
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      "No Notifications",
+                      style: CustomTextStyles.h3.copyWith(
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      "You're all caught up!",
+                      style: CustomTextStyles.description.copyWith(
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                  ],
+                ),
+              );
             }
             return ListView.builder(
+              padding: EdgeInsets.symmetric(vertical: 8),
               itemCount: notification.length,
               itemBuilder: (context, index) {
                 final noti = notification[index];
@@ -48,10 +85,48 @@ class NotificationScreen extends ConsumerWidget {
             );
           },
           error: (error, stack) {
-            return Center(child: Text("Error fetching Notification $error"));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 60,
+                    color: Colors.red.shade300,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    "Something went wrong",
+                    style: CustomTextStyles.h4.copyWith(
+                      color: Colors.red.shade600,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Error: $error",
+                    style: CustomTextStyles.description,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
           },
           loading: () {
-            return Center(child: CircularProgressIndicator());
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text(
+                    "Loading notifications...",
+                    style: CustomTextStyles.description.copyWith(
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            );
           },
         ),
       ),

@@ -14,8 +14,9 @@ import 'package:swamper_solution/models/job_application_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
 import 'package:swamper_solution/views/common/signup_screen/company_form.dart';
+import 'package:swamper_solution/views/individual_views/individual_kyc_application_screen.dart';
 
-class ApplyJobDiaogue {
+class ApplyJobDialogue {
   // Helper method to calculate hours from shift string
   double calculateShiftHours(String shift) {
     try {
@@ -89,7 +90,7 @@ class ApplyJobDiaogue {
     }
   }
 
-  void showApplyJobDialouge(
+  void showApplyJobDialogue(
     BuildContext context,
     JobModel jobDetails,
     IndividualModel userData,
@@ -114,10 +115,12 @@ class ApplyJobDiaogue {
                 userData.kycVerified == "approved" &&
                 !isLoading;
             return AlertDialog(
+              
               title: Text("Apply for this Job"),
               content: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
+                spacing: 12,
                 children: [
                   DropdownButton<String>(
                     isExpanded: true,
@@ -192,7 +195,7 @@ class ApplyJobDiaogue {
                                       selectedShift: selectedShift!,
                                       resume: quickApplicationResumeUrl,
                                       applicationStatus: "Pending",
-                                      isQuickApplied: true
+                                      isQuickApplied: true,
                                     );
                                 final message = await JobApplicationController()
                                     .applyForJob(
@@ -216,7 +219,7 @@ class ApplyJobDiaogue {
                                     message: "Job Applied Successfully",
                                     backgroundColor: Colors.green,
                                   );
-                              ref.invalidate(haveAppliedThisJobProvider);
+                                  ref.invalidate(haveAppliedThisJobProvider);
 
                                   context.pop();
                                 } else {
@@ -262,9 +265,33 @@ class ApplyJobDiaogue {
                   if (userData.kycVerified != "approved")
                     Padding(
                       padding: const EdgeInsets.only(top: 12.0),
-                      child: Text(
-                        "Verify your KYC to apply for Job",
-                        style: TextStyle(color: AppColors().red, fontSize: 14),
+                      child: Row(
+                        children: [
+                          Text(
+                            "Due Diligence not verified. ",
+                            style: TextStyle(
+                              color: AppColors().red,
+                              fontSize: 14,
+                            ),
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(padding: EdgeInsets.all(0)),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => IndividualKycApplicationScreen(),
+                                ),
+                              );
+                            },
+                            child: Text("Verify Now." ,style: TextStyle(
+                              color: AppColors().primaryColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700
+                            ),),
+                          ),
+                        ],
                       ),
                     ),
                 ],
@@ -317,7 +344,7 @@ class ApplyJobDiaogue {
                                   selectedShift: selectedShift!,
                                   resume: resumeUrl,
                                   applicationStatus: "Pending",
-                                  isQuickApplied: false
+                                  isQuickApplied: false,
                                 );
                             final message = await JobApplicationController()
                                 .applyForJob(applicationDetails, applicationId);

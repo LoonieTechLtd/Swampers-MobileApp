@@ -29,274 +29,276 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 10),
-
-              Center(
-                child: Image.asset(
-                  'assets/images/company_logo.png',
-                  height: 180,
-                  width: 180,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 10),
+            
+                Center(
+                  child: Image.asset(
+                    'assets/images/company_logo.png',
+                    height: 180,
+                    width: 180,
+                  ),
                 ),
-              ),
-              SizedBox(height: 40),
-              Row(
-                children: [
-                  Text(
-                    "Login To ",
-                    style: TextStyle(
-                      fontSize: 30,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  Text(
-                    "Swamper",
-                    style: TextStyle(
-                      fontSize: 30,
-                      color: Colors.blue,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 14),
-              Form(
-                key: formKey,
-                child: Column(
+                SizedBox(height: 40),
+                Row(
                   children: [
-                    CustomTextfield(
-                      hintText: "Email",
-                      controller: emailController,
-                      obscureText: false,
-                      textInputType: TextInputType.emailAddress,
-                    ),
-                    SizedBox(height: 16),
-                    CustomTextfield(
-                      hintText: "Password",
-                      controller: passwordController,
-                      obscureText: !isVisible,
-                      textInputType: TextInputType.text,
-                      onPressedSuffix: () {
-                        setState(() {
-                          isVisible = !isVisible;
-                        });
-                      },
-                      suffixIcon: Icon(
-                        isVisible ? Icons.visibility : Icons.visibility_off,
+                    Text(
+                      "Login To ",
+                      style: TextStyle(
+                        fontSize: 30,
+                        color: Colors.black87,
+                        fontWeight: FontWeight.w900,
                       ),
-                      validator: (value) {
-                        if (value!.length < 6) {
-                          return "Password must be at least 6 characters";
-                        }
-                        return null;
-                      },
+                    ),
+                    Text(
+                      "Swamper",
+                      style: TextStyle(
+                        fontSize: 30,
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                   ],
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      context.push('/reset_password');
-                    },
-                    child: Text("Forget Password?"),
+                SizedBox(height: 14),
+                Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      CustomTextfield(
+                        hintText: "Email",
+                        controller: emailController,
+                        obscureText: false,
+                        textInputType: TextInputType.emailAddress,
+                      ),
+                      SizedBox(height: 16),
+                      CustomTextfield(
+                        hintText: "Password",
+                        controller: passwordController,
+                        obscureText: !isVisible,
+                        textInputType: TextInputType.text,
+                        onPressedSuffix: () {
+                          setState(() {
+                            isVisible = !isVisible;
+                          });
+                        },
+                        suffixIcon: Icon(
+                          isVisible ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        validator: (value) {
+                          if (value!.length < 6) {
+                            return "Password must be at least 6 characters";
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              SizedBox(height: 30),
-              CustomButton(
-                backgroundColor: Colors.blue,
-                onPressed: () async {
-                  if (!formKey.currentState!.validate()) return;
-                  setState(() {
-                    isLoading = true;
-                  });
-                  try {
-                    final message = await AuthServices().login(
-                      emailController.text.trim(),
-                      passwordController.text.trim(),
-                      ref,
-                    );
-                    if (message == "Individual") {
-                      if (mounted) context.go('/individual');
-                    } else if (message == "Company") {
-                      if (mounted) context.go('/company');
-                    } else if (message == "email-not-verified") {
-                      if (mounted) {
-                        context.goNamed('email_varification_screen');
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        context.push('/reset_password');
+                      },
+                      child: Text("Forget Password?"),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 30),
+                CustomButton(
+                  backgroundColor: Colors.blue,
+                  onPressed: () async {
+                    if (!formKey.currentState!.validate()) return;
+                    setState(() {
+                      isLoading = true;
+                    });
+                    try {
+                      final message = await AuthServices().login(
+                        emailController.text.trim(),
+                        passwordController.text.trim(),
+                        ref,
+                      );
+                      if (message == "Individual") {
+                        if (mounted) context.go('/individual');
+                      } else if (message == "Company") {
+                        if (mounted) context.go('/company');
+                      } else if (message == "email-not-verified") {
+                        if (mounted) {
+                          context.goNamed('email_varification_screen');
+                          showCustomSnackBar(
+                            context: context,
+                            message:
+                                "Please verify your email address to continue",
+                            backgroundColor: Colors.orange,
+                          );
+                        }
+                      } else if (message == "signup") {
+                        if (mounted) {
+                          context.go('/signup');
+                          showCustomSnackBar(
+                            context: context,
+                            message: "Please create an account first",
+                            backgroundColor: Colors.orange,
+                          );
+                        }
+                      } else {
                         showCustomSnackBar(
                           context: context,
-                          message:
-                              "Please verify your email address to continue",
-                          backgroundColor: Colors.orange,
+                          message: message,
+                          backgroundColor: Colors.red,
                         );
+                        setState(() {
+                          isLoading = false;
+                        });
                       }
-                    } else if (message == "signup") {
-                      if (mounted) {
-                        context.go('/signup');
-                        showCustomSnackBar(
-                          context: context,
-                          message: "Please create an account first",
-                          backgroundColor: Colors.orange,
-                        );
-                      }
-                    } else {
+                    } catch (e) {
                       showCustomSnackBar(
                         context: context,
-                        message: message,
+                        message: "Login failed. Please try again later.",
                         backgroundColor: Colors.red,
                       );
                       setState(() {
                         isLoading = false;
                       });
                     }
-                  } catch (e) {
-                    showCustomSnackBar(
-                      context: context,
-                      message: "Login failed. Please try again later.",
-                      backgroundColor: Colors.red,
-                    );
-                    setState(() {
-                      isLoading = false;
-                    });
-                  }
-                },
-                isLoading: isLoading,
-                text: "Log In",
-                textColor: Colors.white,
-              ),
-
-              // Divider
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 10,
-                  children: [
-                    Expanded(child: Divider()),
-                    Text("OR"),
-                    Expanded(child: Divider()),
-                  ],
-                ),
-              ),
-
-              // Google login button
-              SizedBox(
-                height: 50,
-                width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    try {
-                      final result = await AuthServices().loginWithGoogle(ref);
-
-                      if (result is String) {
-                        if (result == "Individual") {
-                          if (mounted) context.go('/individual');
-                        } else if (result == "Company") {
-                          if (mounted) context.go('/company');
-                        } else {
-                          if (mounted) {
-                            showCustomSnackBar(
-                              context: context,
-                              message: result,
-                              backgroundColor: Colors.red,
-                            );
-                          }
-                        }
-                      } else if (result is Map) {
-                        if (result["status"] == "new_user") {
-                          if (mounted) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => GoogleSignInRoleScreen(
-                                      uid: result["uid"],
-                                      email: result["email"],
-                                    ),
-                              ),
-                            );
-                          }
-                        }
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        showCustomSnackBar(
-                          context: context,
-                          message: "Failed to sign in with Google",
-                          backgroundColor: Colors.red,
-                        );
-                      }
-                    } finally {
-                      if (mounted) {
-                        setState(() {
-                          isLoading = false;
-                        });
-                      }
-                    }
                   },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25.0),
-                      side: BorderSide(color: Colors.black, width: 1),
-                    ),
-                    elevation: 0,
-                  ),
+                  isLoading: isLoading,
+                  text: "Log In",
+                  textColor: Colors.white,
+                ),
+            
+                // Divider
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: 10,
                     children: [
-                      if (isLoading)
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.black,
-                            ),
-                          ),
-                        )
-                      else ...[
-                        Row(
-                          children: [
-                            SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CachedNetworkImage(
-                                imageUrl:
-                                    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/1024px-Google_Favicon_2025.svg.png",
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Text("Login with Google"),
-                          ],
-                        ),
-                      ],
+                      Expanded(child: Divider()),
+                      Text("OR"),
+                      Expanded(child: Divider()),
                     ],
                   ),
                 ),
-              ),
-
-              SizedBox(height: 40),
-              AuthNavigationButton(
-                prefixText: "Don't have an account?",
-                buttonText: "Register",
-                onTap: () {
-                  context.push('/signup');
-                },
-              ),
-            ],
+            
+                // Google login button
+                SizedBox(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      try {
+                        final result = await AuthServices().loginWithGoogle(ref);
+            
+                        if (result is String) {
+                          if (result == "Individual") {
+                            if (mounted) context.go('/individual');
+                          } else if (result == "Company") {
+                            if (mounted) context.go('/company');
+                          } else {
+                            if (mounted) {
+                              showCustomSnackBar(
+                                context: context,
+                                message: result,
+                                backgroundColor: Colors.red,
+                              );
+                            }
+                          }
+                        } else if (result is Map) {
+                          if (result["status"] == "new_user") {
+                            if (mounted) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => GoogleSignInRoleScreen(
+                                        uid: result["uid"],
+                                        email: result["email"],
+                                      ),
+                                ),
+                              );
+                            }
+                          }
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          showCustomSnackBar(
+                            context: context,
+                            message: "Failed to sign in with Google",
+                            backgroundColor: Colors.red,
+                          );
+                        }
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25.0),
+                        side: BorderSide(color: Colors.black, width: 1),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (isLoading)
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.black,
+                              ),
+                            ),
+                          )
+                        else ...[
+                          Row(
+                            children: [
+                              SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CachedNetworkImage(
+                                  imageUrl:
+                                      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/1024px-Google_Favicon_2025.svg.png",
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Text("Login with Google"),
+                            ],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+            
+                SizedBox(height: 40),
+                AuthNavigationButton(
+                  prefixText: "Don't have an account?",
+                  buttonText: "Register",
+                  onTap: () {
+                    context.push('/signup');
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),

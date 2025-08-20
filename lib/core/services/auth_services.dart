@@ -414,7 +414,7 @@ class AuthServices {
         case 'user-disabled':
           return 'This account has been disabled';
         default:
-          return 'Login failed: ${e.message}';
+          return 'Login failed: Email or Password is incorrect';
       }
     } catch (e) {
       return 'Login failed. Please try again';
