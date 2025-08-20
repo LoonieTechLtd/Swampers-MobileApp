@@ -7,7 +7,6 @@ import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
 
 class OneTimeResumeUploadScreen extends StatefulWidget {
   const OneTimeResumeUploadScreen({super.key});
-
   @override
   State<OneTimeResumeUploadScreen> createState() =>
       _OneTimeResumeUploadScreenState();

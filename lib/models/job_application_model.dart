@@ -9,6 +9,7 @@ class JobApplicationModel {
   final String resume;
   final String applicationStatus;
   final JobModel jobDetails;
+  final bool isQuickApplied;
   JobApplicationModel({
     required this.applicationId,
     required this.applicantId,
@@ -17,6 +18,7 @@ class JobApplicationModel {
     required this.resume,
     required this.applicationStatus,
     required this.jobDetails,
+    required this.isQuickApplied,
   });
 
   JobApplicationModel copyWith({
@@ -27,6 +29,7 @@ class JobApplicationModel {
     String? resume,
     String? applicationStatus,
     JobModel? jobDetails,
+    bool? isQuickApplied,
   }) {
     return JobApplicationModel(
       applicationId: applicationId ?? this.applicationId,
@@ -36,6 +39,7 @@ class JobApplicationModel {
       resume: resume ?? this.resume,
       applicationStatus: applicationStatus ?? this.applicationStatus,
       jobDetails: jobDetails ?? this.jobDetails,
+      isQuickApplied: isQuickApplied ?? this.isQuickApplied,
     );
   }
 
@@ -48,6 +52,7 @@ class JobApplicationModel {
       'resume': resume,
       'applicationStatus': applicationStatus,
       'jobDetails': jobDetails.toMap(),
+      'isQuickApplied': isQuickApplied,
     };
   }
 
@@ -59,41 +64,39 @@ class JobApplicationModel {
       selectedShift: map['selectedShift'] as String,
       resume: map['resume'] as String,
       applicationStatus: map['applicationStatus'] as String,
-      jobDetails: JobModel.fromMap(map['jobDetails'] as Map<String,dynamic>),
+      jobDetails: JobModel.fromMap(map['jobDetails'] as Map<String, dynamic>),
+      isQuickApplied: map['isQuickApplied'] as bool,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory JobApplicationModel.fromJson(String source) => JobApplicationModel.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() {
-    return 'JobApplicationModel(applicationId: $applicationId, applicantId: $applicantId, appliedDate: $appliedDate, selectedShift: $selectedShift, resume: $resume, applicationStatus: $applicationStatus, jobDetails: $jobDetails)';
-  }
+  factory JobApplicationModel.fromJson(String source) =>
+      JobApplicationModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   bool operator ==(covariant JobApplicationModel other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.applicationId == applicationId &&
-      other.applicantId == applicantId &&
-      other.appliedDate == appliedDate &&
-      other.selectedShift == selectedShift &&
-      other.resume == resume &&
-      other.applicationStatus == applicationStatus &&
-      other.jobDetails == jobDetails;
+
+    return other.applicationId == applicationId &&
+        other.applicantId == applicantId &&
+        other.appliedDate == appliedDate &&
+        other.selectedShift == selectedShift &&
+        other.resume == resume &&
+        other.applicationStatus == applicationStatus &&
+        other.jobDetails == jobDetails &&
+        other.isQuickApplied == isQuickApplied;
   }
 
   @override
   int get hashCode {
     return applicationId.hashCode ^
-      applicantId.hashCode ^
-      appliedDate.hashCode ^
-      selectedShift.hashCode ^
-      resume.hashCode ^
-      applicationStatus.hashCode ^
-      jobDetails.hashCode;
+        applicantId.hashCode ^
+        appliedDate.hashCode ^
+        selectedShift.hashCode ^
+        resume.hashCode ^
+        applicationStatus.hashCode ^
+        jobDetails.hashCode ^
+        isQuickApplied.hashCode;
   }
 }

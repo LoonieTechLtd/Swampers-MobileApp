@@ -39,10 +39,6 @@ class EmploymentScreen extends StatelessWidget {
           "Employment History", 
           style: CustomTextStyles.title.copyWith(color: Colors.black87)
         ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black87),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
       ),
       body: SafeArea(
         child: Column(
@@ -84,7 +80,7 @@ class EmploymentScreen extends StatelessWidget {
                         highlightColor: Colors.blue[50],
                         constraints: BoxConstraints(
                           minHeight: 50.0,
-                          minWidth: MediaQuery.of(context).size.width * 0.42,
+                          minWidth:  (MediaQuery.of(context).size.width - 45) / 2,
                         ),
                         onPressed: (int index) {
                           ref

@@ -99,9 +99,9 @@ class PostedJobsCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Icon(FeatherIcons.users, size: 16),
-                    const SizedBox(width: 4),
-                    Text("20", style: CustomTextStyles.bodyText),
+                     Icon(FeatherIcons.users, size: 16),
+                     SizedBox(width: 4),
+                    Text(jobDetails.noOfWorkers.toString(), style: CustomTextStyles.bodyText),
                   ],
                 ),
               ],

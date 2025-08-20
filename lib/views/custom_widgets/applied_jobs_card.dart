@@ -172,7 +172,7 @@ class AppliedJobsCard extends StatelessWidget {
                 SizedBox(height: 20),
 
                 // Enhanced delete button
-                Container(
+                SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(

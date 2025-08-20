@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:random_string/random_string.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
@@ -11,6 +12,7 @@ import 'package:swamper_solution/controllers/stats_controller.dart';
 import 'package:swamper_solution/models/individual_model.dart';
 import 'package:swamper_solution/models/job_application_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
+import 'package:swamper_solution/providers/all_providers.dart';
 import 'package:swamper_solution/views/common/signup_screen/company_form.dart';
 
 class ApplyJobDiaogue {
@@ -91,6 +93,7 @@ class ApplyJobDiaogue {
     BuildContext context,
     JobModel jobDetails,
     IndividualModel userData,
+    WidgetRef ref,
   ) {
     showDialog(
       context: context,
@@ -175,8 +178,7 @@ class ApplyJobDiaogue {
                                 final String applicationId = randomAlphaNumeric(
                                   10,
                                 );
-                              
-                               
+
                                 final JobApplicationModel applicationDetails =
                                     JobApplicationModel(
                                       applicationId: applicationId,
@@ -190,6 +192,7 @@ class ApplyJobDiaogue {
                                       selectedShift: selectedShift!,
                                       resume: quickApplicationResumeUrl,
                                       applicationStatus: "Pending",
+                                      isQuickApplied: true
                                     );
                                 final message = await JobApplicationController()
                                     .applyForJob(
@@ -213,6 +216,8 @@ class ApplyJobDiaogue {
                                     message: "Job Applied Successfully",
                                     backgroundColor: Colors.green,
                                   );
+                              ref.invalidate(haveAppliedThisJobProvider);
+
                                   context.pop();
                                 } else {
                                   showCustomSnackBar(
@@ -312,6 +317,7 @@ class ApplyJobDiaogue {
                                   selectedShift: selectedShift!,
                                   resume: resumeUrl,
                                   applicationStatus: "Pending",
+                                  isQuickApplied: false
                                 );
                             final message = await JobApplicationController()
                                 .applyForJob(applicationDetails, applicationId);
@@ -332,6 +338,7 @@ class ApplyJobDiaogue {
                                 message: "Job Applied Successfully",
                                 backgroundColor: Colors.green,
                               );
+                              ref.invalidate(haveAppliedThisJobProvider);
                               context.pop();
                             } else {
                               showCustomSnackBar(

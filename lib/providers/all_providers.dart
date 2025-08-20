@@ -145,7 +145,6 @@ final getCurrentJobsProvider =
 
 final shiftControllerProvider = Provider((ref) => ShiftController());
 
-
 final todayShiftStatusProvider = FutureProvider.family<
   Map<String, dynamic>?,
   ({String jobId, String uid})
@@ -420,4 +419,11 @@ final isShiftButtonEnabledProvider = Provider.family<
     loading: () => false,
     error: (_, __) => false,
   );
+});
+
+final haveAppliedThisJobProvider = FutureProvider.family<bool, JobModel>((
+  ref,
+  jobModel,
+) async {
+  return await JobApplicationController().haveAppliedThisJob(jobModel);
 });

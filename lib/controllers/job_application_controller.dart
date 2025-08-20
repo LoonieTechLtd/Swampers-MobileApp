@@ -100,28 +100,30 @@ class JobApplicationController {
             ]),
           });
 
-      // 3. Delete the associated resume file from storage (existing logic)
-      String resumePath = jobApplication.resume;
-      if (resumePath.startsWith("http")) {
-        final uri = Uri.parse(resumePath);
-        final pathParam =
-            uri.pathSegments.contains('o')
-                ? uri.pathSegments[uri.pathSegments.indexOf('o') + 1]
-                : null;
-        if (pathParam != null) {
-          resumePath = Uri.decodeFull(pathParam);
-        } else {
-          // fallback: try to extract path from the URL
-          final match = RegExp(r"/o/(.+)\\?").firstMatch(resumePath);
-          if (match != null) {
-            resumePath = Uri.decodeFull(match.group(1)!);
+      if (jobApplication.isQuickApplied == false) {
+        // 3. Delete the associated resume file from storage (existing logic)
+        String resumePath = jobApplication.resume;
+        if (resumePath.startsWith("http")) {
+          final uri = Uri.parse(resumePath);
+          final pathParam =
+              uri.pathSegments.contains('o')
+                  ? uri.pathSegments[uri.pathSegments.indexOf('o') + 1]
+                  : null;
+          if (pathParam != null) {
+            resumePath = Uri.decodeFull(pathParam);
           } else {
-            // fallback to just deleting by filename
-            resumePath = jobApplication.resume.split('/').last;
+            // fallback: try to extract path from the URL
+            final match = RegExp(r"/o/(.+)\\?").firstMatch(resumePath);
+            if (match != null) {
+              resumePath = Uri.decodeFull(match.group(1)!);
+            } else {
+              // fallback to just deleting by filename
+              resumePath = jobApplication.resume.split('/').last;
+            }
           }
         }
+        await storage.ref().child(resumePath).delete();
       }
-      await storage.ref().child(resumePath).delete();
 
       return true;
     } on FirebaseException catch (e) {
@@ -258,7 +260,8 @@ class JobApplicationController {
   Future<String?> getQuickApplyResume() async {
     try {
       final String userId = auth.currentUser!.uid;
-      final docSnapshot = await firestore.collection("profiles").doc(userId).get();
+      final docSnapshot =
+          await firestore.collection("profiles").doc(userId).get();
       if (docSnapshot.exists) {
         final data = docSnapshot.data();
         final resumeUrl = data?['oneTimeResume'] as String?;
@@ -268,6 +271,23 @@ class JobApplicationController {
     } catch (e) {
       debugPrint("Unable to quick apply: $e");
       return null;
+    }
+  }
+
+  Future<bool> haveAppliedThisJob(JobModel jobDetails) async {
+    try {
+      final uid = auth.currentUser!.uid;
+      final doc =
+          await firestore.collection("jobs").doc(jobDetails.jobId).get();
+      if (doc.exists) {
+        final appliedUsers =
+            doc.data()?['appliedUsers'] as List<dynamic>? ?? [];
+        return appliedUsers.contains(uid);
+      }
+      return false;
+    } catch (e) {
+      debugPrint("Error checking if user has applied to this job: $e");
+      return false;
     }
   }
 }

@@ -5,8 +5,8 @@ class AdminContactScreen extends StatelessWidget {
   const AdminContactScreen({super.key});
 
   // Admin contact details
-  static const String adminPhone = '+1234567890';
-  static const String adminEmail = 'admin@yourcompany.com';
+  static const String adminPhone = '(778) 834-6436';
+  static const String adminEmail = 'admin@swampersolutions.com';
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +20,7 @@ class AdminContactScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 20),
 
+              
               // Header section
               Container(
                 padding: const EdgeInsets.all(20),
@@ -201,7 +202,7 @@ class AdminContactScreen extends StatelessWidget {
 
 
 void _makePhoneCall(String phoneNumber) async {
-  final uri = Uri.parse('tel:$phoneNumber');      // simpler & safe
+  final uri = Uri.parse('tel:$phoneNumber');
   if (await canLaunchUrl(uri)) {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   } else {

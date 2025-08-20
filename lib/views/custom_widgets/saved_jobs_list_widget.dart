@@ -8,7 +8,8 @@ import 'package:swamper_solution/providers/all_providers.dart';
 
 class SavedJobsListWidget extends ConsumerWidget {
   final JobModel job;
-  const SavedJobsListWidget({super.key, required this.job});
+final VoidCallback onTap;
+  const SavedJobsListWidget({super.key, required this.job, required this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,9 +33,7 @@ class SavedJobsListWidget extends ConsumerWidget {
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            // Navigate to job details
-          },
+          onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -162,8 +161,6 @@ class SavedJobsListWidget extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-
-                
                     ],
                   ),
                 ),

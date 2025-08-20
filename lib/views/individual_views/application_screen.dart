@@ -4,6 +4,7 @@ import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
 import 'package:swamper_solution/views/custom_widgets/applied_jobs_card.dart';
 import 'package:swamper_solution/views/custom_widgets/saved_jobs_list_widget.dart';
+import 'package:swamper_solution/views/individual_views/job_details_screen.dart';
 
 class ApplicationScreen extends StatelessWidget {
   const ApplicationScreen({super.key});
@@ -19,10 +20,6 @@ class ApplicationScreen extends StatelessWidget {
         title: Text(
           "My Applications",
           style: CustomTextStyles.title.copyWith(color: Colors.black87),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.black87),
-          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: SafeArea(
@@ -46,7 +43,6 @@ class ApplicationScreen extends StatelessWidget {
                 child: Consumer(
                   builder: (context, ref, child) {
                     final isSelected = ref.watch(applicationProvider);
-
                     return Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(25),
@@ -65,7 +61,8 @@ class ApplicationScreen extends StatelessWidget {
                         highlightColor: Colors.blue[50],
                         constraints: BoxConstraints(
                           minHeight: 50.0,
-                          minWidth: MediaQuery.of(context).size.width * 0.42,
+                          minWidth:
+                              (MediaQuery.of(context).size.width - 45) / 2,
                         ),
                         onPressed: (int index) {
                           ref
@@ -114,6 +111,7 @@ class ApplicationScreen extends StatelessWidget {
                 ),
               ),
             ),
+
             // Enhanced content section with padding
             Expanded(
               child: Padding(
@@ -122,9 +120,7 @@ class ApplicationScreen extends StatelessWidget {
                   builder: (context, ref, child) {
                     final isSelected = ref.watch(applicationProvider);
 
-                    // 🧠 decide which list to show
                     if (isSelected[0]) {
-                      // ---- Applied Jobs ----
                       return ref
                           .watch(getUserApplicationsProvider)
                           .when(
@@ -182,22 +178,53 @@ class ApplicationScreen extends StatelessWidget {
                                           subtitle:
                                               "Save interesting jobs to access them quickly later",
                                         )
-                                        : ListView.builder(
-                                          padding: EdgeInsets.only(
-                                            top: 16,
-                                            bottom: 100,
-                                          ),
-                                          itemCount: jobs.length,
-                                          itemBuilder:
-                                              (_, i) => Padding(
-                                                padding: EdgeInsets.only(
-                                                  bottom: 12,
-                                                ),
-                                                child: SavedJobsListWidget(
-                                                  job: jobs[i],
-                                                ),
-                                              ),
-                                        ),
+                                        : ref
+                                            .watch(individualProvider)
+                                            .when(
+                                              data: (userDetails) {
+                                                return ListView.builder(
+                                                  padding: EdgeInsets.only(
+                                                    top: 16,
+                                                    bottom: 100,
+                                                  ),
+                                                  itemCount: jobs.length,
+                                                  itemBuilder:
+                                                      (_, i) => Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                              bottom: 12,
+                                                            ),
+                                                        child: SavedJobsListWidget(
+                                                          onTap: () {
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder:
+                                                                    (
+                                                                      _,
+                                                                    ) => JobDetailsScreen(
+                                                                      jobDetails:
+                                                                          jobs[i],
+                                                                      userData:
+                                                                          userDetails!,
+                                                                    ),
+                                                              ),
+                                                            );
+                                                          },
+                                                          job: jobs[i],
+                                                        ),
+                                                      ),
+                                                );
+                                              },
+                                              error: (error, stack) {
+                                                return _buildErrorState(
+                                                  'Error: $error',
+                                                );
+                                              },
+                                              loading: () {
+                                                return CircularProgressIndicator();
+                                              },
+                                            ),
                             error: (e, __) => _buildErrorState('Error: $e'),
                             loading:
                                 () => const Center(
