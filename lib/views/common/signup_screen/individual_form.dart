@@ -27,7 +27,7 @@ class _IndividualFormState extends State<IndividualForm> {
       TextEditingController();
   bool isSelectedOther = false;
   final List<String> workOptions = [
-    "Forklist Operator",
+    "Forklift Operator",
     "Warehouse Associate",
     "Lumping & Destuffing",
     "Construction",

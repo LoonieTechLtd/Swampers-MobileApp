@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "968299498317-5njrca87eul0a23fglv9ahpqqdstovtk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.swampersolutions.swamper_solutions",
+            "certificate_hash": "903430624f859a6a0418ab7d75d0ba2d650d93a4"
+          }
+        },
+        {
           "client_id": "968299498317-t21ia5j9lrcqk8u3pcjghsddd8rrp89f.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -27,7 +35,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "968299498317-t21ia5j9lrcqk8u3pcjghsddd8rrp89f.apps.googleusercontent.com",
+              "client_id": "968299498317-b8gtsdsd9u2rgcfu0er8bd7um8dqko25.apps.googleusercontent.com",
               "client_type": 3
             },
             {

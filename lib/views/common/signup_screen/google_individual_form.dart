@@ -23,17 +23,20 @@ class _GoogleIndividualFormState extends State<GoogleIndividualForm> {
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
-
+  final TextEditingController otherWorkController = TextEditingController();
+  bool isOtherWorkSelected = false;
   final List<String> workOptions = [
-    "Warehouse Associates",
+    "Forklift Operator",
+    "Warehouse Associate",
     "Lumping & Destuffing",
-    "Constructions",
-    "Factory Works",
+    "Construction",
+    "Factory Work",
     "Handy Man",
-    "Cleaning",
+    "Cleaner",
     "Movers",
-    "General Works",
+    "General Work",
     "Restaurant Service",
+    "Other",
   ];
 
   bool isLoading = false;
@@ -45,6 +48,7 @@ class _GoogleIndividualFormState extends State<GoogleIndividualForm> {
     lastNameController.dispose();
     phoneController.dispose();
     addressController.dispose();
+    otherWorkController.dispose();
     super.dispose();
   }
 
@@ -139,13 +143,30 @@ class _GoogleIndividualFormState extends State<GoogleIndividualForm> {
                     hintText: "Select your interested work",
                     options: workOptions,
                     onChanged: (value) {
+                      if (value == "Other") {
+                        setState(() {
+                          isOtherWorkSelected = true;
+                        });
+                      } else {
+                        setState(() {
+                          isOtherWorkSelected = false;
+                        });
+                      }
                       setState(() {
                         selectedWork = value;
                       });
                     },
                   ),
+                  isOtherWorkSelected
+                      ? CustomTextfield(
+                        hintText: "Enter your interested work",
+                        controller: otherWorkController,
+                        obscureText: false,
+                        textInputType: TextInputType.text,
+                      )
+                      : SizedBox(),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 30),
                   CustomButton(
                     backgroundColor: Colors.blue,
                     isLoading: isLoading,
@@ -163,7 +184,10 @@ class _GoogleIndividualFormState extends State<GoogleIndividualForm> {
                               lastName: lastNameController.text,
                               phone: phoneController.text,
                               address: addressController.text,
-                              interestedWork: selectedWork,
+                              interestedWork:
+                                  isOtherWorkSelected
+                                      ? otherWorkController.text.trim()
+                                      : selectedWork!,
                               type: "Individual",
                             );
                         if (result == "Success") {

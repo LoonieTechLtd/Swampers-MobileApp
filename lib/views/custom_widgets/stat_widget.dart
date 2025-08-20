@@ -15,15 +15,17 @@ class StatWidget extends StatelessWidget {
       children: [
         Container(
           height: 80,
-          width: 80,
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          constraints: BoxConstraints(minWidth: 78),
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
+            
+            borderRadius: BorderRadius.circular(40),
             color: Colors.white,
           ),
           child: Center(
             child: Text(
               data,
-              style: GoogleFonts.audiowide(fontSize: 24, color: Colors.blue,fontWeight: FontWeight.w600),
+              style: GoogleFonts.audiowide(fontSize: 24, color: Colors.blue, fontWeight: FontWeight.w600),
             ),
           ),
         ),

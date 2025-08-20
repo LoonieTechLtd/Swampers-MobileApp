@@ -263,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               StatWidget(
-                                data: data.totalHours.toString(),
+                                data: data.totalHours.toStringAsFixed(1),
                                 label: "Total Hours",
                               ),
                               StatWidget(
