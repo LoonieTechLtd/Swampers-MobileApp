@@ -14,14 +14,14 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await FirebaseMessaging.instance.requestPermission();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  await NotificiationServices.initilizeLocalNotifications();
+  await NotificationServices.initilizeLocalNotifications();
   runApp(ProviderScope(child: MyApp()));
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   debugPrint('Background message received: ${message.notification?.title}');
-  NotificiationServices.showNotification(
+  NotificationServices.showNotification(
     title: message.notification?.title ?? 'Notification',
     body: message.notification?.body ?? '',
   );
@@ -55,7 +55,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Foreground message received: ${message.notification?.title}');
-      NotificiationServices.showNotification(
+      NotificationServices.showNotification(
         title: message.notification?.title ?? 'Notification',
         body: message.notification?.body ?? '',
       );

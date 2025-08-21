@@ -80,7 +80,8 @@ class HomeScreen extends StatelessWidget {
                               ),
                               const SizedBox(width: 12),
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     user.companyName,
@@ -98,7 +99,9 @@ class HomeScreen extends StatelessWidget {
                               Spacer(),
                               IconButton(
                                 onPressed: () {
-                                  context.go('/company/company_notifications');
+                                  context.go(
+                                    '/company/company_notifications',
+                                  );
                                 },
                                 icon: Icon(
                                   FeatherIcons.bell,

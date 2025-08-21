@@ -31,7 +31,7 @@ class JobApplicationController {
             "appliedUsers": FieldValue.arrayUnion([newApplication.applicantId]),
           });
 
-      NotificiationServices.showNotification(
+      NotificationServices.showNotification(
         title: "Job Application Submitted",
         body:
             "Please wait until your job application is approved. It might take a while",

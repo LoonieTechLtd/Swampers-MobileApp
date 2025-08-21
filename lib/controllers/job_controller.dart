@@ -17,7 +17,7 @@ class JobController {
     try {
       await firestore.collection("jobs").doc(jobId).set(newJob.toMap());
 
-      NotificiationServices.showNotification(
+      NotificationServices.showNotification(
         title: "Job Posted",
         body:
             "Please wait until your job is approved.\n this will take some time.",

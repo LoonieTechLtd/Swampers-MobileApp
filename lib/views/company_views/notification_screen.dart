@@ -16,7 +16,7 @@ class NotificationScreen extends ConsumerWidget {
       backgroundColor: Colors.grey.shade50,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          NotificiationServices.showNotification(
+          NotificationServices.showNotification(
             title: "Test Notification",
             body: "Body of the test notification and other details",
           );

@@ -9,6 +9,7 @@ import 'package:swamper_solution/providers/all_providers.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_choice_chip.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_search_bar.dart';
 import 'package:swamper_solution/views/custom_widgets/job_post_card.dart';
+import 'package:swamper_solution/views/custom_widgets/kyc_status_home.dart';
 import 'package:swamper_solution/views/custom_widgets/stat_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -120,7 +121,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: Icons.info_outline,
                         title: 'About',
                         onTap: () {
-                          launchUrl(Uri.parse("https://swampersolutions.com/about"), mode: LaunchMode.externalApplication);
+                          launchUrl(
+                            Uri.parse("https://swampersolutions.com/about"),
+                            mode: LaunchMode.externalApplication,
+                          );
                         },
                       ),
                       const Spacer(),
@@ -184,51 +188,60 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (user == null) {
                             return Text("No User Found");
                           }
-                          return Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
+                          return Column(
+                            spacing: 12,
                             children: [
-                              SizedBox(width: 12),
-                              InkWell(
-                                onTap: () {
-                                  Scaffold.of(context).openDrawer();
-                                },
-                                child: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                    user.profilePic,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    user.firstName,
-                                    style: CustomTextStyles.h5.copyWith(
+                                  SizedBox(width: 12),
+                                  InkWell(
+                                    onTap: () {
+                                      Scaffold.of(context).openDrawer();
+                                    },
+                                    child: CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                        user.profilePic,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        user.firstName,
+                                        style: CustomTextStyles.h5.copyWith(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      Text(
+                                        "Welcome back",
+                                        style: CustomTextStyles.description
+                                            .copyWith(
+                                              color: Colors.white70,
+                                              fontSize: 14,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                  Spacer(),
+                                  IconButton(
+                                    onPressed: () {
+                                      context.go('/individual/notifications');
+                                    },
+                                    icon: Icon(
+                                      FeatherIcons.bell,
                                       color: Colors.white,
                                     ),
                                   ),
-                                  Text(
-                                    "Welcome back",
-                                    style: CustomTextStyles.description
-                                        .copyWith(
-                                          color: Colors.white70,
-                                          fontSize: 14,
-                                        ),
-                                  ),
                                 ],
                               ),
-                              Spacer(),
-                              IconButton(
-                                onPressed: () {
-                                  context.go('/individual/notifications');
-                                },
-                                icon: Icon(
-                                  FeatherIcons.bell,
-                                  color: Colors.white,
-                                ),
-                              ),
+
+                              // kyc status coitainer
+                              KycStatusHome(kycStatus: user.kycVerified),
                             ],
                           );
                         },
