@@ -6,6 +6,7 @@ import 'package:random_string/random_string.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/controllers/job_controller.dart';
+import 'package:swamper_solution/controllers/stats_controller.dart';
 import 'package:swamper_solution/models/job_model.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
@@ -827,7 +828,15 @@ class _PostedJobDetailsScreenState
         message: "Job deleted",
         backgroundColor: Colors.green,
       );
-      // After successful deletion, navigate back from this screen
+      final statsUpdated = await StatsController().updateCompanyStats(
+        widget.jobDetails.noOfWorkers,
+        1,
+        true,
+      );
+
+      if (!statsUpdated) {
+        debugPrint("Warning: Failed to update company stats");
+      }
       context.pop();
     } else {
       showCustomSnackBar(

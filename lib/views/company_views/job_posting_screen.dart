@@ -315,6 +315,7 @@ class JobPostingScreenState extends State<JobPostingScreen> {
                           .updateCompanyStats(
                             newJob.noOfWorkers,
                             1,
+                            false
                           );
 
                       if (!statsUpdated) {

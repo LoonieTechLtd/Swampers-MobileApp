@@ -71,6 +71,7 @@ class StatsController {
   Future<bool> updateCompanyStats(
     int additionalHired,
     int additionalJobs,
+    bool onDelete
   ) async {
     try {
       final docRef = firestore
@@ -89,10 +90,17 @@ class StatsController {
                 ? (data["totalJobs"] as double).toInt()
                 : (data["totalJobs"] ?? 0) as int;
 
-        await docRef.update({
+        if(onDelete){
+          await docRef.update({
+          "totalHired": currentHired - additionalHired,
+          "totalJobs": currentJobs - additionalJobs,
+        });
+        }else{
+          await docRef.update({
           "totalHired": currentHired + additionalHired,
           "totalJobs": currentJobs + additionalJobs,
         });
+        }
         return true;
       }
       return false;

@@ -124,7 +124,6 @@ class JobApplicationController {
         }
         await storage.ref().child(resumePath).delete();
       }
-
       return true;
     } on FirebaseException catch (e) {
       debugPrint("Failed to delete job application or update job: $e");
