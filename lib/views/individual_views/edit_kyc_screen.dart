@@ -894,7 +894,7 @@ class _IndividualKycApplicationScreenState
 
                           final IndividualKycModel updatedKyc =
                               IndividualKycModel(
-                                userInfo: k!.userInfo,
+                                userInfo: k!.userInfo.copyWith(kycVerified: "pending"),
                                 dob: selectedDate.toString(),
                                 gender: selectedGender ?? k.gender,
                                 sinNumber: sinController.text,

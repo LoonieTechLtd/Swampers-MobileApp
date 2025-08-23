@@ -109,6 +109,9 @@ class KycController {
           .collection("kycApplications")
           .doc(auth.currentUser!.uid)
           .update(updatedKyc.toMap());
+      await firestore.collection("profiles").doc(auth.currentUser!.uid).update({
+        "kycVerified": "pending",
+      });
       return true;
     } catch (e) {
       debugPrint("Failed to update kyc $e");

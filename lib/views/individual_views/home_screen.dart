@@ -163,131 +163,224 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
       body: SafeArea(
-        child: ListView(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    const Color.fromARGB(255, 5, 100, 178),
-                    const Color.fromARGB(255, 5, 100, 178),
-                    const Color.fromARGB(255, 28, 28, 30),
-                  ],
-                ),
-              ),
-              child: Column(
+        child: Consumer(
+          
+          builder: (context, ref, child) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                ref.invalidate(getIndividualStats);
+                ref.invalidate(getJobProvider);
+                ref.invalidate(individualProvider);
+                return;
+              },
+              child: ListView(
                 children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          const Color.fromARGB(255, 5, 100, 178),
+                          const Color.fromARGB(255, 5, 100, 178),
+                          const Color.fromARGB(255, 28, 28, 30),
+                        ],
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final userAsync = ref.watch(individualProvider);
+                            return userAsync.when(
+                              data: (user) {
+                                if (user == null) {
+                                  return Text("No User Found");
+                                }
+                                return Column(
+                                  spacing: 12,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(width: 12),
+                                        InkWell(
+                                          onTap: () {
+                                            Scaffold.of(context).openDrawer();
+                                          },
+                                          child: CircleAvatar(
+                                            backgroundImage: NetworkImage(
+                                              user.profilePic,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              user.firstName,
+                                              style: CustomTextStyles.h5
+                                                  .copyWith(
+                                                    color: Colors.white,
+                                                  ),
+                                            ),
+                                            Text(
+                                              "Welcome back",
+                                              style: CustomTextStyles
+                                                  .description
+                                                  .copyWith(
+                                                    color: Colors.white70,
+                                                    fontSize: 14,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                        Spacer(),
+                                        IconButton(
+                                          onPressed: () {
+                                            context.go(
+                                              '/individual/notifications',
+                                            );
+                                          },
+                                          icon: Icon(
+                                            FeatherIcons.bell,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    // kyc status coitainer
+                                    KycStatusHome(kycStatus: user.kycVerified),
+                                  ],
+                                );
+                              },
+                              error: (error, stack) {
+                                return Text("Error loading user data");
+                              },
+                              loading: () {
+                                return Center(child: SizedBox());
+                              },
+                            );
+                          },
+                        ),
+
+                        // Search Bar Field
+                        CustomSearchBar(
+                          searchController: searchController,
+                          hintText: "Search for job title or location",
+                        ),
+
+                        const SizedBox(height: 16),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final userStats = ref.watch(getIndividualStats);
+                            return userStats.when(
+                              data: (data) {
+                                if (data == null) {
+                                  return Center(
+                                    child: Text("No stats data available"),
+                                  );
+                                }
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    StatWidget(
+                                      data: data.totalHours.toStringAsFixed(1),
+                                      label: "Total Hours",
+                                    ),
+                                    StatWidget(
+                                      data: data.totalJobs.toString(),
+                                      label: "Total Jobs",
+                                    ),
+                                  ],
+                                );
+                              },
+                              error: (error, stack) {
+                                return Center(child: Text("Error: $error"));
+                              },
+                              loading: () {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 14),
+
+                  // Choice Chips to filter quickly
+                  CustomChoiceChip(
+                    onWorkSelected: (work) {
+                      setState(() {
+                        selectedWork = work;
+                      });
+                    },
+                  ),
+
+                  SizedBox(height: 14),
+
                   Consumer(
                     builder: (context, ref, child) {
+                      final jobAsync = ref.watch(getJobProvider);
                       final userAsync = ref.watch(individualProvider);
                       return userAsync.when(
                         data: (user) {
                           if (user == null) {
-                            return Text("No User Found");
+                            return Center(child: Text("No User Found"));
                           }
-                          return Column(
-                            spacing: 12,
-                            children: [
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  SizedBox(width: 12),
-                                  InkWell(
-                                    onTap: () {
-                                      Scaffold.of(context).openDrawer();
-                                    },
-                                    child: CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                        user.profilePic,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        user.firstName,
-                                        style: CustomTextStyles.h5.copyWith(
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      Text(
-                                        "Welcome back",
-                                        style: CustomTextStyles.description
-                                            .copyWith(
-                                              color: Colors.white70,
-                                              fontSize: 14,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                  Spacer(),
-                                  IconButton(
-                                    onPressed: () {
-                                      context.go('/individual/notifications');
-                                    },
-                                    icon: Icon(
-                                      FeatherIcons.bell,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                          return jobAsync.when(
+                            data: (jobs) {
+                              final filteredJobs =
+                                  jobs.where((job) {
+                                    final matchesWork =
+                                        selectedWork == "All Works" ||
+                                        job.role == selectedWork;
+                                    final matchesSearch =
+                                        searchController.text.trim().isEmpty ||
+                                        JobController().searchJob(
+                                          job,
+                                          searchController.text,
+                                        );
+                                    return matchesSearch && matchesWork;
+                                  }).toList();
 
-                              // kyc status coitainer
-                              KycStatusHome(kycStatus: user.kycVerified),
-                            ],
+                              return Column(
+                                children:
+                                    filteredJobs
+                                        .map(
+                                          (job) => JobPostCard(
+                                            jobDetails: job,
+                                            userDetails: user,
+                                          ),
+                                        )
+                                        .toList(),
+                              );
+                            },
+                            error: (error, stack) {
+                              return Center(
+                                child: Text("Error Loading Jobs: $error"),
+                              );
+                            },
+                            loading: () {
+                              return Center(child: CircularProgressIndicator());
+                            },
                           );
                         },
                         error: (error, stack) {
-                          return Text("Error loading user data");
-                        },
-                        loading: () {
-                          return Center(child: SizedBox());
-                        },
-                      );
-                    },
-                  ),
-
-                  // Search Bar Field
-                  CustomSearchBar(
-                    searchController: searchController,
-                    hintText: "Search for job title or location",
-                  ),
-
-                  const SizedBox(height: 16),
-                  Consumer(
-                    builder: (context, ref, child) {
-                      final userStats = ref.watch(getIndividualStats);
-                      return userStats.when(
-                        data: (data) {
-                          if (data == null) {
-                            return Center(
-                              child: Text("No stats data available"),
-                            );
-                          }
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              StatWidget(
-                                data: data.totalHours.toStringAsFixed(1),
-                                label: "Total Hours",
-                              ),
-                              StatWidget(
-                                data: data.totalJobs.toString(),
-                                label: "Total Jobs",
-                              ),
-                            ],
+                          return Center(
+                            child: Text("Error Loading User: $error"),
                           );
-                        },
-                        error: (error, stack) {
-                          return Center(child: Text("Error: $error"));
                         },
                         loading: () {
                           return Center(child: CircularProgressIndicator());
@@ -295,80 +388,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
-                  SizedBox(height: 20),
                 ],
               ),
-            ),
-            SizedBox(height: 14),
-
-            // Choice Chips to filter quickly
-            CustomChoiceChip(
-              onWorkSelected: (work) {
-                setState(() {
-                  selectedWork = work;
-                });
-              },
-            ),
-
-            SizedBox(height: 14),
-
-            Consumer(
-              builder: (context, ref, child) {
-                final jobAsync = ref.watch(getJobProvider);
-                final userAsync = ref.watch(individualProvider);
-                return userAsync.when(
-                  data: (user) {
-                    if (user == null) {
-                      return Center(child: Text("No User Found"));
-                    }
-                    return jobAsync.when(
-                      data: (jobs) {
-                        final filteredJobs =
-                            jobs.where((job) {
-                              final matchesWork =
-                                  selectedWork == "All Works" ||
-                                  job.role == selectedWork;
-                              final matchesSearch =
-                                  searchController.text.trim().isEmpty ||
-                                  JobController().searchJob(
-                                    job,
-                                    searchController.text,
-                                  );
-                              return matchesSearch && matchesWork;
-                            }).toList();
-
-                        return Column(
-                          children:
-                              filteredJobs
-                                  .map(
-                                    (job) => JobPostCard(
-                                      jobDetails: job,
-                                      userDetails: user,
-                                    ),
-                                  )
-                                  .toList(),
-                        );
-                      },
-                      error: (error, stack) {
-                        return Center(
-                          child: Text("Error Loading Jobs: $error"),
-                        );
-                      },
-                      loading: () {
-                        return Center(child: CircularProgressIndicator());
-                      },
-                    );
-                  },
-                  error: (error, stack) {
-                    return Center(child: Text("Error Loading User: $error"));
-                  },
-                  loading: () {
-                    return Center(child: CircularProgressIndicator());
-                  },
-                );
-              },
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
