@@ -3,11 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/models/job_model.dart';
 import 'package:swamper_solution/views/custom_widgets/applied_jobs_card.dart';
+import 'package:intl/intl.dart';
 
 class PostedJobsCard extends StatelessWidget {
   final JobModel jobDetails;
   const PostedJobsCard({super.key, required this.jobDetails});
 
+  String formatPostedDate(String dateString) {
+    try {
+      DateTime date = DateTime.parse(dateString);
+      return DateFormat('MMMM d yyyy').format(date);
+    } catch (e) {
+      return dateString;
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -51,7 +60,7 @@ class PostedJobsCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Posted ${jobDetails.postedDate}",
+                            "Posted: ${formatPostedDate(jobDetails.postedDate)}",
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey[600],

@@ -15,6 +15,7 @@ import 'package:swamper_solution/views/custom_widgets/custom_drop_down.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_textfield.dart';
 import 'package:swamper_solution/views/custom_widgets/date_picker_bottom_sheet.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:swamper_solution/views/individual_views/users_main_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EditKycScreen extends ConsumerStatefulWidget {
@@ -894,7 +895,9 @@ class _IndividualKycApplicationScreenState
 
                           final IndividualKycModel updatedKyc =
                               IndividualKycModel(
-                                userInfo: k!.userInfo.copyWith(kycVerified: "pending"),
+                                userInfo: k!.userInfo.copyWith(
+                                  kycVerified: "pending",
+                                ),
                                 dob: selectedDate.toString(),
                                 gender: selectedGender ?? k.gender,
                                 sinNumber: sinController.text,
@@ -936,7 +939,13 @@ class _IndividualKycApplicationScreenState
                               message: "Due Diligence Updated successfully",
                               backgroundColor: AppColors().green,
                             );
-                            ref.invalidate(getKycData);
+                            ref.invalidate(individualProvider);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => UsersMainScreen()
+                              ),
+                            );
                           } else {
                             showCustomSnackBar(
                               context: context,

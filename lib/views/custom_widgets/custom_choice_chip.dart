@@ -53,7 +53,7 @@ class _CustomChoiceChipState extends State<CustomChoiceChip> {
                 size: widget.iconSize,
                 color: _selectedIndex == index ? Colors.white : Colors.black,
               ),
-              
+
               showCheckmark: false,
               label: Text(sport.name),
               selected: _selectedIndex == index,

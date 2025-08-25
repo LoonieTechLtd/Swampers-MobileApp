@@ -8,8 +8,8 @@ import 'package:swamper_solution/controllers/job_controller.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_choice_chip.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_search_bar.dart';
+import 'package:swamper_solution/views/custom_widgets/due_diligence_not_verified.dart';
 import 'package:swamper_solution/views/custom_widgets/job_post_card.dart';
-import 'package:swamper_solution/views/custom_widgets/kyc_status_home.dart';
 import 'package:swamper_solution/views/custom_widgets/stat_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -164,7 +164,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
         child: Consumer(
-          
           builder: (context, ref, child) {
             return RefreshIndicator(
               onRefresh: () async {
@@ -256,7 +255,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
 
                                     // kyc status coitainer
-                                    KycStatusHome(kycStatus: user.kycVerified),
+                                    user.kycVerified == "notSubmitted"
+                                        ? DueDiligenceNotVerified()
+                                        : SizedBox(),
                                   ],
                                 );
                               },

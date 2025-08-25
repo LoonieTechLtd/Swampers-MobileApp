@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class KycReviewScreen extends ConsumerWidget {
   const KycReviewScreen({super.key});
@@ -203,34 +202,25 @@ class KycReviewScreen extends ConsumerWidget {
       // It's a document (PDF/DOC)
       return SizedBox(
         height: 120,
-        width: 120,
+        width: 130,
         child: Card(
-          child: InkWell(
-            onTap: () async {
-              // Try to open the document URL
-              final uri = Uri.parse(url);
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              }
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.description, size: 40, color: Colors.blue[600]),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: Text(
-                    _getFileName(url),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 10),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+          elevation: 0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.description, size: 40, color: Colors.blue[600]),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Text(
+                  _getFileName(url),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 10),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       );
