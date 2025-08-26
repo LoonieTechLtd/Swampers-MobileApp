@@ -28,6 +28,68 @@ class AuthServices {
     }
   }
 
+  // Method to create user profile with phone number validation using Firestore transaction
+  Future<String> createUserProfileWithPhoneValidation({
+    required String uid,
+    required Map<String, dynamic> profileData,
+    required String phoneNumber,
+  }) async {
+    try {
+      final normalizedPhone = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+
+      return await firestore.runTransaction<String>((transaction) async {
+        // Check for existing phone numbers within the transaction
+        final phoneQuery =
+            await firestore
+                .collection("profiles")
+                .where("contactNo", isEqualTo: phoneNumber)
+                .get();
+
+        final normalizedPhoneQuery =
+            await firestore
+                .collection("profiles")
+                .where("contactNo", isEqualTo: normalizedPhone)
+                .get();
+
+        if (phoneQuery.docs.isNotEmpty ||
+            normalizedPhoneQuery.docs.isNotEmpty) {
+          throw Exception(
+            "Phone number is already registered with another account",
+          );
+        }
+
+        // Additional manual check for phone number variations
+        final allProfiles = await firestore.collection("profiles").get();
+        for (var doc in allProfiles.docs) {
+          final data = doc.data();
+          final existingPhone = data['contactNo'] as String?;
+          if (existingPhone != null) {
+            final existingNormalizedPhone = existingPhone.replaceAll(
+              RegExp(r'[^\d]'),
+              '',
+            );
+            if (existingNormalizedPhone == normalizedPhone &&
+                existingNormalizedPhone.isNotEmpty &&
+                existingNormalizedPhone.length >= 10) {
+              throw Exception(
+                "Phone number is already registered with another account",
+              );
+            }
+          }
+        }
+
+        // If no duplicates found, create the profile
+        final userDocRef = firestore.collection("profiles").doc(uid);
+        transaction.set(userDocRef, profileData);
+
+        return "Success";
+      });
+    } catch (e) {
+      debugPrint("Error creating user profile: $e");
+      return e.toString();
+    }
+  }
+
   Future<bool> sendEmailVerificationLink(String email) async {
     try {
       final user = auth.currentUser;
@@ -54,6 +116,9 @@ class AuthServices {
     String? companyName,
   }) async {
     try {
+      // Normalize phone number at the beginning
+      final normalizedPhone = phone.replaceAll(RegExp(r'[^\d]'), '');
+
       if (type == "Individual") {
         if (firstName == null || lastName == null) {
           return "First name and last name are required for individual profiles";
@@ -66,25 +131,32 @@ class AuthServices {
           email: email,
           address: address,
           role: "Individual",
-          contactNo: phone,
+          contactNo: normalizedPhone, // Use normalized phone
           profilePic:
               "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
           kycVerified: "notSubmitted",
           interestedWork: interestedWork!,
           createdAt: DateTime.now().toString(),
-          oneTimeResume: ""
+          oneTimeResume: "",
         );
+
+        // Use transaction-based profile creation to prevent duplicate phone numbers
+        final profileCreationResult =
+            await createUserProfileWithPhoneValidation(
+              uid: uid,
+              profileData: newUser.toMap(),
+              phoneNumber: phone,
+            );
+
+        if (profileCreationResult != "Success") {
+          return profileCreationResult;
+        }
 
         final IndividualStatsModel stats = IndividualStatsModel(
           uid: uid,
           totalHours: 0,
           totalJobs: 0,
         );
-        if (await haveSameNumber(phone)) {
-          return "Phone no already used by another user";
-        }
-
-        await firestore.collection("profiles").doc(uid).set(newUser.toMap());
 
         await StatsController().createUserStatsCollection(stats, uid);
       } else if (type == "Company") {
@@ -97,7 +169,7 @@ class AuthServices {
           companyName: companyName,
           email: email,
           role: "Company",
-          contactNo: phone,
+          contactNo: normalizedPhone, // Use normalized phone
           profilePic:
               "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
           address: address,
@@ -105,16 +177,23 @@ class AuthServices {
           isSuspended: false,
         );
 
+        // Use transaction-based profile creation to prevent duplicate phone numbers
+        final profileCreationResult =
+            await createUserProfileWithPhoneValidation(
+              uid: uid,
+              profileData: newCompany.toMap(),
+              phoneNumber: phone,
+            );
+
+        if (profileCreationResult != "Success") {
+          return profileCreationResult;
+        }
+
         final CompanyStatsModel companyStats = CompanyStatsModel(
           uid: uid,
           totalJobs: 0,
           totalHired: 0,
         );
-        if (await haveSameNumber(phone)) {
-          return "Phone no already used by another user";
-        }
-
-        await firestore.collection("profiles").doc(uid).set(newCompany.toMap());
 
         await StatsController().createCompanyStatsCollection(companyStats, uid);
       }
@@ -211,18 +290,23 @@ class AuthServices {
     String interestedWork,
   ) async {
     try {
+      // Normalize phone number by removing any spaces, dashes, or special characters
+      final normalizedContactNo = contactNo.replaceAll(RegExp(r'[^\d]'), '');
+
+      debugPrint(
+        "Registering user with phone: $contactNo (normalized: $normalizedContactNo)",
+      );
+
+      // First create the user account in Firebase Auth
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      if (await haveSameNumber(contactNo)) {
-        return "Phone no already used by another user";
-      }
-
       // Send email verification link
       await userCredential.user!.sendEmailVerification();
 
+      // Now check for duplicate phone numbers and create profile using transaction
       final IndividualModel newUser = IndividualModel(
         uid: userCredential.user!.uid.toString(),
         firstName: firstName,
@@ -230,31 +314,46 @@ class AuthServices {
         email: email,
         address: address,
         role: "Individual",
-        contactNo: contactNo,
+        contactNo: normalizedContactNo, // Store normalized phone number
         profilePic: profilePic,
         kycVerified: "notSubmitted",
         interestedWork: interestedWork,
         createdAt: DateTime.now().toString(),
-        oneTimeResume: ""
+        oneTimeResume: "",
       );
+
+      final profileCreationResult = await createUserProfileWithPhoneValidation(
+        uid: userCredential.user!.uid,
+        profileData: newUser.toMap(),
+        phoneNumber: contactNo,
+      );
+
+      if (profileCreationResult != "Success") {
+        // Delete the auth account if profile creation failed
+        await userCredential.user!.delete();
+        await auth.signOut();
+        return profileCreationResult;
+      }
 
       final IndividualStatsModel stats = IndividualStatsModel(
         uid: userCredential.user!.uid,
         totalHours: 0,
         totalJobs: 0,
       );
-      await firestore
-          .collection("profiles")
-          .doc(userCredential.user!.uid)
-          .set(newUser.toMap());
 
-      StatsController().createUserStatsCollection(
+      await StatsController().createUserStatsCollection(
         stats,
         userCredential.user!.uid,
       );
 
+      debugPrint(
+        "User registered successfully with UID: ${userCredential.user!.uid}",
+      );
       return "Success";
     } on FirebaseAuthException catch (e) {
+      debugPrint(
+        "FirebaseAuthException during registration: ${e.code} - ${e.message}",
+      );
       switch (e.code) {
         case 'email-already-in-use':
           return 'Email is already registered';
@@ -265,6 +364,8 @@ class AuthServices {
         default:
           return 'Registration failed. Please try again';
       }
+    } catch (e) {
+      return 'Registration failed. Please try again';
     }
   }
 
@@ -280,45 +381,67 @@ class AuthServices {
     String profilePic,
   ) async {
     try {
+      // Normalize phone number by removing any spaces, dashes, or special characters
+      final normalizedContactNo = contactNo.replaceAll(RegExp(r'[^\d]'), '');
+
+      debugPrint(
+        "Registering company with phone: $contactNo (normalized: $normalizedContactNo)",
+      );
+
+      // First create the user account in Firebase Auth
       UserCredential userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      if (await haveSameNumber(contactNo)) {
-        return "Phone no already used by another user";
-      }
 
       // Send email verification link
       await userCredential.user!.sendEmailVerification();
 
+      // Now check for duplicate phone numbers and create profile using transaction
       final CompanyModel newCompany = CompanyModel(
         uid: userCredential.user!.uid.toString(),
         companyName: companyName,
         email: email,
         role: "Company",
-        contactNo: contactNo,
+        contactNo: normalizedContactNo, // Store normalized phone number
         profilePic: profilePic,
         address: address,
         createdAt: DateTime.now().toString(),
         isSuspended: false,
       );
 
+      final profileCreationResult = await createUserProfileWithPhoneValidation(
+        uid: userCredential.user!.uid,
+        profileData: newCompany.toMap(),
+        phoneNumber: contactNo,
+      );
+
+      if (profileCreationResult != "Success") {
+        // Delete the auth account if profile creation failed
+        await userCredential.user!.delete();
+        await auth.signOut();
+        return profileCreationResult;
+      }
+
       final CompanyStatsModel companyStats = CompanyStatsModel(
         uid: userCredential.user!.uid,
         totalJobs: 0,
         totalHired: 0,
       );
-      await firestore
-          .collection("profiles")
-          .doc(userCredential.user!.uid)
-          .set(newCompany.toMap());
 
-      StatsController().createCompanyStatsCollection(
+      await StatsController().createCompanyStatsCollection(
         companyStats,
         userCredential.user!.uid,
       );
+
+      debugPrint(
+        "Company registered successfully with UID: ${userCredential.user!.uid}",
+      );
       return "Success";
     } on FirebaseAuthException catch (e) {
+      debugPrint(
+        "FirebaseAuthException during company registration: ${e.code} - ${e.message}",
+      );
       switch (e.code) {
         case 'email-already-in-use':
           return 'Email is already registered';
@@ -329,6 +452,9 @@ class AuthServices {
         default:
           return 'Registration failed. Please try again';
       }
+    } catch (e) {
+      debugPrint("Unexpected error during company registration: $e");
+      return 'Registration failed. Please try again';
     }
   }
 
@@ -503,15 +629,118 @@ class AuthServices {
 
   Future<bool> haveSameNumber(String phoneNo) async {
     try {
+      // Normalize phone number by removing any spaces, dashes, or special characters
+      final normalizedPhone = phoneNo.replaceAll(RegExp(r'[^\d]'), '');
+
+      debugPrint(
+        "Checking phone number: $phoneNo (normalized: $normalizedPhone)",
+      );
+
+      // Check with original phone number format
       final res =
           await firestore
               .collection("profiles")
               .where("contactNo", isEqualTo: phoneNo)
               .get();
-      return res.docs.isNotEmpty;
-    } catch (e) {
-      debugPrint("Error Checking Phone number: $e");
+
+      debugPrint(
+        "Found ${res.docs.length} documents with phone number: $phoneNo",
+      );
+
+      if (res.docs.isNotEmpty) {
+        return true;
+      }
+
+      // Also check with normalized phone number to catch different formats
+      if (phoneNo != normalizedPhone) {
+        final normalizedRes =
+            await firestore
+                .collection("profiles")
+                .where("contactNo", isEqualTo: normalizedPhone)
+                .get();
+
+        debugPrint(
+          "Found ${normalizedRes.docs.length} documents with normalized phone number: $normalizedPhone",
+        );
+
+        if (normalizedRes.docs.isNotEmpty) {
+          return true;
+        }
+      }
+
+      // Additional comprehensive check: Query all profiles and check manually
+      // This ensures we catch any edge cases with different phone formats
+      final allProfiles = await firestore.collection("profiles").get();
+
+      for (var doc in allProfiles.docs) {
+        final data = doc.data();
+        final existingPhone = data['contactNo'] as String?;
+        if (existingPhone != null) {
+          final existingNormalizedPhone = existingPhone.replaceAll(
+            RegExp(r'[^\d]'),
+            '',
+          );
+          if (existingNormalizedPhone == normalizedPhone &&
+              existingNormalizedPhone.isNotEmpty &&
+              existingNormalizedPhone.length >= 10) {
+            debugPrint(
+              "Found matching phone number in manual check: $existingPhone (normalized: $existingNormalizedPhone)",
+            );
+            return true;
+          }
+        }
+      }
+
+      debugPrint("No duplicate phone number found");
       return false;
+    } on FirebaseException catch (e) {
+      debugPrint(
+        "Firestore error while checking phone number: ${e.code} - ${e.message}",
+      );
+
+      // Handle specific permission errors
+      if (e.code == 'permission-denied') {
+        debugPrint(
+          "Permission denied - user may not be authenticated or lacks proper permissions",
+        );
+      }
+
+      // For any Firestore errors, throw the exception to be handled by caller
+      throw Exception("Unable to verify phone number uniqueness: ${e.message}");
+    } catch (e) {
+      debugPrint("Unexpected error checking phone number: $e");
+      // For unexpected errors, throw the exception to be handled by caller
+      throw Exception("Unable to verify phone number uniqueness: $e");
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> debugPhoneNumbers() async {
+    try {
+      final allProfiles = await firestore.collection("profiles").get();
+
+      List<Map<String, dynamic>> phoneData = [];
+
+      for (var doc in allProfiles.docs) {
+        final data = doc.data();
+        final phone = data['contactNo'] as String?;
+        final email = data['email'] as String?;
+        final role = data['role'] as String?;
+
+        if (phone != null) {
+          phoneData.add({
+            'uid': doc.id,
+            'email': email,
+            'role': role,
+            'originalPhone': phone,
+            'normalizedPhone': phone.replaceAll(RegExp(r'[^\d]'), ''),
+          });
+        }
+      }
+
+      return phoneData;
+    } catch (e) {
+      debugPrint("Error getting phone numbers for debugging: $e");
+      return [];
     }
   }
 

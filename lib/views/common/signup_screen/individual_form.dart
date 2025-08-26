@@ -178,6 +178,23 @@ class _IndividualFormState extends State<IndividualForm> {
                 });
 
                 try {
+                  debugPrint("Starting individual registration process...");
+                  debugPrint(
+                    "Phone number entered: '${phoneController.text.trim()}'",
+                  );
+
+                  // Temporary debugging: List all existing phone numbers
+                  final existingPhones =
+                      await AuthServices().debugPhoneNumbers();
+                  debugPrint(
+                    "Existing phone numbers in database (${existingPhones.length} total):",
+                  );
+                  for (var phoneData in existingPhones) {
+                    debugPrint(
+                      "  ${phoneData['email']}: ${phoneData['originalPhone']} (normalized: ${phoneData['normalizedPhone']})",
+                    );
+                  }
+
                   final result = await AuthServices().registerUser(
                     emailController.text.trim(),
                     passwordController.text,
@@ -190,6 +207,8 @@ class _IndividualFormState extends State<IndividualForm> {
                         ? otherInterstedJobController.text.trim()
                         : selectedWork!,
                   );
+
+                  debugPrint("Registration result: $result");
 
                   if (!mounted) return;
 
@@ -209,10 +228,11 @@ class _IndividualFormState extends State<IndividualForm> {
                     );
                   }
                 } catch (e) {
+                  debugPrint("Exception during registration: $e");
                   if (!mounted) return;
                   showCustomSnackBar(
                     context: context,
-                    message: e.toString(),
+                    message: "Registration error: ${e.toString()}",
                     backgroundColor: Colors.red,
                   );
                 } finally {

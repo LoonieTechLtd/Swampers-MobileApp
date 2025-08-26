@@ -1,14 +1,17 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
-import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/controllers/job_offers_controller.dart';
 import 'package:swamper_solution/models/individual_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
 import 'package:swamper_solution/views/common/signup_screen/individual_form.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
+import 'package:swamper_solution/views/custom_widgets/descriptionCard.dart';
+import 'package:swamper_solution/views/custom_widgets/image_carousel.dart';
+import 'package:swamper_solution/views/custom_widgets/info_card.dart';
+import 'package:swamper_solution/views/custom_widgets/job_header.dart';
+import 'package:swamper_solution/views/custom_widgets/shift_card.dart';
 
 class JobOfferScreen extends ConsumerWidget {
   final JobModel jobDetails;
@@ -19,19 +22,68 @@ class JobOfferScreen extends ConsumerWidget {
     required this.userData,
   });
 
-  Widget _sectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12.0, bottom: 4),
-      child: Text(title, style: CustomTextStyles.title),
-    );
+  DateTime _parseDate(String dateStr) {
+    final parts = dateStr.split('/');
+    final day = int.parse(parts[0]);
+    final month = int.parse(parts[1]);
+    final year = int.parse(parts[2]);
+    return DateTime(year, month, day);
   }
 
-  Widget _spacedDivider() => const Divider(thickness: 1.0, height: 24);
+  String _formatDateRange(String dateRangeString) {
+    try {
+      final parts = dateRangeString.split(' to ');
+      if (parts.length != 2) return dateRangeString;
+
+      final startDate = _parseDate(parts[0]);
+      final endDate = _parseDate(parts[1]);
+
+      final months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ];
+
+      final startMonth = months[startDate.month - 1];
+      final startDay = startDate.day.toString().padLeft(2, '0');
+      final endMonth = months[endDate.month - 1];
+      final endDay = endDate.day.toString().padLeft(2, '0');
+
+      return '$startMonth $startDay to $endMonth $endDay';
+    } catch (e) {
+      return dateRangeString;
+    }
+  }
+
+  String _calculateTotalDays(String dateRangeString) {
+    try {
+      final parts = dateRangeString.split(' to ');
+      if (parts.length != 2) return '';
+
+      final startDate = _parseDate(parts[0]);
+      final endDate = _parseDate(parts[1]);
+
+      final difference = endDate.difference(startDate).inDays + 1;
+      return '$difference day${difference == 1 ? '' : 's'}';
+    } catch (e) {
+      return '';
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final PageController pageController = PageController();
     final ValueNotifier<int> currentPage = ValueNotifier<int>(0);
+
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
@@ -40,6 +92,86 @@ class JobOfferScreen extends ConsumerWidget {
         }
       },
       child: Scaffold(
+        backgroundColor: Colors.grey.shade50,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Text("Job Offer"),
+          centerTitle: true,
+          leading: Container(
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.9),
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () => context.pop(),
+            ),
+          ),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    buildImageCarousel(
+                      pageController,
+                      currentPage,
+                      jobDetails.images,
+                    ),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        children: [
+                          buildJobHeader(jobDetails: jobDetails),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: buildInfoCard(
+                                  "Workers",
+                                  jobDetails.noOfWorkers.toString(),
+                                  Icons.people,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: buildInfoCard(
+                                  "Duration",
+                                  _calculateTotalDays(jobDetails.days),
+                                  Icons.timer,
+                                  iconColor: Colors.orange,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          buildInfoCard(
+                            "Job Period",
+                            _formatDateRange(jobDetails.days),
+                            Icons.calendar_today,
+                            iconColor: Colors.green,
+                          ),
+                          const SizedBox(height: 16),
+                          buildShiftsCard(jobDetails.shifts),
+                          const SizedBox(height: 16),
+                          buildDescriptionCard(
+                            description: jobDetails.description,
+                          ),
+                          const SizedBox(height: 100),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -129,92 +261,6 @@ class JobOfferScreen extends ConsumerWidget {
                 ),
               ),
             ],
-          ),
-        ),
-        appBar: AppBar(
-          title: Text("Job Offer"),
-          centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              context.pop();
-            },
-          ),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.36,
-                    width: double.infinity,
-                    child: PageView.builder(
-                      controller: pageController,
-                      itemCount: jobDetails.images.length,
-                      onPageChanged: (index) => currentPage.value = index,
-                      itemBuilder: (context, index) {
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: CachedNetworkImage(
-                            placeholder:
-                                (context, url) =>
-                                    Center(child: CircularProgressIndicator()),
-                            imageUrl: jobDetails.images[index],
-                            fit: BoxFit.cover,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          jobDetails.role,
-                          style: CustomTextStyles.h3,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on_rounded),
-                      const SizedBox(width: 6),
-                      Text(
-                        jobDetails.location,
-                        style: CustomTextStyles.bodyText,
-                      ),
-                    ],
-                  ),
-                  _spacedDivider(),
-                  _sectionTitle("No of Workers"),
-                  Text(
-                    jobDetails.noOfWorkers.toString(),
-                    style: CustomTextStyles.bodyText,
-                  ),
-                  _spacedDivider(),
-                  _sectionTitle("Days"),
-                  Text(jobDetails.days, style: CustomTextStyles.bodyText),
-                  _spacedDivider(),
-                  _sectionTitle("Shifts"),
-                  ...jobDetails.shifts.map(
-                    (shift) => Text(shift, style: CustomTextStyles.bodyText),
-                  ),
-                  _spacedDivider(),
-                  _sectionTitle("Job descriptions"),
-                  Text(
-                    jobDetails.description,
-                    style: CustomTextStyles.bodyText,
-                  ),
-                  const SizedBox(height: 80),
-                ],
-              ),
-            ),
           ),
         ),
       ),

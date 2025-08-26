@@ -46,6 +46,10 @@ class JobOffersController {
               .where("jobDetails.id", isEqualTo: jobData.jobId)
               .get();
 
+      await firestore.collection("jobs").doc(jobData.jobId).update({
+        "appliedUsers": FieldValue.arrayUnion([userData.uid]),
+      });
+
       for (final doc in querySnap.docs) {
         batch.update(doc.reference, {"applicationStatus": "Approved"});
       }
