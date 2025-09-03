@@ -111,7 +111,7 @@ class _CurrentJobsScreenState extends ConsumerState<CurrentJobsScreen> {
                     child: CustomSearchBar(
                       fillColor: const Color.fromARGB(14, 0, 0, 0),
                       searchController: searchController,
-                      hintText: "Search jobs by role, location, or description",
+                      hintText: "Search today's job",
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -362,7 +362,7 @@ class _CurrentJobsScreenState extends ConsumerState<CurrentJobsScreen> {
                                     Colors.orange[600]!,
                                   ),
                                   const SizedBox(height: 10),
-                                  
+
                                   // Description with improved styling
                                   if (job.description.isNotEmpty) ...[
                                     const SizedBox(height: 16),

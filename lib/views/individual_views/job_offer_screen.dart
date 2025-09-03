@@ -1,10 +1,13 @@
+import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/consts/app_colors.dart';
+import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/controllers/job_offers_controller.dart';
 import 'package:swamper_solution/models/individual_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
+import 'package:swamper_solution/providers/all_providers.dart';
 import 'package:swamper_solution/views/common/signup_screen/individual_form.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
 import 'package:swamper_solution/views/custom_widgets/descriptionCard.dart';
@@ -83,7 +86,6 @@ class JobOfferScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final PageController pageController = PageController();
     final ValueNotifier<int> currentPage = ValueNotifier<int>(0);
-
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
@@ -173,95 +175,192 @@ class JobOfferScreen extends ConsumerWidget {
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
-            spacing: 12,
-            children: [
-              Expanded(
-                child: CustomButton(
-                  backgroundColor: AppColors().red,
-                  onPressed: () async {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text("Reject the Job"),
-                          content: Text(
-                            "Are you sure want to reject this job? Once rejected cannot reapply",
+        floatingActionButton: Consumer(
+          builder: (context, ref, child) {
+            final isJobAcceptedAsync = ref.watch(
+              isJobAcceptedProvider(jobDetails),
+            );
+            return isJobAcceptedAsync.when(
+              data: (isAccepted) {
+                if (!isAccepted) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: CustomButton(
+                            backgroundColor: AppColors().red,
+                            onPressed: () async {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text("Reject the Job"),
+                                    content: Text(
+                                      "Are you sure want to reject this job? Once rejected cannot reapply",
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          context.pop();
+                                        },
+                                        child: Text(
+                                          "Cancel",
+                                          style: TextStyle(
+                                            color: AppColors().primaryColor,
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          final res =
+                                              await JobOffersController()
+                                                  .onJobOfferRejected(
+                                                    jobDetails,
+                                                    userData,
+                                                  );
+                                          if (res == false) {
+                                            showCustomSnackBar(
+                                              context: context,
+                                              message: "Failed to reject job",
+                                              backgroundColor: AppColors().red,
+                                            );
+                                          } else {
+                                            showCustomSnackBar(
+                                              context: context,
+                                              message: "Job Rejected",
+                                              backgroundColor:
+                                                  AppColors().green,
+                                            );
+                                          }
+                                          context.pop();
+                                          context.pop();
+                                        },
+                                        child: Text(
+                                          "Reject Job",
+                                          style: TextStyle(
+                                            color: AppColors().red,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            text: "Reject Job",
+                            textColor: AppColors().white,
                           ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                context.pop();
-                              },
-                              child: Text(
-                                "Cancel",
-                                style: TextStyle(
-                                  color: AppColors().primaryColor,
-                                ),
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                final res = await JobOffersController()
-                                    .onJobOfferRejected(jobDetails, userData);
-                                if (res == false) {
-                                  showCustomSnackBar(
-                                    context: context,
-                                    message: "Failed to reject job",
-                                    backgroundColor: AppColors().red,
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: CustomButton(
+                            backgroundColor: AppColors().primaryColor,
+                            onPressed: () async {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text("Accept the Job"),
+                                    content: Text(
+                                      "Once job is accepted you cannot reject or delete it.",
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          context.pop();
+                                        },
+                                        child: Text(
+                                          "Cancel",
+                                          style: TextStyle(
+                                            color: AppColors().primaryColor,
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          final res =
+                                              await JobOffersController()
+                                                  .onJobAccept(
+                                                    userData,
+                                                    jobDetails,
+                                                  );
+                                          if (res == true) {
+                                            showCustomSnackBar(
+                                              context: context,
+                                              message:
+                                                  "Job Accepted Successfully",
+                                              backgroundColor:
+                                                  AppColors().green,
+                                            );
+                                            ref.invalidate(
+                                              isJobAcceptedProvider,
+                                            );
+                                            context.pop();
+                                          } else {
+                                            showCustomSnackBar(
+                                              context: context,
+                                              message: "Failed to accept Job",
+                                              backgroundColor: AppColors().red,
+                                            );
+                                          }
+                                        },
+                                        child: Text(
+                                          "Accept Job",
+                                          style: TextStyle(
+                                            color: AppColors().primaryColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   );
-                                } else {
-                                  showCustomSnackBar(
-                                    context: context,
-                                    message: "Job Rejected",
-                                    backgroundColor: AppColors().green,
-                                  );
-                                }
-                              },
-                              child: Text(
-                                "Reject Job",
-                                style: TextStyle(color: AppColors().red),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  text: "Reject Job",
-                  textColor: AppColors().white,
-                ),
-              ),
-              Expanded(
-                child: CustomButton(
-                  backgroundColor: AppColors().primaryColor,
-                  onPressed: () async {
-                    final res = await JobOffersController().onJobAccept(
-                      userData,
-                      jobDetails,
-                    );
-                    if (res == true) {
-                      showCustomSnackBar(
-                        context: context,
-                        message: "Job Accepted Successfully",
-                        backgroundColor: AppColors().green,
-                      );
-                    } else {
-                      showCustomSnackBar(
-                        context: context,
-                        message: "Failed to accept Job",
-                        backgroundColor: AppColors().red,
-                      );
-                    }
-                  },
-                  text: "Accept Job",
-                  textColor: AppColors().white,
-                ),
-              ),
-            ],
-          ),
+                                },
+                              );
+                            },
+                            text: "Accept Job",
+                            textColor: AppColors().white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: AppColors().red,
+
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    width: double.infinity,
+                    height: 56,
+                    child: Row(
+                      spacing: 8,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          FeatherIcons.checkCircle,
+                          color: AppColors().white,
+                        ),
+                        Text(
+                          "Already Accepted",
+                          style: CustomTextStyles.h4.copyWith(
+                            color: AppColors().white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              },
+              error: (error, stack) {
+                return Text("Failed to check status");
+              },
+              loading: () {
+                return Center(child: CircularProgressIndicator());
+              },
+            );
+          },
         ),
       ),
     );

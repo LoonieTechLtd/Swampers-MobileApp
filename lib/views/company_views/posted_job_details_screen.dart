@@ -437,7 +437,7 @@ class _PostedJobDetailsScreenState
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
-            "Applicants",
+            "Assigned from admin",
             style: CustomTextStyles.h5.copyWith(fontWeight: FontWeight.bold),
           ),
         ),

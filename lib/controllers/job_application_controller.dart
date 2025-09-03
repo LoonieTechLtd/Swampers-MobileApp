@@ -134,41 +134,48 @@ class JobApplicationController {
     }
   }
 
-  Future<List<IndividualModel>> fetchAppliedUsers(JobModel job) async {
-    List<IndividualModel> appliedUsers = [];
+  // method to fetch all the assigned users
+  Future<List<IndividualModel>> fetchAssignedUsers(JobModel job) async {
+    List<IndividualModel> assignedUsers = [];
     try {
-      if (job.appliedUsers!.isEmpty) {
-        debugPrint("No applied users for this job.");
-        return appliedUsers; // Return an empty list if no users have applied
+      if (job.assignedStaffs.isEmpty) {
+        debugPrint("No assigned users for this job.");
+        return assignedUsers;
       }
 
-      if (job.appliedUsers!.length > 10) {
-        debugPrint(
-          "Warning: More than 10 applied users. Consider batching queries for better performance and to avoid Firestore 'whereIn' limitations.",
-        );
+      // Filter assigned staffs to get only those who have accepted
+      List<String> acceptedUserIds =
+          job.assignedStaffs
+              .where((assignedUser) => assignedUser.hasAccepted == true)
+              .map((assignedUser) => assignedUser.id)
+              .toList();
+
+      if (acceptedUserIds.isEmpty) {
+        debugPrint("No users have accepted the assignment for this job.");
+        return assignedUsers;
       }
 
       final QuerySnapshot<Map<String, dynamic>> snapshot =
           await firestore
               .collection("profiles")
-              .where(FieldPath.documentId, whereIn: job.appliedUsers)
+              .where(FieldPath.documentId, whereIn: acceptedUserIds)
               .get();
 
       for (var doc in snapshot.docs) {
         try {
-          appliedUsers.add(IndividualModel.fromMap(doc.data()));
+          assignedUsers.add(IndividualModel.fromMap(doc.data()));
         } catch (e) {
           debugPrint("Error parsing individual user document: ${doc.id} - $e");
         }
       }
     } on FirebaseException catch (e) {
-      debugPrint("Firebase error fetching applied users: $e");
+      debugPrint("Firebase error fetching assigned users: $e");
     } catch (e) {
       debugPrint(
-        "An unexpected error occurred while fetching applied users: $e",
+        "An unexpected error occurred while fetching assigned users: $e",
       );
     }
-    return appliedUsers;
+    return assignedUsers;
   }
 
   // Method to get User's application

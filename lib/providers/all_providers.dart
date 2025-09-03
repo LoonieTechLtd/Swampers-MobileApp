@@ -127,7 +127,7 @@ final appliedUsersProvider = FutureProvider.family<
   JobModel
 >((ref, jobModel) async {
   try {
-    final users = await JobApplicationController().fetchAppliedUsers(jobModel);
+    final users = await JobApplicationController().fetchAssignedUsers(jobModel);
     return users;
   } catch (e) {
     debugPrint("Error fetching applied users for job ${jobModel.jobId}: $e");
@@ -426,4 +426,11 @@ final haveAppliedThisJobProvider = FutureProvider.family<bool, JobModel>((
   jobModel,
 ) async {
   return await JobApplicationController().haveAppliedThisJob(jobModel);
+});
+
+final isJobAcceptedProvider = FutureProvider.family<bool, JobModel>((
+  ref,
+  jobData,
+) {
+  return JobOffersController().isJobAccepted(jobData);
 });

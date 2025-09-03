@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:swamper_solution/providers/all_providers.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_search_bar.dart';
-import 'package:swamper_solution/views/custom_widgets/posted_jobs_card.dart';
+import 'package:swamper_solution/views/custom_widgets/posted_jobs_card.dart';                     
 
 class JobsScreen extends StatelessWidget {
   JobsScreen({super.key});
