@@ -58,13 +58,14 @@ flutter_native_splash:
   color_dark_ios: "#ffffff"
   image: assets/images/splash_logo.png
   icon_background_color: "#ffffff"
-  branding: assets/images/splash_branding.png
-  branding_bottom_padding: 24
+  branding: assets/images/brandingios.png
   branding_mode: bottom
   branding_dark_android: assets/images/splash_branding.png
   android_gravity: center
   ios_content_mode: scaleAspectFit
   web_image_mode: center
+  
+  
 
   # Following are specific parameters for Android 12+.
   android_12:

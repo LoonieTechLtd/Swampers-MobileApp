@@ -7,17 +7,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
 import 'package:swamper_solution/firebase_options.dart';
 import 'package:swamper_solution/routes/app_route_config.dart';
+import 'dart:io' show Platform;
 import 'package:swamper_solution/core/services/notificiation_services.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Ask for permission (especially for iOS)
   await FirebaseMessaging.instance.requestPermission();
+
+  // Handle background messages
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  // Initialize local notifications
   await NotificationServices.initilizeLocalNotifications();
-  runApp(ProviderScope(child: MyApp()));
+
+  runApp(const ProviderScope(child: MyApp()));
 }
 
+// Background message handler
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   debugPrint('Background message received: ${message.notification?.title}');
@@ -41,18 +50,21 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
     _appRoute = AppRouteConfig();
-    // Set up FCM
-    _setupFCM();
-    // Only rebuild on significant auth changes, not every state change
+
+    _setupFCM(); // Set up FCM
+
+    // Listen for auth state changes and rebuild only on significant changes
     User? lastUser;
     FirebaseAuth.instance.authStateChanges().listen((user) {
       if (mounted && lastUser?.uid != user?.uid) {
         lastUser = user;
-        setState(() {});
+        setState(() {}); // Rebuild if user changes
       }
     });
 
+    // Foreground message handler
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Foreground message received: ${message.notification?.title}');
       NotificationServices.showNotification(
@@ -72,48 +84,61 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     debugPrint('App lifecycle state changed to: $state');
-
-    switch (state) {
-      case AppLifecycleState.resumed:
-        debugPrint('App resumed from background');
-        break;
-      case AppLifecycleState.paused:
-        debugPrint('App paused/went to background');
-        break;
-      case AppLifecycleState.detached:
-        debugPrint('App detached');
-        break;
-      default:
-        break;
-    }
+    // Additional handling based on state (if needed)
   }
 
   Future<void> _setupFCM() async {
-    try {
-      // Get FCM token
-      String? token = await FirebaseMessaging.instance.getToken();
-      debugPrint('FCM Token: $token');
-      if (token != null) {
-        // Save token to user's profile when user is authenticated
-        FirebaseAuth.instance.authStateChanges().listen((user) async {
-          if (user != null) {
-            await _saveFCMToken(user.uid, token);
-          }
-        });
+  try {
+    // iOS only: Wait for APNs token to become available
+    if (Platform.isIOS) {
+      String? apnsToken;
+      int retries = 0;
+
+      while (apnsToken == null && retries < 5) {
+        apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+        if (apnsToken == null) {
+          debugPrint('⏳ Waiting for APNs token... retrying in 2s');
+          await Future.delayed(const Duration(seconds: 2));
+          retries++;
+        }
       }
 
-      // Listen for token refresh
-      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-        debugPrint('FCM Token refreshed: $newToken');
-        User? user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          _saveFCMToken(user.uid, newToken);
-        }
-      });
-    } catch (e) {
-      debugPrint('Error setting up FCM: $e');
+      if (apnsToken == null) {
+        debugPrint('⚠️ Failed to get APNs token after retries.');
+      } else {
+        debugPrint('✅ APNs token: $apnsToken');
+      }
     }
+
+    // 3. Now request FCM token
+    String? fcmToken = await FirebaseMessaging.instance.getToken();
+    if (fcmToken == null) {
+      debugPrint('⚠️ FCM token is null');
+      return;
+    }
+
+    debugPrint('✅ FCM token: $fcmToken');
+
+    // 4. Save token to Firestore if user is logged in
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await _saveFCMToken(user.uid, fcmToken);
+    }
+
+    // 5. Listen for FCM token refresh
+    FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+      debugPrint('🔄 FCM token refreshed: $newToken');
+      User? currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        await _saveFCMToken(currentUser.uid, newToken);
+      }
+    });
+  } catch (e, stackTrace) {
+    debugPrint('❌ Error setting up FCM: $e');
+    debugPrint(stackTrace.toString());
   }
+}
+
 
   Future<void> _saveFCMToken(String userId, String token) async {
     try {
