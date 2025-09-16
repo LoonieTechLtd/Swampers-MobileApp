@@ -43,21 +43,30 @@ android {
         versionName = flutter.versionName
     }
 
-   signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = keystoreProperties["storeFile"]?.let { file(it.toString()) }
-            storePassword = keystoreProperties["storePassword"] as String
+    signingConfigs {
+        if (
+            keystorePropertiesFile.exists() &&
+            keystoreProperties["keyAlias"] != null &&
+            keystoreProperties["keyPassword"] != null &&
+            keystoreProperties["storeFile"] != null &&
+            keystoreProperties["storePassword"] != null
+        ) {
+            create("release") {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = keystoreProperties["storeFile"]?.let { file(it.toString()) }
+                storePassword = keystoreProperties["storePassword"] as String
+            }
         }
     }
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now,
-            // so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
-            signingConfig = signingConfigs.getByName("release")
+            // Use release signing config if available, otherwise fallback to debug
+            signingConfig = if (signingConfigs.findByName("release") != null) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
             
             // Enable code shrinking, obfuscation, and optimization
             isMinifyEnabled = true
