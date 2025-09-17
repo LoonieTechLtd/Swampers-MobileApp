@@ -1101,7 +1101,7 @@ class _IndividualKycApplicationScreenState
                                               TapGestureRecognizer()
                                                 ..onTap = () {
                                                   goToUrl(
-                                                    "https://swampersolutions.com/Cannabis-Policy",
+                                                    "https://swampersolutions.com/privacy-policy",
                                                   );
                                                 },
                                           text:
@@ -1148,7 +1148,7 @@ class _IndividualKycApplicationScreenState
                                               TapGestureRecognizer()
                                                 ..onTap = () {
                                                   goToUrl(
-                                                    "https://swampersolutions.com/Anti-violence-Policy",
+                                                    "https://swampersolutions.com/privacy-policy",
                                                   );
                                                 },
                                           text:
@@ -1196,7 +1196,7 @@ class _IndividualKycApplicationScreenState
                                               TapGestureRecognizer()
                                                 ..onTap = () {
                                                   goToUrl(
-                                                    "https://swampersolutions.com/Privacy-Policy",
+                                                    "https://swampersolutions.com/privacy-policy",
                                                   );
                                                 },
                                           text: 'Privacy Policy of Swamper',
