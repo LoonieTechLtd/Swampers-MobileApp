@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,7 +13,22 @@ import 'package:swamper_solution/core/services/notificiation_services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Request permissions first
   await FirebaseMessaging.instance.requestPermission();
+
+  // For iOS, ensure APNS token is available before setting up FCM
+  if (defaultTargetPlatform == TargetPlatform.iOS) {
+    // Wait a bit for APNS token to be available
+    await Future.delayed(Duration(seconds: 1));
+    try {
+      String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+      debugPrint('Main APNS Token: $apnsToken');
+    } catch (e) {
+      debugPrint('Error getting APNS token in main: $e');
+    }
+  }
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await NotificationServices.initilizeLocalNotifications();
   runApp(ProviderScope(child: MyApp()));
@@ -90,6 +106,20 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
   Future<void> _setupFCM() async {
     try {
+      // For iOS, get APNS token first
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+        if (apnsToken != null) {
+          debugPrint('APNS Token: $apnsToken');
+        } else {
+          debugPrint('APNS token not available yet, will retry...');
+          // Retry getting APNS token after a delay
+          await Future.delayed(Duration(seconds: 3));
+          apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+          debugPrint('APNS Token (retry): $apnsToken');
+        }
+      }
+
       // Get FCM token
       String? token = await FirebaseMessaging.instance.getToken();
       debugPrint('FCM Token: $token');
