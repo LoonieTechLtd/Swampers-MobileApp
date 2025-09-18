@@ -681,6 +681,15 @@ class _IndividualKycApplicationScreenState
                         hintText: "Emergency Contact Number",
                         controller: emergencyContactNumberController,
                         obscureText: false,
+                        validator: (value){
+                          if (value == null || value.isEmpty) {
+                              return 'Please enter Emergency Phone no';
+                            }
+                            if (value.length != 10) {
+                              return 'Invalid Phone no';
+                            }
+                            return null;
+                        },
                         textInputType: TextInputType.numberWithOptions(),
                       ),
                       CustomTextfield(
@@ -688,6 +697,7 @@ class _IndividualKycApplicationScreenState
                         controller: emergencyContactNameController,
                         obscureText: false,
                         textInputType: TextInputType.name,
+                        
                       ),
                       Container(
                         key: modeOfTravelKey,

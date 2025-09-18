@@ -13,13 +13,10 @@ import 'package:swamper_solution/core/services/notificiation_services.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  // Request permissions first
   await FirebaseMessaging.instance.requestPermission();
 
-  // For iOS, ensure APNS token is available before setting up FCM
+  // ensure apns key availability
   if (defaultTargetPlatform == TargetPlatform.iOS) {
-    // Wait a bit for APNS token to be available
     await Future.delayed(Duration(seconds: 1));
     try {
       String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
@@ -30,7 +27,7 @@ void main() async {
   }
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  await NotificationServices.initilizeLocalNotifications();
+  await NotificationServices.initializeLocalNotifications();
   runApp(ProviderScope(child: MyApp()));
 }
 
@@ -60,7 +57,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     _appRoute = AppRouteConfig();
     // Set up FCM
     _setupFCM();
-    // Only rebuild on significant auth changes, not every state change
     User? lastUser;
     FirebaseAuth.instance.authStateChanges().listen((user) {
       if (mounted && lastUser?.uid != user?.uid) {
