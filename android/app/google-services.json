@@ -14,11 +14,19 @@
       },
       "oauth_client": [
         {
-          "client_id": "968299498317-5njrca87eul0a23fglv9ahpqqdstovtk.apps.googleusercontent.com",
+          "client_id": "968299498317-8i9328k24ehubma8rv9coghtj86kcokp.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.swampersolutions.swamper_solutions",
-            "certificate_hash": "903430624f859a6a0418ab7d75d0ba2d650d93a4"
+            "certificate_hash": "1522cdf705f61597f9ecd859e75dcb8fdc8931bd"
+          }
+        },
+        {
+          "client_id": "968299498317-sjg6b1336bm41mj1ksnii0a1t6aci4e5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.swampersolutions.swamper_solutions",
+            "certificate_hash": "8551316d7703e20c3be4af8ecb832a178e33776a"
           }
         },
         {
@@ -39,10 +47,10 @@
               "client_type": 3
             },
             {
-              "client_id": "968299498317-o4dm8brg2ahheul8ci38s8khimc4bkt2.apps.googleusercontent.com",
+              "client_id": "968299498317-md4g8o82a5j3m17ucsfppn28ai37kl6v.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.swamperSolution"
+                "bundle_id": "com.swampersolutoins.swampersolutoins"
               }
             }
           ]

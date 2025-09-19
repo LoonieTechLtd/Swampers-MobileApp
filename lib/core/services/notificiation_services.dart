@@ -39,6 +39,23 @@ class NotificationServices {
 
       debugPrint('Local notifications initialized: $initialized');
 
+      // Create notification channel for Android
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'alerts', // Channel ID
+        'Alerts', // Channel name
+        description: 'Notification tests as alerts',
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      );
+
+      // Create the channel
+      await _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.createNotificationChannel(channel);
+
       // Request permissions for iOS
       await _flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
@@ -108,6 +125,7 @@ class NotificationServices {
   static Future<void> showNotification({
     required String title,
     required String body,
+    String? payload,
   }) async {
     try {
       debugPrint('Attempting to show notification: $title - $body');
@@ -115,6 +133,7 @@ class NotificationServices {
       // Check if notifications are enabled
       final bool notificationsEnabled = await areNotificationsEnabled();
       if (!notificationsEnabled) {
+        debugPrint('Notifications are not enabled');
         return;
       }
 
@@ -129,8 +148,8 @@ class NotificationServices {
             playSound: true,
             enableVibration: true,
             color: Colors.blue,
-            // Remove LED configuration to avoid compatibility issues
             styleInformation: BigTextStyleInformation(''),
+            showWhen: true,
           );
 
       // iOS notification details
@@ -158,6 +177,7 @@ class NotificationServices {
         title,
         body,
         platformChannelSpecifics,
+        payload: payload,
       );
 
       debugPrint('Notification sent with ID: $notificationId');
@@ -165,4 +185,6 @@ class NotificationServices {
       debugPrint('Error showing notification: $e');
     }
   }
+
+  
 }
