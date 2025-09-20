@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/core/services/auth_services.dart';
@@ -8,8 +6,8 @@ import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_textfield.dart';
 import 'package:swamper_solution/views/common/signup_screen/company_form.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:swamper_solution/views/common/signup_screen/google_role_screen.dart';
-import 'package:swamper_solution/views/custom_widgets/google_sign_in_button.dart';
+// import 'package:swamper_solution/views/common/signup_screen/google_role_screen.dart';
+// import 'package:swamper_solution/views/custom_widgets/google_sign_in_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -189,63 +187,63 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
 
-                // Google login button
-                GoogleSignInButton(
-                  isLoading: isLoading,
-                  onTap: () async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    try {
-                      final result = await AuthServices().loginWithGoogle(ref);
+                // // Google login button
+                // GoogleSignInButton(
+                //   isLoading: isLoading,
+                //   onTap: () async {
+                //     setState(() {
+                //       isLoading = true;
+                //     });
+                //     try {
+                //       final result = await AuthServices().loginWithGoogle(ref);
 
-                      if (result is String) {
-                        if (result == "Individual") {
-                          if (mounted) context.go('/individual');
-                        } else if (result == "Company") {
-                          if (mounted) context.go('/company');
-                        } else {
-                          if (mounted) {
-                            showCustomSnackBar(
-                              context: context,
-                              message: result,
-                              backgroundColor: Colors.red,
-                            );
-                          }
-                        }
-                      } else if (result is Map) {
-                        if (result["status"] == "new_user") {
-                          if (mounted) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => GoogleSignInRoleScreen(
-                                      uid: result["uid"],
-                                      email: result["email"],
-                                    ),
-                              ),
-                            );
-                          }
-                        }
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        showCustomSnackBar(
-                          context: context,
-                          message: "Failed to sign in with Google",
-                          backgroundColor: Colors.red,
-                        );
-                      }
-                    } finally {
-                      if (mounted) {
-                        setState(() {
-                          isLoading = false;
-                        });
-                      }
-                    }
-                  },
-                ),
+                //       if (result is String) {
+                //         if (result == "Individual") {
+                //           if (mounted) context.go('/individual');
+                //         } else if (result == "Company") {
+                //           if (mounted) context.go('/company');
+                //         } else {
+                //           if (mounted) {
+                //             showCustomSnackBar(
+                //               context: context,
+                //               message: result,
+                //               backgroundColor: Colors.red,
+                //             );
+                //           }
+                //         }
+                //       } else if (result is Map) {
+                //         if (result["status"] == "new_user") {
+                //           if (mounted) {
+                //             Navigator.push(
+                //               context,
+                //               MaterialPageRoute(
+                //                 builder:
+                //                     (context) => GoogleSignInRoleScreen(
+                //                       uid: result["uid"],
+                //                       email: result["email"],
+                //                     ),
+                //               ),
+                //             );
+                //           }
+                //         }
+                //       }
+                //     } catch (e) {
+                //       if (mounted) {
+                //         showCustomSnackBar(
+                //           context: context,
+                //           message: "Failed to sign in with Google",
+                //           backgroundColor: Colors.red,
+                //         );
+                //       }
+                //     } finally {
+                //       if (mounted) {
+                //         setState(() {
+                //           isLoading = false;
+                //         });
+                //       }
+                //     }
+                //   },
+                // ),
 
                 SizedBox(height: 40),
                 AuthNavigationButton(
