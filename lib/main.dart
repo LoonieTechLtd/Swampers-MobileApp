@@ -27,8 +27,6 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  // Request permissions first
   await FirebaseMessaging.instance.requestPermission();
 
   // ensure apns key availability
@@ -174,36 +172,9 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
   void _handleNotificationTap(RemoteMessage message) {
     try {
-<<<<<<< HEAD
-      // For iOS, get APNS token first
-      if (defaultTargetPlatform == TargetPlatform.iOS) {
-        String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-        if (apnsToken != null) {
-          debugPrint('APNS Token: $apnsToken');
-        } else {
-          debugPrint('APNS token not available yet, will retry...');
-          // Retry getting APNS token after a delay
-          await Future.delayed(Duration(seconds: 3));
-          apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-          debugPrint('APNS Token (retry): $apnsToken');
-        }
-      }
-
-      // Get FCM token
-      String? token = await FirebaseMessaging.instance.getToken();
-      debugPrint('FCM Token: $token');
-      if (token != null) {
-        // Save token to user's profile when user is authenticated
-        FirebaseAuth.instance.authStateChanges().listen((user) async {
-          if (user != null) {
-            await _saveFCMToken(user.uid, token);
-          }
-        });
-=======
       debugPrint('Handling notification tap: ${message.data}');
       if (mounted) {
         context.goNamed("notifications");
->>>>>>> origin/main
       }
     } catch (e) {
       debugPrint('Error in notification tap handler: $e');
