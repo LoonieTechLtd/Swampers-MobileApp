@@ -14,7 +14,7 @@ class OneTimeResumeUploadScreen extends StatefulWidget {
 
 class _OneTimeResumeUploadScreenState extends State<OneTimeResumeUploadScreen> {
   final UserController _userController = UserController();
-  XFile? _selectedResume;
+  XFile? selectedResume;
   bool _isUploading = false;
   String? _uploadedResumeUrl;
   bool _isLoading = true;
@@ -33,7 +33,7 @@ class _OneTimeResumeUploadScreenState extends State<OneTimeResumeUploadScreen> {
         _uploadedResumeUrl = existingResumeUrl;
         _isLoading = false;
       });
-      if (existingResumeUrl!.isEmpty) {
+      if (existingResumeUrl == null || existingResumeUrl.isEmpty) {
         return false;
       } else {
         return true;
@@ -84,7 +84,7 @@ class _OneTimeResumeUploadScreenState extends State<OneTimeResumeUploadScreen> {
       }
 
       setState(() {
-        _selectedResume = selectedFile;
+        selectedResume = selectedFile;
       });
 
       // Upload resume
@@ -107,7 +107,7 @@ class _OneTimeResumeUploadScreenState extends State<OneTimeResumeUploadScreen> {
       } else {
         setState(() {
           _isUploading = false;
-          _selectedResume = null;
+          selectedResume = null;
         });
 
         if (mounted) {
@@ -122,7 +122,7 @@ class _OneTimeResumeUploadScreenState extends State<OneTimeResumeUploadScreen> {
     } catch (e) {
       setState(() {
         _isUploading = false;
-        _selectedResume = null;
+        selectedResume = null;
       });
 
       if (mounted) {
@@ -224,7 +224,11 @@ class _OneTimeResumeUploadScreenState extends State<OneTimeResumeUploadScreen> {
                 },
                 isLoading: _isUploading,
 
-                text: (_uploadedResumeUrl != null && _uploadedResumeUrl!.isNotEmpty)?"Update your resume":"Select a resume",
+                text:
+                    (_uploadedResumeUrl != null &&
+                            _uploadedResumeUrl!.isNotEmpty)
+                        ? "Update your resume"
+                        : "Select a resume",
                 textColor: AppColors().white,
               ),
 

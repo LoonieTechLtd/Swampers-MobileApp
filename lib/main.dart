@@ -11,6 +11,19 @@ import 'package:swamper_solution/firebase_options.dart';
 import 'package:swamper_solution/routes/app_route_config.dart';
 import 'package:swamper_solution/core/services/notificiation_services.dart';
 
+// Background message handler
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  debugPrint('Background message received: ${message.notification?.title}');
+
+  await NotificationServices.showNotification(
+    title: message.notification?.title ?? 'Notification',
+    body: message.notification?.body ?? '',
+    payload: message.data.toString(),
+  );
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -27,12 +40,17 @@ void main() async {
     }
   }
 
-  FirebaseMessaging.onBackgroundMessage(TokensTopicsServices().firebaseMessagingBackgroundHandler);
+  // Use the top-level function for background message handling
+  try {
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    debugPrint('Background message handler registered successfully');
+  } catch (e) {
+    debugPrint('Error registering background message handler: $e');
+  }
+
   await NotificationServices.initializeLocalNotifications();
   runApp(ProviderScope(child: MyApp()));
 }
-
-
 
 class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
@@ -49,13 +67,22 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _appRoute = AppRouteConfig();
-    // Set up FCM
-    TokensTopicsServices().setupFCM();
+
+    // Set up FCM with error handling
+    try {
+      TokensTopicsServices().setupFCM();
+    } catch (e) {
+      debugPrint('Error setting up FCM: $e');
+    }
 
     // Subscribe to topics for already authenticated users
     User? currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
-      TokensTopicsServices().subscribeToTopics(currentUser.uid);
+      try {
+        TokensTopicsServices().subscribeToTopics(currentUser.uid);
+      } catch (e) {
+        debugPrint('Error subscribing to topics: $e');
+      }
     }
 
     User? lastUser;
@@ -63,7 +90,11 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       if (mounted && lastUser?.uid != user?.uid) {
         // Handle user logout - unsubscribe from topics
         if (lastUser != null && user == null) {
-          TokensTopicsServices().unsubscribeFromAllTopics();
+          try {
+            TokensTopicsServices().unsubscribeFromAllTopics();
+          } catch (e) {
+            debugPrint('Error unsubscribing from topics: $e');
+          }
         }
         lastUser = user;
         setState(() {});
@@ -75,17 +106,25 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       debugPrint('Message data: ${message.data}');
 
       // Show notification when app is in foreground
-      NotificationServices.showNotification(
-        title: message.notification?.title ?? 'Notification',
-        body: message.notification?.body ?? '',
-        payload: message.data.toString(),
-      );
+      try {
+        NotificationServices.showNotification(
+          title: message.notification?.title ?? 'Notification',
+          body: message.notification?.body ?? '',
+          payload: message.data.toString(),
+        );
+      } catch (e) {
+        debugPrint('Error showing foreground notification: $e');
+      }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       debugPrint('Message clicked: ${message.notification?.title}');
       // Handle navigation based on message data
-      _handleNotificationTap(message);
+      try {
+        _handleNotificationTap(message);
+      } catch (e) {
+        debugPrint('Error handling notification tap: $e');
+      }
     });
 
     // Check if app was opened from a notification
@@ -96,7 +135,11 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         debugPrint(
           'App opened from notification: ${message.notification?.title}',
         );
-        _handleNotificationTap(message);
+        try {
+          _handleNotificationTap(message);
+        } catch (e) {
+          debugPrint('Error handling initial notification: $e');
+        }
       }
     });
   }
@@ -128,8 +171,14 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   }
 
   void _handleNotificationTap(RemoteMessage message) {
-    debugPrint('Handling notification tap: ${message.data}');
-    context.goNamed("notifications");
+    try {
+      debugPrint('Handling notification tap: ${message.data}');
+      if (mounted) {
+        context.goNamed("notifications");
+      }
+    } catch (e) {
+      debugPrint('Error in notification tap handler: $e');
+    }
   }
 
   @override

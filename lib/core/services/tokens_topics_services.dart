@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:swamper_solution/core/services/notificiation_services.dart';
 
 class TokensTopicsServices {
   // save FCM token in database
@@ -113,15 +111,4 @@ class TokensTopicsServices {
       debugPrint('Error unsubscribing from topics: $e');
     }
   }
-
-  Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  debugPrint('Background message received: ${message.notification?.title}');
-
-  await NotificationServices.showNotification(
-    title: message.notification?.title ?? 'Notification',
-    body: message.notification?.body ?? '',
-    payload: message.data.toString(),
-  );
-}
 }

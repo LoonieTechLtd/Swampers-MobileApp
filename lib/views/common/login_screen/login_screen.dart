@@ -1,4 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/core/services/auth_services.dart';
@@ -8,6 +9,7 @@ import 'package:swamper_solution/views/custom_widgets/custom_textfield.dart';
 import 'package:swamper_solution/views/common/signup_screen/company_form.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:swamper_solution/views/common/signup_screen/google_role_screen.dart';
+import 'package:swamper_solution/views/custom_widgets/google_sign_in_button.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -35,7 +37,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 10),
-            
+
                 Center(
                   child: Image.asset(
                     'assets/images/company_logo.png',
@@ -172,7 +174,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   text: "Log In",
                   textColor: Colors.white,
                 ),
-            
+
                 // Divider
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -186,109 +188,65 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ],
                   ),
                 ),
-            
+
                 // Google login button
-                SizedBox(
-                  height: 50,
-                  width: MediaQuery.of(context).size.width,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      setState(() {
-                        isLoading = true;
-                      });
-                      try {
-                        final result = await AuthServices().loginWithGoogle(ref);
-            
-                        if (result is String) {
-                          if (result == "Individual") {
-                            if (mounted) context.go('/individual');
-                          } else if (result == "Company") {
-                            if (mounted) context.go('/company');
-                          } else {
-                            if (mounted) {
-                              showCustomSnackBar(
-                                context: context,
-                                message: result,
-                                backgroundColor: Colors.red,
-                              );
-                            }
-                          }
-                        } else if (result is Map) {
-                          if (result["status"] == "new_user") {
-                            if (mounted) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => GoogleSignInRoleScreen(
-                                        uid: result["uid"],
-                                        email: result["email"],
-                                      ),
-                                ),
-                              );
-                            }
+                GoogleSignInButton(
+                  isLoading: isLoading,
+                  onTap: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    try {
+                      final result = await AuthServices().loginWithGoogle(ref);
+
+                      if (result is String) {
+                        if (result == "Individual") {
+                          if (mounted) context.go('/individual');
+                        } else if (result == "Company") {
+                          if (mounted) context.go('/company');
+                        } else {
+                          if (mounted) {
+                            showCustomSnackBar(
+                              context: context,
+                              message: result,
+                              backgroundColor: Colors.red,
+                            );
                           }
                         }
-                      } catch (e) {
-                        if (mounted) {
-                          showCustomSnackBar(
-                            context: context,
-                            message: "Failed to sign in with Google",
-                            backgroundColor: Colors.red,
-                          );
-                        }
-                      } finally {
-                        if (mounted) {
-                          setState(() {
-                            isLoading = false;
-                          });
+                      } else if (result is Map) {
+                        if (result["status"] == "new_user") {
+                          if (mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => GoogleSignInRoleScreen(
+                                      uid: result["uid"],
+                                      email: result["email"],
+                                    ),
+                              ),
+                            );
+                          }
                         }
                       }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25.0),
-                        side: BorderSide(color: Colors.black, width: 1),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        if (isLoading)
-                          SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.black,
-                              ),
-                            ),
-                          )
-                        else ...[
-                          Row(
-                            children: [
-                              SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CachedNetworkImage(
-                                  imageUrl:
-                                      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/1024px-Google_Favicon_2025.svg.png",
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Text("Login with Google"),
-                            ],
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
+                    } catch (e) {
+                      if (mounted) {
+                        showCustomSnackBar(
+                          context: context,
+                          message: "Failed to sign in with Google",
+                          backgroundColor: Colors.red,
+                        );
+                      }
+                    } finally {
+                      if (mounted) {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    }
+                  },
                 ),
-            
+
                 SizedBox(height: 40),
                 AuthNavigationButton(
                   prefixText: "Don't have an account?",
