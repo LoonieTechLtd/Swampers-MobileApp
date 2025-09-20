@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -861,12 +863,38 @@ class AuthServices {
 
   Future<dynamic> signInWithApple([WidgetRef? ref]) async {
     try {
-      final credential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
+      // Check if Apple Sign In is available on this platform
+      if (!await SignInWithApple.isAvailable()) {
+        return "Apple Sign In is not available on this device";
+      }
+
+      late AuthorizationCredentialAppleID credential;
+
+      // Handle different platforms
+      if (Platform.isIOS || Platform.isMacOS) {
+        // Native Apple Sign-In for iOS/macOS
+        credential = await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+        );
+      } else {
+        // Web-based Apple Sign-In for Android/Web
+        credential = await SignInWithApple.getAppleIDCredential(
+          scopes: [
+            AppleIDAuthorizationScopes.email,
+            AppleIDAuthorizationScopes.fullName,
+          ],
+          webAuthenticationOptions: WebAuthenticationOptions(
+            clientId:
+                'com.swampersolutions.swamper.service', // Apple Service ID
+            redirectUri: Uri.parse(
+              'https://swamper-solutions.firebaseapp.com/__/auth/handler',
+            ),
+          ),
+        );
+      }
 
       final oAuthCredential = OAuthProvider("apple.com").credential(
         idToken: credential.identityToken,
@@ -926,6 +954,14 @@ class AuthServices {
         return "Error checking user profile. Account removed.";
       }
     } catch (e) {
+      debugPrint("Apple Sign-In error: $e");
+      if (e.toString().contains('cancelled')) {
+        return "Apple Sign-In was cancelled";
+      } else if (e.toString().contains('invalid_client')) {
+        return "Apple Sign-In configuration error. Please contact support.";
+      } else if (e.toString().contains('invalid_request')) {
+        return "Apple Sign-In setup incomplete. Please try again later.";
+      }
       return "Failed to sign in with Apple: $e";
     }
   }
