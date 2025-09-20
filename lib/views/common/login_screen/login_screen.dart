@@ -189,7 +189,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
 
-                // Google login button
+               Platform.isIOS?ElevatedButton.icon(
+                icon: Icon(Icons.apple),
+                onPressed: (){
+
+                  
+                }, label: Text("Login With Apple")): // Google login button
                 GoogleSignInButton(
                   isLoading: isLoading,
                   onTap: () async {
