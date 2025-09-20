@@ -681,6 +681,15 @@ class _IndividualKycApplicationScreenState
                         hintText: "Emergency Contact Number",
                         controller: emergencyContactNumberController,
                         obscureText: false,
+                        validator: (value){
+                          if (value == null || value.isEmpty) {
+                              return 'Please enter Emergency Phone no';
+                            }
+                            if (value.length != 10) {
+                              return 'Invalid Phone no';
+                            }
+                            return null;
+                        },
                         textInputType: TextInputType.numberWithOptions(),
                       ),
                       CustomTextfield(
@@ -688,6 +697,7 @@ class _IndividualKycApplicationScreenState
                         controller: emergencyContactNameController,
                         obscureText: false,
                         textInputType: TextInputType.name,
+                        
                       ),
                       Container(
                         key: modeOfTravelKey,
@@ -1101,7 +1111,7 @@ class _IndividualKycApplicationScreenState
                                               TapGestureRecognizer()
                                                 ..onTap = () {
                                                   goToUrl(
-                                                    "https://swampersolutions.com/Cannabis-Policy",
+                                                    "https://swampersolutions.com/privacy-policy",
                                                   );
                                                 },
                                           text:
@@ -1148,7 +1158,7 @@ class _IndividualKycApplicationScreenState
                                               TapGestureRecognizer()
                                                 ..onTap = () {
                                                   goToUrl(
-                                                    "https://swampersolutions.com/Anti-violence-Policy",
+                                                    "https://swampersolutions.com/privacy-policy",
                                                   );
                                                 },
                                           text:
@@ -1196,7 +1206,7 @@ class _IndividualKycApplicationScreenState
                                               TapGestureRecognizer()
                                                 ..onTap = () {
                                                   goToUrl(
-                                                    "https://swampersolutions.com/Privacy-Policy",
+                                                    "https://swampersolutions.com/privacy-policy",
                                                   );
                                                 },
                                           text: 'Privacy Policy of Swamper',

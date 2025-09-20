@@ -4,11 +4,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
 import 'package:swamper_solution/consts/custom_text_styles.dart';
+import 'package:swamper_solution/core/services/tokens_topics_services.dart';
 import 'package:swamper_solution/firebase_options.dart';
 import 'package:swamper_solution/routes/app_route_config.dart';
 import 'package:swamper_solution/core/services/notificiation_services.dart';
+
+// Background message handler
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  debugPrint('Background message received: ${message.notification?.title}');
+
+  await NotificationServices.showNotification(
+    title: message.notification?.title ?? 'Notification',
+    body: message.notification?.body ?? '',
+    payload: message.data.toString(),
+  );
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,9 +31,8 @@ void main() async {
   // Request permissions first
   await FirebaseMessaging.instance.requestPermission();
 
-  // For iOS, ensure APNS token is available before setting up FCM
+  // ensure apns key availability
   if (defaultTargetPlatform == TargetPlatform.iOS) {
-    // Wait a bit for APNS token to be available
     await Future.delayed(Duration(seconds: 1));
     try {
       String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
@@ -29,18 +42,16 @@ void main() async {
     }
   }
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  await NotificationServices.initilizeLocalNotifications();
-  runApp(ProviderScope(child: MyApp()));
-}
+  // Use the top-level function for background message handling
+  try {
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    debugPrint('Background message handler registered successfully');
+  } catch (e) {
+    debugPrint('Error registering background message handler: $e');
+  }
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  debugPrint('Background message received: ${message.notification?.title}');
-  NotificationServices.showNotification(
-    title: message.notification?.title ?? 'Notification',
-    body: message.notification?.body ?? '',
-  );
+  await NotificationServices.initializeLocalNotifications();
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -58,12 +69,35 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _appRoute = AppRouteConfig();
-    // Set up FCM
-    _setupFCM();
-    // Only rebuild on significant auth changes, not every state change
+
+    // Set up FCM with error handling
+    try {
+      TokensTopicsServices().setupFCM();
+    } catch (e) {
+      debugPrint('Error setting up FCM: $e');
+    }
+
+    // Subscribe to topics for already authenticated users
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser != null) {
+      try {
+        TokensTopicsServices().subscribeToTopics(currentUser.uid);
+      } catch (e) {
+        debugPrint('Error subscribing to topics: $e');
+      }
+    }
+
     User? lastUser;
     FirebaseAuth.instance.authStateChanges().listen((user) {
       if (mounted && lastUser?.uid != user?.uid) {
+        // Handle user logout - unsubscribe from topics
+        if (lastUser != null && user == null) {
+          try {
+            TokensTopicsServices().unsubscribeFromAllTopics();
+          } catch (e) {
+            debugPrint('Error unsubscribing from topics: $e');
+          }
+        }
         lastUser = user;
         setState(() {});
       }
@@ -71,10 +105,44 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Foreground message received: ${message.notification?.title}');
-      NotificationServices.showNotification(
-        title: message.notification?.title ?? 'Notification',
-        body: message.notification?.body ?? '',
-      );
+      debugPrint('Message data: ${message.data}');
+
+      // Show notification when app is in foreground
+      try {
+        NotificationServices.showNotification(
+          title: message.notification?.title ?? 'Notification',
+          body: message.notification?.body ?? '',
+          payload: message.data.toString(),
+        );
+      } catch (e) {
+        debugPrint('Error showing foreground notification: $e');
+      }
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      debugPrint('Message clicked: ${message.notification?.title}');
+      // Handle navigation based on message data
+      try {
+        _handleNotificationTap(message);
+      } catch (e) {
+        debugPrint('Error handling notification tap: $e');
+      }
+    });
+
+    // Check if app was opened from a notification
+    FirebaseMessaging.instance.getInitialMessage().then((
+      RemoteMessage? message,
+    ) {
+      if (message != null) {
+        debugPrint(
+          'App opened from notification: ${message.notification?.title}',
+        );
+        try {
+          _handleNotificationTap(message);
+        } catch (e) {
+          debugPrint('Error handling initial notification: $e');
+        }
+      }
     });
   }
 
@@ -104,8 +172,9 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _setupFCM() async {
+  void _handleNotificationTap(RemoteMessage message) {
     try {
+<<<<<<< HEAD
       // For iOS, get APNS token first
       if (defaultTargetPlatform == TargetPlatform.iOS) {
         String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
@@ -130,30 +199,14 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
             await _saveFCMToken(user.uid, token);
           }
         });
+=======
+      debugPrint('Handling notification tap: ${message.data}');
+      if (mounted) {
+        context.goNamed("notifications");
+>>>>>>> origin/main
       }
-
-      // Listen for token refresh
-      FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-        debugPrint('FCM Token refreshed: $newToken');
-        User? user = FirebaseAuth.instance.currentUser;
-        if (user != null) {
-          _saveFCMToken(user.uid, newToken);
-        }
-      });
     } catch (e) {
-      debugPrint('Error setting up FCM: $e');
-    }
-  }
-
-  Future<void> _saveFCMToken(String userId, String token) async {
-    try {
-      await FirebaseFirestore.instance.collection('fcmtokens').doc(userId).set({
-        'fcmToken': token,
-        'userId': userId,
-      });
-      debugPrint('FCM token saved for user: $userId');
-    } catch (e) {
-      debugPrint('Error saving FCM token: $e');
+      debugPrint('Error in notification tap handler: $e');
     }
   }
 
