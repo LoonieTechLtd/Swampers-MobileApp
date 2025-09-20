@@ -50,6 +50,7 @@ dependencies:
   flutter_native_splash: ^2.4.1
   upgrader: ^11.4.0
   flutter_local_notifications: ^19.4.2
+  sign_in_with_apple: ^7.0.1
 
 flutter_native_splash:
   color: "#ffffff"

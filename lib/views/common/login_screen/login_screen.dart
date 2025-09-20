@@ -189,63 +189,114 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
 
-                // Google login button
-                GoogleSignInButton(
-                  isLoading: isLoading,
-                  onTap: () async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    try {
-                      final result = await AuthServices().loginWithGoogle(ref);
-
-                      if (result is String) {
-                        if (result == "Individual") {
-                          if (mounted) context.go('/individual');
-                        } else if (result == "Company") {
-                          if (mounted) context.go('/company');
-                        } else {
+                Platform.isIOS
+                    ? ElevatedButton.icon(
+                      icon: Icon(Icons.apple),
+                      onPressed: () async {
+                        try {
+   
+                          final result =await AuthServices().signInWithApple(ref);
+                          if (result is String) {
+                            if (result == "Individual") {
+                              if (mounted) context.go('/individual');
+                            } else if (result == "Company") {
+                              if (mounted) context.go('/company');
+                            } else {
+                              if (mounted) {
+                                showCustomSnackBar(
+                                  context: context,
+                                  message: result,
+                                  backgroundColor: Colors.red,
+                                );
+                              }
+                            }
+                          } else if (result is Map) {
+                            if (result["status"] == "new_user") {
+                              if (mounted) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => GoogleSignInRoleScreen(
+                                          uid: result["uid"],
+                                          email: result["email"],
+                                        ),
+                                  ),
+                                );
+                              }
+                            }
+                          }
+                        } catch (e) {
                           if (mounted) {
                             showCustomSnackBar(
                               context: context,
-                              message: result,
+                              message: "Failed to sign in with Apple",
                               backgroundColor: Colors.red,
                             );
                           }
                         }
-                      } else if (result is Map) {
-                        if (result["status"] == "new_user") {
+                      },
+                      label: Text("Login With Apple"),
+                    )
+                    : // Google login button
+                    GoogleSignInButton(
+                      isLoading: isLoading,
+                      onTap: () async {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        try {
+                          final result = await AuthServices().loginWithGoogle(
+                            ref,
+                          );
+
+                          if (result is String) {
+                            if (result == "Individual") {
+                              if (mounted) context.go('/individual');
+                            } else if (result == "Company") {
+                              if (mounted) context.go('/company');
+                            } else {
+                              if (mounted) {
+                                showCustomSnackBar(
+                                  context: context,
+                                  message: result,
+                                  backgroundColor: Colors.red,
+                                );
+                              }
+                            }
+                          } else if (result is Map) {
+                            if (result["status"] == "new_user") {
+                              if (mounted) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => GoogleSignInRoleScreen(
+                                          uid: result["uid"],
+                                          email: result["email"],
+                                        ),
+                                  ),
+                                );
+                              }
+                            }
+                          }
+                        } catch (e) {
                           if (mounted) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => GoogleSignInRoleScreen(
-                                      uid: result["uid"],
-                                      email: result["email"],
-                                    ),
-                              ),
+                            showCustomSnackBar(
+                              context: context,
+                              message: "Failed to sign in with Google",
+                              backgroundColor: Colors.red,
                             );
                           }
+                        } finally {
+                          if (mounted) {
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
                         }
-                      }
-                    } catch (e) {
-                      if (mounted) {
-                        showCustomSnackBar(
-                          context: context,
-                          message: "Failed to sign in with Google",
-                          backgroundColor: Colors.red,
-                        );
-                      }
-                    } finally {
-                      if (mounted) {
-                        setState(() {
-                          isLoading = false;
-                        });
-                      }
-                    }
-                  },
-                ),
+                      },
+                    ),
 
                 SizedBox(height: 40),
                 AuthNavigationButton(

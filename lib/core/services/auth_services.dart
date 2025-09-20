@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:swamper_solution/controllers/stats_controller.dart';
 import 'package:swamper_solution/models/company_model.dart';
 import 'package:swamper_solution/models/company_stats_model.dart';
@@ -101,6 +102,106 @@ class AuthServices {
       }
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<String> completeAppleUserProfile({
+    required String uid,
+    required String email,
+    required String phone,
+    required String address,
+    required String type,
+    String? firstName,
+    String? lastName,
+    String? interestedWork,
+    String? companyName,
+  }) async {
+    try {
+      // Normalize phone number at the beginning
+      final normalizedPhone = phone.replaceAll(RegExp(r'[^\d]'), '');
+
+      if (type == "Individual") {
+        if (firstName == null || lastName == null) {
+          return "First name and last name are required for individual profiles";
+        }
+
+        final IndividualModel newUser = IndividualModel(
+          uid: uid,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          address: address,
+          role: "Individual",
+          contactNo: normalizedPhone, // Use normalized phone
+          profilePic:
+              "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
+          kycVerified: "notSubmitted",
+          interestedWork: interestedWork!,
+          createdAt: DateTime.now().toString(),
+          oneTimeResume: "",
+        );
+
+        // Use transaction-based profile creation to prevent duplicate phone numbers
+        final profileCreationResult =
+            await createUserProfileWithPhoneValidation(
+              uid: uid,
+              profileData: newUser.toMap(),
+              phoneNumber: phone,
+            );
+
+        if (profileCreationResult != "Success") {
+          return profileCreationResult;
+        }
+
+        final IndividualStatsModel stats = IndividualStatsModel(
+          uid: uid,
+          totalHours: 0,
+          totalJobs: 0,
+        );
+
+        await StatsController().createUserStatsCollection(stats, uid);
+      } else if (type == "Company") {
+        if (companyName == null) {
+          return "Company name is required for company profiles";
+        }
+
+        final CompanyModel newCompany = CompanyModel(
+          uid: uid,
+          companyName: companyName,
+          email: email,
+          role: "Company",
+          contactNo: normalizedPhone, // Use normalized phone
+          profilePic:
+              "https://i.pinimg.com/736x/87/14/55/8714556a52021ba3a55c8e7a3547d28c.jpg",
+          address: address,
+          createdAt: DateTime.now().toString(),
+          isSuspended: false,
+        );
+
+        // Use transaction-based profile creation to prevent duplicate phone numbers
+        final profileCreationResult =
+            await createUserProfileWithPhoneValidation(
+              uid: uid,
+              profileData: newCompany.toMap(),
+              phoneNumber: phone,
+            );
+
+        if (profileCreationResult != "Success") {
+          return profileCreationResult;
+        }
+
+        final CompanyStatsModel companyStats = CompanyStatsModel(
+          uid: uid,
+          totalJobs: 0,
+          totalHired: 0,
+        );
+
+        await StatsController().createCompanyStatsCollection(companyStats, uid);
+      }
+
+      return "Success";
+    } catch (e) {
+      return e.toString();
     }
   }
 
@@ -755,6 +856,77 @@ class AuthServices {
     } catch (e) {
       debugPrint("Error checking email in firestore: $e");
       return false;
+    }
+  }
+
+  Future<dynamic> signInWithApple([WidgetRef? ref]) async {
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
+
+      final oAuthCredential = OAuthProvider("apple.com").credential(
+        idToken: credential.identityToken,
+        accessToken: credential.authorizationCode,
+      );
+
+      final UserCredential userCredential = await auth.signInWithCredential(
+        oAuthCredential,
+      );
+
+      if (ref != null) {
+        ref.invalidate(companyProvider);
+        ref.invalidate(individualProvider);
+        ref.invalidate(getCompanyJobProvider);
+        ref.invalidate(getJobProvider);
+        ref.invalidate(getIndividualStats);
+      }
+
+      try {
+        final exists = await userExists(userCredential.user!.uid);
+
+        if (!exists) {
+          return {
+            "status": "new_user",
+            "uid": userCredential.user!.uid,
+            "email": userCredential.user!.email,
+            "name":
+                credential.givenName != null && credential.familyName != null
+                    ? "${credential.givenName} ${credential.familyName}"
+                    : null,
+          };
+        }
+
+        final userDoc =
+            await firestore
+                .collection("profiles")
+                .doc(userCredential.user!.uid)
+                .get();
+        final role = userDoc.get("role");
+
+        if (role == "Individual" || role == "Company") {
+          return role.toString();
+        } else {
+          // Delete the account from Firebase Auth and sign out
+          await userCredential.user!.delete();
+          await auth.signOut();
+          return "Invalid user role. Account removed.";
+        }
+      } catch (e) {
+        // Delete the account from Firebase Auth and sign out
+        try {
+          await userCredential.user!.delete();
+        } catch (deleteError) {
+          debugPrint("Error deleting user: $deleteError");
+        }
+        await auth.signOut();
+        return "Error checking user profile. Account removed.";
+      }
+    } catch (e) {
+      return "Failed to sign in with Apple: $e";
     }
   }
 }
