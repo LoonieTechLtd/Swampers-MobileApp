@@ -191,8 +191,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 // Apple Sign-In Button (iOS native, Android/Web via browser)
                 if (Platform.isIOS ||
-                    Platform.isMacOS ||
-                    Platform.isAndroid) ...[
+                    Platform.isMacOS) ...[
                   AppleSignInButton(
                     isLoading: isLoading,
                     onTap: () async {
