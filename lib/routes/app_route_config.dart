@@ -8,11 +8,13 @@ import 'package:swamper_solution/models/job_application_model.dart';
 import 'package:swamper_solution/models/job_model.dart';
 import 'package:swamper_solution/views/common/email_verification_screen.dart';
 import 'package:swamper_solution/views/company_views/admin_contact_screen.dart';
+import 'package:swamper_solution/views/company_views/delete_company_account_screen.dart';
 import 'package:swamper_solution/views/company_views/edit_job_screen.dart';
 import 'package:swamper_solution/views/company_views/job_posting_screen.dart';
 import 'package:swamper_solution/views/company_views/jobs_screen.dart';
 import 'package:swamper_solution/views/company_views/posted_job_details_screen.dart';
 import 'package:swamper_solution/views/individual_views/current_job_details_screen.dart';
+import 'package:swamper_solution/views/individual_views/delete_account_screen.dart';
 import 'package:swamper_solution/views/individual_views/individual_kyc_application_screen.dart';
 import 'package:swamper_solution/views/individual_views/job_details_screen.dart';
 import 'package:swamper_solution/views/individual_views/job_offer_screen.dart';
@@ -56,7 +58,7 @@ class AppRouteConfig {
           return KycStatusScreen();
         },
       ),
-   
+
       GoRoute(
         path: "kyc_verified_screen",
         name: "kyc_verified_screen",
@@ -92,14 +94,13 @@ class AppRouteConfig {
         path: '/individual',
         builder: (context, state) => const UsersMainScreen(),
         routes: [
-
-             GoRoute(
-        path: "profile_screen",
-        name: "profile_screen",
-        builder: (context, state) {
-          return ProfileScreen();
-        },
-      ),
+          GoRoute(
+            path: "profile_screen",
+            name: "profile_screen",
+            builder: (context, state) {
+              return ProfileScreen();
+            },
+          ),
           GoRoute(
             path: 'job_details',
             name: 'individual_job_details',
@@ -182,6 +183,13 @@ class AppRouteConfig {
             name: "one_time_resume_upload_screen",
             builder: (context, state) => const OneTimeResumeUploadScreen(),
           ),
+          GoRoute(
+            path: "/delete_account",
+            name: "delete_account",
+            builder: (context, state) {
+              return DeleteAccountScreen();
+            },
+          ),
         ],
       ),
 
@@ -240,6 +248,14 @@ class AppRouteConfig {
             builder: (context, state) {
               final job = state.extra as JobModel;
               return EditJobScreen(jobDetails: job);
+            },
+          ),
+
+          GoRoute(
+            path: "/delete_company_account",
+            name: "delete_company_account",
+            builder: (context, state) {
+              return DeleteCompanyAccountScreen();
             },
           ),
         ],

@@ -111,6 +111,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                       _buildDrawerItem(
+                        icon: Icons.no_accounts_outlined,
+                        title: "Account Deletion",
+                        onTap: () {
+                          context.goNamed("delete_account");
+                        },
+                      ),
+                      _buildDrawerItem(
                         icon: Icons.headset_mic_outlined,
                         title: 'Help and Support',
                         onTap: () {

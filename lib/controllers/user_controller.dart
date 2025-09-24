@@ -2,10 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:swamper_solution/models/company_model.dart';
 import 'package:swamper_solution/models/individual_model.dart';
+import 'package:swamper_solution/providers/all_providers.dart';
 
 class UserController {
   FirebaseAuth auth = FirebaseAuth.instance;
@@ -118,9 +122,6 @@ class UserController {
     }
   }
 
-
-
-
   Future<String> addOneTimeResume(XFile resume) async {
     try {
       final String uid = auth.currentUser!.uid.toString();
@@ -138,5 +139,104 @@ class UserController {
     }
   }
 
+  Future<bool> reauthenticateWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
+      if (googleUser == null) return false;
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await auth.currentUser!.reauthenticateWithCredential(credential);
+      return true;
+    } catch (e) {
+      debugPrint("Failed to reauthenticate with Google: $e");
+      return false;
+    }
+  }
+
+  Future<bool> reauthenticateUser(String password) async {
+    try {
+      final user = auth.currentUser;
+      if (user == null || user.email == null) return false;
+
+      final credential = EmailAuthProvider.credential(
+        email: user.email!,
+        password: password,
+      );
+
+      await user.reauthenticateWithCredential(credential);
+      return true;
+    } catch (e) {
+      debugPrint("Failed to reauthenticate user: $e");
+      return false;
+    }
+  }
+
+  String? getUserAuthProvider() {
+    final user = auth.currentUser;
+    if (user == null || user.providerData.isEmpty) return null;
+
+    return user.providerData.first.providerId;
+  }
+
+  Future<bool> deleteAccount(
+    BuildContext context,
+    WidgetRef ref, [
+    String? password,
+  ]) async {
+    try {
+      final provider = getUserAuthProvider();
+      bool reauthenticated = false;
+
+      // Re-authenticate based on provider
+      if (provider == 'google.com') {
+        reauthenticated = await reauthenticateWithGoogle();
+      } else if (provider == 'password' && password != null) {
+        reauthenticated = await reauthenticateUser(password);
+      } else {
+        debugPrint("Unsupported authentication provider: $provider");
+        return false;
+      }
+
+      if (!reauthenticated) {
+        debugPrint("Reauthentication failed");
+        return false;
+      }
+
+      // Clear providers
+      ref.invalidate(individualProvider);
+      ref.invalidate(companyProvider);
+      ref.invalidate(getCompanyJobProvider);
+      ref.invalidate(getJobProvider);
+      ref.invalidate(getUserApplicationsProvider);
+      ref.invalidate(getCompanyStats);
+      ref.invalidate(getIndividualStats);
+
+      final user = auth.currentUser;
+      if (user == null) {
+        return false;
+      } else {
+        // Delete user data from Firestore
+        await firestore.collection("profiles").doc(user.uid).delete();
+
+        // Delete the user account
+        await user.delete();
+
+        if (context.mounted) {
+          context.go("/");
+        }
+        return true;
+      }
+    } catch (e) {
+      debugPrint("Failed to delete user account: $e");
+      return false;
+    }
+  }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:swamper_solution/consts/app_colors.dart';
 import 'package:swamper_solution/views/custom_widgets/custom_button.dart';
 import 'package:swamper_solution/views/custom_widgets/log_out_button.dart';
 
@@ -73,14 +75,24 @@ class ProfileActionButtons extends StatelessWidget {
 
   Widget _buildStackedLayout() {
     return Column(
+      spacing: 12,
       children: [
         CustomButton(
-          backgroundColor: Colors.blue,
+          backgroundColor: AppColors().primaryColor,
           onPressed: onEditProfile,
           text: "Edit Profile",
           textColor: Colors.white,
         ),
-        const SizedBox(height: 12),
+        user.role == "Company"
+            ? CustomButton(
+              backgroundColor: AppColors().red,
+              onPressed: () {
+                context.goNamed("delete_company_account");
+              },
+              text: "Delete Account",
+              textColor: Colors.white,
+            )
+            : const SizedBox(),
         LogOutButton(onTap: onLogout),
       ],
     );
